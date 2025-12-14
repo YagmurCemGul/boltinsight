@@ -1,0 +1,258 @@
+'use client';
+
+import { useState } from 'react';
+import { useAppStore } from '@/lib/store';
+import { Sidebar } from '@/components/sidebar';
+import { ChatInterface } from '@/components/chat';
+import { ProposalEditor } from '@/components/proposal';
+import { MetaLearnings } from '@/components/meta-learnings';
+import { MarginOfErrorCalculator, DemographicDistribution, FeasibilityCheck } from '@/components/tools';
+import { Library } from '@/components/library';
+import { cn } from '@/lib/utils';
+import type { Proposal, ProposalContent } from '@/types';
+
+export function MainContent() {
+  const {
+    activeSection,
+    sidebarOpen,
+    currentProposal,
+    setCurrentProposal,
+    addProposal,
+    updateProposal,
+    currentUser,
+    clearChat,
+  } = useAppStore();
+
+  const [proposalMode, setProposalMode] = useState<'chat' | 'editor'>('chat');
+  const [workingProposal, setWorkingProposal] = useState<Proposal | null>(null);
+
+  // Create new proposal when starting from chat
+  const handleStartNewProposal = () => {
+    clearChat();
+    setProposalMode('chat');
+    setWorkingProposal(null);
+  };
+
+  // Switch to editor mode with current proposal
+  const handleSwitchToEditor = () => {
+    if (!workingProposal) {
+      // Create a new draft proposal
+      const newProposal = addProposal({
+        status: 'draft',
+        content: {
+          title: '',
+          client: '',
+        },
+        author: currentUser,
+      });
+      setWorkingProposal(newProposal);
+    }
+    setProposalMode('editor');
+  };
+
+  // Save proposal from editor
+  const handleSaveProposal = (content: ProposalContent) => {
+    if (workingProposal) {
+      updateProposal(workingProposal.id, { content });
+      setWorkingProposal({ ...workingProposal, content });
+    }
+  };
+
+  // Render content based on active section
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'new-proposal':
+        return (
+          <div className="flex h-full flex-col">
+            {/* Mode Toggle */}
+            <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900">
+                  {proposalMode === 'chat' ? 'Create New Proposal' : 'Edit Proposal'}
+                </h1>
+                <p className="text-sm text-gray-500">
+                  {proposalMode === 'chat'
+                    ? 'Start a conversation to build your proposal'
+                    : 'Edit and refine your proposal content'}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setProposalMode('chat')}
+                  className={cn(
+                    'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                    proposalMode === 'chat'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  )}
+                >
+                  Chat Mode
+                </button>
+                <button
+                  onClick={handleSwitchToEditor}
+                  className={cn(
+                    'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                    proposalMode === 'editor'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  )}
+                >
+                  Editor Mode
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-hidden">
+              {proposalMode === 'chat' ? (
+                <ChatInterface />
+              ) : workingProposal ? (
+                <ProposalEditor
+                  proposal={workingProposal}
+                  onSave={handleSaveProposal}
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <p className="text-gray-500">Loading...</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'view-proposal':
+        return currentProposal ? (
+          <ProposalEditor
+            proposal={currentProposal}
+            onSave={(content) => updateProposal(currentProposal.id, { content })}
+          />
+        ) : (
+          <EmptyState message="Select a proposal to view" />
+        );
+
+      case 'meta-learnings':
+        return <MetaLearnings />;
+
+      case 'moe-calculator':
+        return <MarginOfErrorCalculator />;
+
+      case 'demographics':
+        return <DemographicDistribution />;
+
+      case 'feasibility':
+        return <FeasibilityCheck />;
+
+      case 'library':
+        return <Library />;
+
+      default:
+        // Handle project views
+        if (activeSection.startsWith('project-')) {
+          return <ProjectView projectId={activeSection.replace('project-', '')} />;
+        }
+
+        return (
+          <div className="flex h-full items-center justify-center">
+            <div className="text-center">
+              <h2 className="mb-2 text-xl font-semibold text-gray-900">Welcome to BoltInsight</h2>
+              <p className="text-gray-500">Select an option from the sidebar to get started</p>
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar />
+
+      {/* Main Content Area */}
+      <main
+        className={cn(
+          'flex-1 transition-all duration-200',
+          sidebarOpen ? 'lg:ml-72' : ''
+        )}
+      >
+        <div className="h-full overflow-hidden">{renderContent()}</div>
+      </main>
+    </div>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="flex h-full items-center justify-center">
+      <p className="text-gray-500">{message}</p>
+    </div>
+  );
+}
+
+function ProjectView({ projectId }: { projectId: string }) {
+  const { projects, proposals, setCurrentProposal, setActiveSection } = useAppStore();
+  const project = projects.find((p) => p.id === projectId);
+
+  if (!project) {
+    return <EmptyState message="Project not found" />;
+  }
+
+  const projectProposals = proposals.filter(
+    (p) => p.projectId === projectId || project.proposals.includes(p.id)
+  );
+
+  return (
+    <div className="h-full overflow-y-auto p-6">
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold text-gray-900">{project.name}</h1>
+        {project.description && (
+          <p className="mt-1 text-sm text-gray-500">{project.description}</p>
+        )}
+        {project.client && (
+          <p className="mt-1 text-sm text-gray-500">Client: {project.client}</p>
+        )}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {projectProposals.length === 0 ? (
+          <p className="col-span-full text-center text-gray-500">
+            No proposals in this project yet
+          </p>
+        ) : (
+          projectProposals.map((proposal) => (
+            <button
+              key={proposal.id}
+              onClick={() => {
+                setCurrentProposal(proposal);
+                setActiveSection('view-proposal');
+              }}
+              className="rounded-lg border border-gray-200 bg-white p-4 text-left transition-shadow hover:shadow-md"
+            >
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs font-medium text-blue-600">
+                  {proposal.code || 'Draft'}
+                </span>
+                <span
+                  className={cn(
+                    'rounded px-2 py-0.5 text-xs',
+                    proposal.status === 'approved'
+                      ? 'bg-green-100 text-green-800'
+                      : proposal.status === 'rejected'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-gray-100 text-gray-800'
+                  )}
+                >
+                  {proposal.status.replace('_', ' ')}
+                </span>
+              </div>
+              <h3 className="font-medium text-gray-900">
+                {proposal.content.title || 'Untitled Proposal'}
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
+                {proposal.content.client || 'No client'}
+              </p>
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
