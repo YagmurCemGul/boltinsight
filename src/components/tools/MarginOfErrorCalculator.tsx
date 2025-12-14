@@ -45,8 +45,9 @@ export function MarginOfErrorCalculator() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl p-6">
-      <Card>
+    <div className="h-full overflow-y-auto">
+      <div className="mx-auto max-w-2xl p-6">
+        <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calculator className="h-5 w-5" />
@@ -213,6 +214,7 @@ export function MarginOfErrorCalculator() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

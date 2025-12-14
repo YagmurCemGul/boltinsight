@@ -12,6 +12,8 @@ import {
   Tag,
   Trash2,
   Edit2,
+  FolderOpen,
+  Eye,
 } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
@@ -30,7 +32,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from '@/components/ui';
-import type { LibraryItem } from '@/types';
+import type { LibraryItem, Proposal } from '@/types';
 
 const CATEGORY_OPTIONS = [
   { value: 'external_link', label: 'External Link' },
@@ -47,10 +49,11 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
 };
 
 export function Library() {
-  const { libraryItems, addLibraryItem, deleteLibraryItem } = useAppStore();
+  const { libraryItems, addLibraryItem, deleteLibraryItem, proposals, setCurrentProposal, setActiveSection } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [proposalStatusFilter, setProposalStatusFilter] = useState('');
   const [newItem, setNewItem] = useState<{
     name: string;
     description: string;
@@ -63,6 +66,21 @@ export function Library() {
     url: '',
     category: 'external_link',
     tags: '',
+  });
+
+  // Filter proposals
+  const filteredProposals = proposals.filter((p) => {
+    if (p.status === 'deleted') return false;
+    if (proposalStatusFilter && p.status !== proposalStatusFilter) return false;
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        p.content.title?.toLowerCase().includes(query) ||
+        p.content.client?.toLowerCase().includes(query) ||
+        p.code?.toLowerCase().includes(query)
+      );
+    }
+    return true;
   });
 
   // Filter items
@@ -159,14 +177,60 @@ export function Library() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-6">
-        <Tabs defaultValue="all">
+        <Tabs defaultValue="proposals">
           <TabsList className="mb-6">
-            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="proposals">Proposals</TabsTrigger>
+            <TabsTrigger value="all">All Resources</TabsTrigger>
             <TabsTrigger value="external_link">External Links</TabsTrigger>
             <TabsTrigger value="video">Videos</TabsTrigger>
             <TabsTrigger value="methodology">Methodologies</TabsTrigger>
             <TabsTrigger value="template">Templates</TabsTrigger>
           </TabsList>
+
+          {/* Proposals Tab */}
+          <TabsContent value="proposals">
+            <div className="mb-4 flex gap-4">
+              <Select
+                options={[
+                  { value: '', label: 'All Statuses' },
+                  { value: 'draft', label: 'Draft' },
+                  { value: 'pending_approval', label: 'Pending Approval' },
+                  { value: 'approved', label: 'Approved' },
+                  { value: 'rejected', label: 'Rejected' },
+                  { value: 'on_hold', label: 'On Hold' },
+                ]}
+                value={proposalStatusFilter}
+                onChange={(e) => setProposalStatusFilter(e.target.value)}
+                className="w-48"
+              />
+            </div>
+            {filteredProposals.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <FolderOpen className="mb-4 h-12 w-12 text-gray-300" />
+                <h3 className="mb-2 text-lg font-medium text-gray-900">No proposals found</h3>
+                <p className="mb-4 text-sm text-gray-500">
+                  Create a new proposal to get started
+                </p>
+                <Button onClick={() => setActiveSection('new-proposal')}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Proposal
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {filteredProposals.map((proposal) => (
+                  <ProposalCard
+                    key={proposal.id}
+                    proposal={proposal}
+                    onView={() => {
+                      setCurrentProposal(proposal);
+                      setActiveSection('view-proposal');
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
 
           <TabsContent value="all">
             {filteredItems.length === 0 ? (
@@ -355,5 +419,58 @@ function EmptyState({ onAdd, category }: { onAdd: () => void; category?: string 
         Add Resource
       </Button>
     </div>
+  );
+}
+
+function ProposalCard({ proposal, onView }: { proposal: Proposal; onView: () => void }) {
+  const statusColors: Record<string, string> = {
+    draft: 'bg-gray-100 text-gray-700',
+    pending_approval: 'bg-yellow-100 text-yellow-700',
+    approved: 'bg-green-100 text-green-700',
+    rejected: 'bg-red-100 text-red-700',
+    on_hold: 'bg-orange-100 text-orange-700',
+  };
+
+  return (
+    <Card className="group relative transition-shadow hover:shadow-md">
+      <CardContent className="p-4">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+            <FileText className="h-5 w-5" />
+          </div>
+
+          <div className="flex-1 overflow-hidden">
+            <div className="flex items-center gap-2 mb-1">
+              {proposal.code && (
+                <span className="text-xs font-medium text-blue-600">{proposal.code}</span>
+              )}
+              <Badge className={cn('text-xs', statusColors[proposal.status])}>
+                {proposal.status.replace('_', ' ')}
+              </Badge>
+            </div>
+            <h3 className="font-medium text-gray-900 truncate">
+              {proposal.content.title || 'Untitled Proposal'}
+            </h3>
+            {proposal.content.client && (
+              <p className="mt-1 text-sm text-gray-500">{proposal.content.client}</p>
+            )}
+
+            <div className="mt-3 flex items-center gap-2">
+              <button
+                onClick={onView}
+                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+              >
+                <Eye className="h-3 w-3" />
+                View
+              </button>
+              <span className="text-gray-300">|</span>
+              <span className="text-xs text-gray-400">
+                {formatDate(proposal.updatedAt)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

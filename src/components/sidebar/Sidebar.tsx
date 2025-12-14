@@ -11,6 +11,7 @@ import {
   History,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   Settings,
   User,
   Menu,
@@ -20,13 +21,16 @@ import {
   Bell,
   Globe,
   LogOut,
+  PanelLeftClose,
+  PanelLeft,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
+import { useThemeStore } from '@/lib/theme';
 import { SearchSection } from './SearchSection';
 import { ProjectsList } from './ProjectsList';
 import { HistoryList } from './HistoryList';
-import { Modal, Button, Input, Select } from '@/components/ui';
+import { Modal, Button, Input, Select, toast } from '@/components/ui';
 
 const menuItems = [
   {
@@ -54,15 +58,22 @@ const menuItems = [
     expandable: false,
   },
   {
-    id: 'tools',
-    label: 'Tools',
+    id: 'moe-calculator',
+    label: 'Margin of Error',
     icon: Calculator,
-    expandable: true,
-    children: [
-      { id: 'moe-calculator', label: 'Margin of Error Calculator' },
-      { id: 'demographics', label: 'Demographic Distribution' },
-      { id: 'feasibility', label: 'Feasibility Check' },
-    ],
+    expandable: false,
+  },
+  {
+    id: 'demographics',
+    label: 'Demographics & Quota',
+    icon: Calculator,
+    expandable: false,
+  },
+  {
+    id: 'feasibility',
+    label: 'Feasibility Check',
+    icon: Calculator,
+    expandable: false,
   },
   {
     id: 'library',
@@ -73,10 +84,10 @@ const menuItems = [
 ];
 
 export function Sidebar() {
-  const { sidebarOpen, setSidebarOpen, activeSection, setActiveSection, currentUser } = useAppStore();
+  const { sidebarOpen, setSidebarOpen, activeSection, setActiveSection, currentUser, sidebarCollapsed, setSidebarCollapsed } = useAppStore();
+  const { isDarkMode, toggleDarkMode } = useThemeStore();
   const [expandedItems, setExpandedItems] = useState<string[]>(['projects', 'history']);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [language, setLanguage] = useState('en');
 
@@ -106,15 +117,24 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen w-72 transform border-r border-gray-200 bg-white transition-transform duration-200 ease-in-out',
+          'fixed left-0 top-0 z-40 h-screen transform border-r border-gray-200 bg-white transition-all duration-200 ease-in-out',
+          sidebarCollapsed ? 'w-16' : 'w-72',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
           'lg:translate-x-0'
         )}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center border-b border-gray-200 px-6">
-            <h1 className="text-xl font-bold text-blue-600">BoltInsight</h1>
+          <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
+            {!sidebarCollapsed && <h1 className="text-xl font-bold text-blue-600">BoltInsight</h1>}
+            {sidebarCollapsed && <span className="text-xl font-bold text-blue-600">BI</span>}
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="hidden lg:flex items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {sidebarCollapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+            </button>
           </div>
 
           {/* Main Navigation */}
@@ -123,12 +143,14 @@ export function Sidebar() {
             <button
               onClick={() => setActiveSection('new-proposal')}
               className={cn(
-                'mb-4 flex w-full items-center gap-3 rounded-lg bg-blue-600 px-4 py-3 text-white transition-colors hover:bg-blue-700',
+                'mb-4 flex w-full items-center rounded-lg bg-blue-600 text-white transition-colors hover:bg-blue-700',
+                sidebarCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3',
                 activeSection === 'new-proposal' && 'ring-2 ring-blue-300'
               )}
+              title={sidebarCollapsed ? 'New Proposal' : undefined}
             >
               <Plus className="h-5 w-5" />
-              <span className="font-medium">New Proposal</span>
+              {!sidebarCollapsed && <span className="font-medium">New Proposal</span>}
             </button>
 
             {/* Menu Items */}
@@ -136,56 +158,41 @@ export function Sidebar() {
               {menuItems.slice(1).map((item) => (
                 <div key={item.id}>
                   <button
-                    onClick={() => handleItemClick(item.id, item.expandable)}
+                    onClick={() => handleItemClick(item.id, item.expandable && !sidebarCollapsed)}
                     className={cn(
-                      'flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-colors',
+                      'flex w-full items-center rounded-lg text-sm transition-colors',
+                      sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5',
                       activeSection === item.id
                         ? 'bg-blue-50 text-blue-600'
                         : 'text-gray-700 hover:bg-gray-100'
                     )}
+                    title={sidebarCollapsed ? item.label : undefined}
                   >
                     <item.icon className="h-5 w-5" />
-                    <span className="flex-1 text-left">{item.label}</span>
-                    {item.expandable && (
-                      expandedItems.includes(item.id) ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      )
+                    {!sidebarCollapsed && (
+                      <>
+                        <span className="flex-1 text-left">{item.label}</span>
+                        {item.expandable && (
+                          expandedItems.includes(item.id) ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )
+                        )}
+                      </>
                     )}
                   </button>
 
                   {/* Search Panels */}
-                  {item.id === 'search-my' && expandedItems.includes(item.id) && (
+                  {!sidebarCollapsed && item.id === 'search-my' && expandedItems.includes(item.id) && (
                     <div className="mt-2 px-2">
                       <SearchSection searchAll={false} />
                     </div>
                   )}
 
-                  {item.id === 'search-all' && expandedItems.includes(item.id) && (
+                  {!sidebarCollapsed && item.id === 'search-all' && expandedItems.includes(item.id) && (
                     <div className="mt-2 px-2">
                       <SearchSection searchAll={true} />
-                    </div>
-                  )}
-
-                  {/* Tools Sub-menu */}
-                  {item.children && expandedItems.includes(item.id) && (
-                    <div className="ml-4 mt-1 space-y-1">
-                      {item.children.map((child) => (
-                        <button
-                          key={child.id}
-                          onClick={() => setActiveSection(child.id)}
-                          className={cn(
-                            'flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm transition-colors',
-                            activeSection === child.id
-                              ? 'bg-blue-50 text-blue-600'
-                              : 'text-gray-600 hover:bg-gray-100'
-                          )}
-                        >
-                          <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                          {child.label}
-                        </button>
-                      ))}
                     </div>
                   )}
                 </div>
@@ -193,28 +200,34 @@ export function Sidebar() {
             </div>
 
             {/* Divider */}
-            <div className="my-4 h-px bg-gray-200" />
+            {!sidebarCollapsed && <div className="my-4 h-px bg-gray-200" />}
 
             {/* Projects Section */}
             <div>
               <button
-                onClick={() => toggleExpand('projects')}
+                onClick={() => !sidebarCollapsed && toggleExpand('projects')}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-colors',
+                  'flex w-full items-center rounded-lg text-sm transition-colors',
+                  sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5',
                   activeSection === 'projects'
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-gray-700 hover:bg-gray-100'
                 )}
+                title={sidebarCollapsed ? 'Projects' : undefined}
               >
                 <FolderKanban className="h-5 w-5" />
-                <span className="flex-1 text-left font-medium">Projects</span>
-                {expandedItems.includes('projects') ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
+                {!sidebarCollapsed && (
+                  <>
+                    <span className="flex-1 text-left font-medium">Projects</span>
+                    {expandedItems.includes('projects') ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </>
                 )}
               </button>
-              {expandedItems.includes('projects') && (
+              {!sidebarCollapsed && expandedItems.includes('projects') && (
                 <div className="mt-2">
                   <ProjectsList />
                 </div>
@@ -222,28 +235,34 @@ export function Sidebar() {
             </div>
 
             {/* Divider */}
-            <div className="my-4 h-px bg-gray-200" />
+            {!sidebarCollapsed && <div className="my-4 h-px bg-gray-200" />}
 
             {/* History Section */}
             <div>
               <button
-                onClick={() => toggleExpand('history')}
+                onClick={() => !sidebarCollapsed && toggleExpand('history')}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-colors',
+                  'flex w-full items-center rounded-lg text-sm transition-colors',
+                  sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5',
                   activeSection === 'history'
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-gray-700 hover:bg-gray-100'
                 )}
+                title={sidebarCollapsed ? 'History' : undefined}
               >
                 <History className="h-5 w-5" />
-                <span className="flex-1 text-left font-medium">History</span>
-                {expandedItems.includes('history') ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
+                {!sidebarCollapsed && (
+                  <>
+                    <span className="flex-1 text-left font-medium">History</span>
+                    {expandedItems.includes('history') ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </>
                 )}
               </button>
-              {expandedItems.includes('history') && (
+              {!sidebarCollapsed && expandedItems.includes('history') && (
                 <div className="mt-2">
                   <HistoryList />
                 </div>
@@ -253,20 +272,28 @@ export function Sidebar() {
 
           {/* User Profile */}
           <div className="border-t border-gray-200 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                <User className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{currentUser.name}</p>
-                <p className="text-xs text-gray-500">{currentUser.email}</p>
-              </div>
+            <div className={cn('flex items-center', sidebarCollapsed ? 'justify-center' : 'gap-3')}>
               <button
                 onClick={() => setSettingsOpen(true)}
-                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200"
+                title={sidebarCollapsed ? 'Settings' : undefined}
               >
-                <Settings className="h-5 w-5" />
+                {sidebarCollapsed ? <Settings className="h-5 w-5" /> : <User className="h-5 w-5" />}
               </button>
+              {!sidebarCollapsed && (
+                <>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{currentUser.name}</p>
+                    <p className="text-xs text-gray-500">{currentUser.email}</p>
+                  </div>
+                  <button
+                    onClick={() => setSettingsOpen(true)}
+                    className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                  >
+                    <Settings className="h-5 w-5" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -307,20 +334,23 @@ export function Sidebar() {
             <h3 className="mb-3 text-sm font-medium text-gray-900">Appearance</h3>
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div className="flex items-center gap-2">
-                {darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                {isDarkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
                 <span className="text-sm">Dark Mode</span>
               </div>
               <button
-                onClick={() => setDarkMode(!darkMode)}
+                onClick={() => {
+                  toggleDarkMode();
+                  toast.success(isDarkMode ? 'Light mode enabled' : 'Dark mode enabled');
+                }}
                 className={cn(
                   'relative h-6 w-11 rounded-full transition-colors',
-                  darkMode ? 'bg-blue-600' : 'bg-gray-200'
+                  isDarkMode ? 'bg-blue-600' : 'bg-gray-200'
                 )}
               >
                 <span
                   className={cn(
                     'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform shadow',
-                    darkMode ? 'left-5' : 'left-0.5'
+                    isDarkMode ? 'left-5' : 'left-0.5'
                   )}
                 />
               </button>

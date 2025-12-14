@@ -17,6 +17,8 @@ import {
   CheckCircle,
   Circle,
   ChevronRight,
+  PanelRightClose,
+  PanelRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProposalContent } from '@/types';
@@ -25,6 +27,8 @@ interface RightSidebarProps {
   content: ProposalContent;
   activeSection?: string;
   onSectionClick?: (sectionId: string) => void;
+  collapsed?: boolean;
+  onToggle?: () => void;
 }
 
 interface SectionField {
@@ -121,7 +125,7 @@ const SECTIONS: Section[] = [
   },
 ];
 
-export function RightSidebar({ content, activeSection, onSectionClick }: RightSidebarProps) {
+export function RightSidebar({ content, activeSection, onSectionClick, collapsed = false, onToggle }: RightSidebarProps) {
   const sectionStatus = useMemo(() => {
     const status: Record<string, { complete: boolean; hasContent: boolean }> = {};
 
@@ -195,28 +199,84 @@ export function RightSidebar({ content, activeSection, onSectionClick }: RightSi
   };
 
   return (
-    <aside className="w-80 border-l border-gray-200 bg-white flex flex-col h-full">
+    <aside className={cn(
+      "border-l border-gray-200 bg-white flex flex-col h-full transition-all duration-200",
+      collapsed ? "w-12" : "w-80"
+    )}>
       {/* Header */}
-      <div className="border-b border-gray-200 p-4">
-        <h2 className="text-sm font-semibold text-gray-900">Section Content</h2>
-        <p className="mt-1 text-xs text-gray-500">
-          {completionStats.requiredCompleted}/{completionStats.requiredTotal} required sections complete
-        </p>
-
-        {/* Progress Bar */}
-        <div className="mt-3 h-2 rounded-full bg-gray-100">
-          <div
-            className="h-full rounded-full bg-blue-600 transition-all duration-300"
-            style={{
-              width: `${(completionStats.requiredCompleted / completionStats.requiredTotal) * 100}%`,
-            }}
-          />
+      <div className={cn("border-b border-gray-200", collapsed ? "p-2" : "p-4")}>
+        <div className="flex items-center justify-between">
+          {!collapsed && <h2 className="text-sm font-semibold text-gray-900">Section Content</h2>}
+          {onToggle && (
+            <button
+              onClick={onToggle}
+              className="flex items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {collapsed ? <PanelRight className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
+            </button>
+          )}
         </div>
+        {!collapsed && (
+          <>
+            <p className="mt-1 text-xs text-gray-500">
+              {completionStats.requiredCompleted}/{completionStats.requiredTotal} required sections complete
+            </p>
+
+            {/* Progress Bar */}
+            <div className="mt-3 h-2 rounded-full bg-gray-100">
+              <div
+                className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                style={{
+                  width: `${(completionStats.requiredCompleted / completionStats.requiredTotal) * 100}%`,
+                }}
+              />
+            </div>
+          </>
+        )}
       </div>
+
+      {/* Required Sections Alert - Show incomplete required sections */}
+      {!collapsed && (
+        <div className="px-4 py-2">
+          {(() => {
+            const requiredSections = SECTIONS.filter(s => s.fields.some(f => f.required));
+            const incompleteRequired = requiredSections.filter(s => !sectionStatus[s.id]?.complete);
+
+            if (incompleteRequired.length > 0) {
+              return (
+                <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-3">
+                  <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-2">
+                    Required sections to complete:
+                  </p>
+                  <div className="space-y-1">
+                    {incompleteRequired.slice(0, 3).map((section) => (
+                      <button
+                        key={section.id}
+                        onClick={() => onSectionClick?.(section.id)}
+                        className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 w-full text-left"
+                      >
+                        <Circle className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{section.label}</span>
+                      </button>
+                    ))}
+                    {incompleteRequired.length > 3 && (
+                      <p className="text-xs text-amber-600 dark:text-amber-500 ml-5">
+                        +{incompleteRequired.length - 3} more
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
+        </div>
+      )}
 
       {/* Sections List */}
       <div className="flex-1 overflow-y-auto">
-        <nav className="p-2 space-y-1">
+        <nav className={cn("space-y-1", collapsed ? "p-1" : "p-2")}>
           {SECTIONS.map((section) => {
             const status = sectionStatus[section.id];
             const isActive = activeSection === section.id;
@@ -227,63 +287,79 @@ export function RightSidebar({ content, activeSection, onSectionClick }: RightSi
                 key={section.id}
                 onClick={() => onSectionClick?.(section.id)}
                 className={cn(
-                  'w-full rounded-lg p-3 text-left transition-all',
+                  'w-full rounded-lg text-left transition-all',
+                  collapsed ? 'p-2 flex items-center justify-center' : 'p-3',
                   isActive
                     ? 'bg-blue-50 ring-1 ring-blue-200'
                     : 'hover:bg-gray-50'
                 )}
+                title={collapsed ? section.label : undefined}
               >
-                <div className="flex items-start gap-3">
-                  {/* Status Icon */}
-                  <div className="mt-0.5">
-                    {status?.complete ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : hasRequired ? (
-                      <Circle className="h-4 w-4 text-gray-300" />
-                    ) : (
-                      <Circle className="h-4 w-4 text-gray-200" />
+                {collapsed ? (
+                  /* Collapsed: show only icon */
+                  <div className="relative">
+                    <section.icon className={cn(
+                      'h-5 w-5',
+                      isActive ? 'text-blue-600' : 'text-gray-400'
+                    )} />
+                    {status?.complete && (
+                      <CheckCircle className="absolute -top-1 -right-1 h-3 w-3 text-green-500 bg-white rounded-full" />
                     )}
                   </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <section.icon className={cn(
-                        'h-4 w-4 flex-shrink-0',
-                        isActive ? 'text-blue-600' : 'text-gray-400'
-                      )} />
-                      <span className={cn(
-                        'text-sm font-medium truncate',
-                        isActive ? 'text-blue-900' : 'text-gray-700'
-                      )}>
-                        {section.label}
-                      </span>
-                      {hasRequired && (
-                        <span className="text-red-500 text-xs">*</span>
+                ) : (
+                  /* Expanded: show full content */
+                  <div className="flex items-start gap-3">
+                    {/* Status Icon */}
+                    <div className="mt-0.5">
+                      {status?.complete ? (
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      ) : hasRequired ? (
+                        <Circle className="h-4 w-4 text-gray-300" />
+                      ) : (
+                        <Circle className="h-4 w-4 text-gray-200" />
                       )}
                     </div>
 
-                    {section.description && (
-                      <p className="mt-0.5 text-xs text-gray-400 truncate">
-                        {section.description}
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <section.icon className={cn(
+                          'h-4 w-4 flex-shrink-0',
+                          isActive ? 'text-blue-600' : 'text-gray-400'
+                        )} />
+                        <span className={cn(
+                          'text-sm font-medium truncate',
+                          isActive ? 'text-blue-900' : 'text-gray-700'
+                        )}>
+                          {section.label}
+                        </span>
+                        {hasRequired && (
+                          <span className="text-red-500 text-xs">*</span>
+                        )}
+                      </div>
+
+                      {section.description && (
+                        <p className="mt-0.5 text-xs text-gray-400 truncate">
+                          {section.description}
+                        </p>
+                      )}
+
+                      {/* Preview Value */}
+                      <p className={cn(
+                        'mt-1 text-xs truncate',
+                        status?.hasContent ? 'text-gray-600' : 'text-gray-300'
+                      )}>
+                        {getPreviewValue(section)}
                       </p>
-                    )}
+                    </div>
 
-                    {/* Preview Value */}
-                    <p className={cn(
-                      'mt-1 text-xs truncate',
-                      status?.hasContent ? 'text-gray-600' : 'text-gray-300'
-                    )}>
-                      {getPreviewValue(section)}
-                    </p>
+                    {/* Arrow */}
+                    <ChevronRight className={cn(
+                      'h-4 w-4 flex-shrink-0 transition-transform',
+                      isActive ? 'text-blue-600 rotate-90' : 'text-gray-300'
+                    )} />
                   </div>
-
-                  {/* Arrow */}
-                  <ChevronRight className={cn(
-                    'h-4 w-4 flex-shrink-0 transition-transform',
-                    isActive ? 'text-blue-600 rotate-90' : 'text-gray-300'
-                  )} />
-                </div>
+                )}
               </button>
             );
           })}
@@ -291,37 +367,56 @@ export function RightSidebar({ content, activeSection, onSectionClick }: RightSi
       </div>
 
       {/* Footer - Quick Stats */}
-      <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <div className="grid grid-cols-2 gap-3 text-center">
-          <div className="rounded-lg bg-white p-2 shadow-sm">
-            <p className="text-lg font-semibold text-gray-900">
-              {content.sampleSize?.toLocaleString() || '-'}
-            </p>
-            <p className="text-xs text-gray-500">Total Sample</p>
+      {!collapsed ? (
+        <div className="border-t border-gray-200 p-4 bg-gray-50">
+          <div className="grid grid-cols-2 gap-3 text-center">
+            <div className="rounded-lg bg-white p-2 shadow-sm">
+              <p className="text-lg font-semibold text-gray-900">
+                {content.sampleSize?.toLocaleString() || '-'}
+              </p>
+              <p className="text-xs text-gray-500">Total Sample</p>
+            </div>
+            <div className="rounded-lg bg-white p-2 shadow-sm">
+              <p className="text-lg font-semibold text-gray-900">
+                {content.markets?.length || 0}
+              </p>
+              <p className="text-xs text-gray-500">Markets</p>
+            </div>
           </div>
-          <div className="rounded-lg bg-white p-2 shadow-sm">
-            <p className="text-lg font-semibold text-gray-900">
-              {content.markets?.length || 0}
-            </p>
-            <p className="text-xs text-gray-500">Markets</p>
+
+          {/* Client Info */}
+          {content.client && (
+            <div className="mt-3 flex items-center gap-2 text-xs text-gray-600">
+              <Building2 className="h-3 w-3" />
+              <span className="truncate">{content.client}</span>
+              {content.contact && (
+                <>
+                  <span className="text-gray-300">|</span>
+                  <User className="h-3 w-3" />
+                  <span className="truncate">{content.contact}</span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="border-t border-gray-200 p-2 bg-gray-50">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className="rounded-lg bg-white p-1.5 shadow-sm" title="Sample Size">
+              <BarChart3 className="h-4 w-4 text-gray-400 mx-auto" />
+              <p className="text-xs font-semibold text-gray-900">
+                {content.sampleSize ? (content.sampleSize >= 1000 ? `${(content.sampleSize / 1000).toFixed(0)}k` : content.sampleSize) : '-'}
+              </p>
+            </div>
+            <div className="rounded-lg bg-white p-1.5 shadow-sm" title="Markets">
+              <Globe className="h-4 w-4 text-gray-400 mx-auto" />
+              <p className="text-xs font-semibold text-gray-900">
+                {content.markets?.length || 0}
+              </p>
+            </div>
           </div>
         </div>
-
-        {/* Client Info */}
-        {content.client && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-gray-600">
-            <Building2 className="h-3 w-3" />
-            <span className="truncate">{content.client}</span>
-            {content.contact && (
-              <>
-                <span className="text-gray-300">|</span>
-                <User className="h-3 w-3" />
-                <span className="truncate">{content.contact}</span>
-              </>
-            )}
-          </div>
-        )}
-      </div>
+      )}
     </aside>
   );
 }

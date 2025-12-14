@@ -296,6 +296,241 @@ const mockProposals: Proposal[] = [
       },
     ],
   },
+  {
+    id: 'proposal-8',
+    code: 'BI-2412-0005',
+    status: 'pending_approval',
+    content: {
+      title: 'Mobile App UX Research',
+      client: 'Samsung',
+      contact: 'Kim Min-ji',
+      background: 'Evaluate user experience of new mobile banking app features before global rollout',
+      businessObjectives: [
+        'Optimize user onboarding flow',
+        'Improve feature discoverability',
+        'Increase user retention rates',
+      ],
+      researchObjectives: [
+        'To identify UX pain points in current app design',
+        'To measure task completion rates for key features',
+        'To understand user mental models for navigation',
+      ],
+      burningQuestions: [
+        'Which features are users struggling to find?',
+        'What causes users to abandon the onboarding process?',
+      ],
+      targetDefinition: 'Adults 18-55, smartphone users with active mobile banking accounts',
+      sampleSize: 800,
+      markets: [
+        { country: 'South Korea', language: 'Korean', sampleSize: 400 },
+        { country: 'USA', language: 'English', sampleSize: 400 },
+      ],
+      advancedAnalysis: ['Heuristic Evaluation', 'Task Flow Analysis', 'Eye Tracking'],
+    },
+    author: currentUser,
+    createdAt: '2024-12-13T14:00:00Z',
+    updatedAt: '2024-12-14T09:00:00Z',
+    versions: [],
+  },
+  {
+    id: 'proposal-9',
+    status: 'draft',
+    content: {
+      title: 'Price Elasticity Study - Premium Segment',
+      client: 'Louis Vuitton',
+      contact: 'Pierre Dubois',
+      background: 'Understand price sensitivity among luxury consumers for new product line pricing strategy',
+      businessObjectives: [
+        'Determine optimal price points',
+        'Understand willingness to pay by segment',
+      ],
+      targetDefinition: 'High-net-worth individuals, household income $200k+, luxury brand purchasers',
+      sampleSize: 500,
+      markets: [
+        { country: 'France', language: 'French', sampleSize: 150 },
+        { country: 'USA', language: 'English', sampleSize: 150 },
+        { country: 'China', language: 'Mandarin', sampleSize: 200 },
+      ],
+    },
+    author: currentUser,
+    createdAt: '2024-12-14T08:00:00Z',
+    updatedAt: '2024-12-14T08:00:00Z',
+    versions: [],
+  },
+  {
+    id: 'proposal-10',
+    code: 'BI-2412-0006',
+    status: 'approved',
+    projectId: 'project-3',
+    content: {
+      title: 'Employee Engagement Survey',
+      client: 'Microsoft',
+      contact: 'Sarah Williams',
+      background: 'Annual employee satisfaction and engagement measurement for EMEA region',
+      businessObjectives: [
+        'Measure employee NPS',
+        'Identify areas for improvement',
+        'Track year-over-year changes',
+      ],
+      researchObjectives: [
+        'To measure overall engagement levels',
+        'To identify key drivers of satisfaction',
+        'To benchmark against industry standards',
+      ],
+      targetDefinition: 'Microsoft EMEA employees, all departments and levels',
+      sampleSize: 5000,
+      markets: [
+        { country: 'UK', language: 'English', sampleSize: 1500 },
+        { country: 'Germany', language: 'German', sampleSize: 1200 },
+        { country: 'France', language: 'French', sampleSize: 1000 },
+        { country: 'Netherlands', language: 'Dutch', sampleSize: 700 },
+        { country: 'Ireland', language: 'English', sampleSize: 600 },
+      ],
+      advancedAnalysis: ['eNPS Analysis', 'Driver Analysis', 'Text Analytics'],
+    },
+    author: currentUser,
+    createdAt: '2024-11-15T10:00:00Z',
+    updatedAt: '2024-11-28T14:00:00Z',
+    sentToClient: true,
+    versions: [],
+    approvalHistory: [
+      {
+        id: 'approval-6',
+        action: 'approved',
+        by: { ...currentUser, id: 'director-1', name: 'Research Director', role: 'manager' },
+        timestamp: '2024-11-28T14:00:00Z',
+      },
+    ],
+  },
+  {
+    id: 'proposal-11',
+    status: 'draft',
+    content: {
+      title: 'Packaging Innovation Test',
+      client: 'Kraft Heinz',
+      contact: 'Amanda Johnson',
+      background: 'Test consumer response to 3 new sustainable packaging designs',
+      businessObjectives: ['Select winning packaging concept', 'Validate sustainability messaging'],
+      targetDefinition: 'Primary grocery shoppers, aged 25-65, environmentally conscious consumers',
+      sampleSize: 1200,
+      markets: [
+        { country: 'USA', language: 'English', sampleSize: 600 },
+        { country: 'Canada', language: 'English', sampleSize: 300 },
+        { country: 'Canada', language: 'French', sampleSize: 300 },
+      ],
+    },
+    author: currentUser,
+    createdAt: '2024-12-13T16:00:00Z',
+    updatedAt: '2024-12-13T16:00:00Z',
+    versions: [],
+  },
+  {
+    id: 'proposal-12',
+    code: 'BI-2411-0007',
+    status: 'approved',
+    content: {
+      title: 'Streaming Service Competitive Analysis',
+      client: 'Disney+',
+      contact: 'Michael Torres',
+      background: 'Comprehensive competitive landscape study of streaming services market',
+      businessObjectives: [
+        'Understand competitive positioning',
+        'Identify content gaps',
+        'Map subscriber journey',
+      ],
+      researchObjectives: [
+        'To measure brand awareness vs competitors',
+        'To understand switching behavior',
+        'To identify content preferences by segment',
+      ],
+      burningQuestions: [
+        'What would make subscribers switch to Disney+?',
+        'How does Disney+ compare on value perception?',
+      ],
+      targetDefinition: 'Adults 18-54, current streaming service subscribers (any platform)',
+      sampleSize: 3000,
+      markets: [
+        { country: 'USA', language: 'English', sampleSize: 1500 },
+        { country: 'UK', language: 'English', sampleSize: 750 },
+        { country: 'Australia', language: 'English', sampleSize: 750 },
+      ],
+      advancedAnalysis: ['Competitive Mapping', 'MaxDiff', 'Customer Journey Analysis'],
+    },
+    author: currentUser,
+    createdAt: '2024-11-20T09:00:00Z',
+    updatedAt: '2024-12-01T15:00:00Z',
+    sentToClient: true,
+    versions: [],
+    approvalHistory: [
+      {
+        id: 'approval-7',
+        action: 'approved',
+        by: { ...currentUser, id: 'manager-1', name: 'Team Manager', role: 'manager' },
+        timestamp: '2024-12-01T15:00:00Z',
+      },
+    ],
+  },
+  {
+    id: 'proposal-13',
+    status: 'pending_approval',
+    content: {
+      title: 'Healthcare Provider Satisfaction Study',
+      client: 'Pfizer',
+      contact: 'Dr. Elizabeth Chen',
+      background: 'Measure HCP satisfaction with medical rep interactions and educational resources',
+      businessObjectives: [
+        'Improve HCP engagement',
+        'Optimize resource allocation',
+        'Strengthen relationships',
+      ],
+      targetDefinition: 'Healthcare professionals - physicians, pharmacists, nurse practitioners',
+      sampleSize: 600,
+      markets: [
+        { country: 'USA', language: 'English', sampleSize: 300 },
+        { country: 'Germany', language: 'German', sampleSize: 150 },
+        { country: 'Japan', language: 'Japanese', sampleSize: 150 },
+      ],
+    },
+    author: currentUser,
+    createdAt: '2024-12-12T11:00:00Z',
+    updatedAt: '2024-12-14T10:00:00Z',
+    versions: [],
+  },
+  {
+    id: 'proposal-14',
+    status: 'on_hold',
+    content: {
+      title: 'Electric Vehicle Purchase Journey',
+      client: 'Toyota',
+      contact: 'Yuki Tanaka',
+      background: 'Map the EV purchase decision journey from awareness to purchase',
+      businessObjectives: [
+        'Understand EV consideration triggers',
+        'Map touchpoints in purchase journey',
+        'Identify barriers to EV adoption',
+      ],
+      targetDefinition: 'Adults 25-60, in-market for new vehicle purchase within 12 months',
+      sampleSize: 2000,
+      markets: [
+        { country: 'Japan', language: 'Japanese', sampleSize: 800 },
+        { country: 'USA', language: 'English', sampleSize: 700 },
+        { country: 'Germany', language: 'German', sampleSize: 500 },
+      ],
+    },
+    author: currentUser,
+    createdAt: '2024-12-10T13:00:00Z',
+    updatedAt: '2024-12-13T09:00:00Z',
+    versions: [],
+    approvalHistory: [
+      {
+        id: 'approval-8',
+        action: 'on_hold',
+        by: { ...currentUser, id: 'director-1', name: 'Research Director', role: 'manager' },
+        comment: 'Budget reallocation pending Q1 planning.',
+        timestamp: '2024-12-13T09:00:00Z',
+      },
+    ],
+  },
 ];
 
 const mockProjects: Project[] = [
@@ -304,7 +539,7 @@ const mockProjects: Project[] = [
     name: 'BoltChatAI Credit Sales',
     description: 'Default project for credit sales and financial services research',
     client: 'Various',
-    proposals: ['proposal-4', 'proposal-6'],
+    proposals: ['proposal-4', 'proposal-6', 'proposal-8', 'proposal-9', 'proposal-10', 'proposal-11', 'proposal-12', 'proposal-13', 'proposal-14'],
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-12-08T00:00:00Z',
     isDefault: true,
@@ -330,32 +565,126 @@ const mockProjects: Project[] = [
 ];
 
 const mockLibraryItems: LibraryItem[] = [
+  // Templates
   {
-    id: 'lib-1',
-    name: 'Margin of Error Calculator',
-    description: 'Calculate statistical margin of error for sample sizes',
-    url: 'https://www.questionpro.com/margin-of-error-calculator/',
-    category: 'external_link',
-    tags: ['statistics', 'sample size'],
-    createdAt: '2024-01-01T00:00:00Z',
+    id: 'template-1',
+    name: 'Brand Health Tracking Template',
+    description: 'Standard template for brand awareness, perception, and NPS studies',
+    url: '/templates/brand-health',
+    category: 'template',
+    tags: ['brand', 'tracking', 'NPS'],
+    createdAt: '2024-01-15T00:00:00Z',
   },
   {
-    id: 'lib-2',
-    name: 'Kano Model Guide',
-    description: 'Understanding and applying the Kano model in research',
-    url: '/resources/kano-model',
-    category: 'methodology',
-    tags: ['methodology', 'product research'],
+    id: 'template-2',
+    name: 'Customer Satisfaction Survey Template',
+    description: 'CSAT and customer experience measurement template',
+    url: '/templates/csat',
+    category: 'template',
+    tags: ['CSAT', 'customer experience', 'satisfaction'],
     createdAt: '2024-02-01T00:00:00Z',
   },
   {
-    id: 'lib-3',
-    name: 'Census Data Portal',
-    description: 'Access demographic data for quota calculations',
-    url: 'https://data.census.gov/',
-    category: 'external_link',
-    tags: ['demographics', 'quota'],
+    id: 'template-3',
+    name: 'Concept Testing Template',
+    description: 'Template for new product/concept evaluation studies',
+    url: '/templates/concept-test',
+    category: 'template',
+    tags: ['concept', 'product', 'innovation'],
+    createdAt: '2024-02-15T00:00:00Z',
+  },
+  {
+    id: 'template-4',
+    name: 'U&A Study Template',
+    description: 'Usage and Attitude study template with standard modules',
+    url: '/templates/ua-study',
+    category: 'template',
+    tags: ['U&A', 'usage', 'attitude'],
     createdAt: '2024-03-01T00:00:00Z',
+  },
+  {
+    id: 'template-5',
+    name: 'Ad Testing Template',
+    description: 'Creative and advertising effectiveness testing template',
+    url: '/templates/ad-test',
+    category: 'template',
+    tags: ['advertising', 'creative', 'testing'],
+    createdAt: '2024-03-15T00:00:00Z',
+  },
+  {
+    id: 'template-6',
+    name: 'Price Sensitivity Template',
+    description: 'Van Westendorp and Gabor-Granger pricing research template',
+    url: '/templates/pricing',
+    category: 'template',
+    tags: ['pricing', 'Van Westendorp', 'Gabor-Granger'],
+    createdAt: '2024-04-01T00:00:00Z',
+  },
+  // Methodologies
+  {
+    id: 'method-1',
+    name: 'MaxDiff Analysis Guide',
+    description: 'Best practices for MaxDiff design and analysis',
+    url: '/methodologies/maxdiff',
+    category: 'methodology',
+    tags: ['MaxDiff', 'preference', 'analysis'],
+    createdAt: '2024-01-20T00:00:00Z',
+  },
+  {
+    id: 'method-2',
+    name: 'Conjoint Analysis Handbook',
+    description: 'Complete guide to conjoint analysis for product optimization',
+    url: '/methodologies/conjoint',
+    category: 'methodology',
+    tags: ['conjoint', 'choice modeling', 'optimization'],
+    createdAt: '2024-02-10T00:00:00Z',
+  },
+  {
+    id: 'method-3',
+    name: 'Segmentation Best Practices',
+    description: 'Guidelines for market segmentation studies',
+    url: '/methodologies/segmentation',
+    category: 'methodology',
+    tags: ['segmentation', 'clustering', 'targeting'],
+    createdAt: '2024-03-05T00:00:00Z',
+  },
+  // Videos
+  {
+    id: 'video-1',
+    name: 'BoltInsight Platform Tutorial',
+    description: 'Complete walkthrough of the proposal creation process',
+    url: '/videos/platform-tutorial',
+    category: 'video',
+    tags: ['tutorial', 'training', 'onboarding'],
+    createdAt: '2024-04-01T00:00:00Z',
+  },
+  {
+    id: 'video-2',
+    name: 'Sample Size Calculator Demo',
+    description: 'How to use the margin of error calculator effectively',
+    url: '/videos/sample-size-demo',
+    category: 'video',
+    tags: ['sample size', 'MOE', 'calculator'],
+    createdAt: '2024-04-15T00:00:00Z',
+  },
+  // External Links
+  {
+    id: 'link-1',
+    name: 'ESOMAR Guidelines',
+    description: 'International standards for market research ethics',
+    url: 'https://www.esomar.org/codes-and-guidelines',
+    category: 'external_link',
+    tags: ['ethics', 'standards', 'ESOMAR'],
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 'link-2',
+    name: 'Survey Design Best Practices',
+    description: 'Qualtrics guide to effective survey design',
+    url: 'https://www.qualtrics.com/experience-management/research/survey-design/',
+    category: 'external_link',
+    tags: ['survey', 'design', 'best practices'],
+    createdAt: '2024-02-01T00:00:00Z',
   },
 ];
 
@@ -383,7 +712,10 @@ interface AppState {
 
   // UI State
   sidebarOpen: boolean;
+  sidebarCollapsed: boolean;
+  rightSidebarCollapsed: boolean;
   activeSection: string;
+  isLoggedIn: boolean;
 
   // Actions
   setCurrentUser: (user: User) => void;
@@ -418,7 +750,10 @@ interface AppState {
 
   // UI actions
   setSidebarOpen: (open: boolean) => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  setRightSidebarCollapsed: (collapsed: boolean) => void;
   setActiveSection: (section: string) => void;
+  setLoggedIn: (loggedIn: boolean) => void;
 
   // Search
   searchProposals: (query: string, searchAll: boolean) => Proposal[];
@@ -438,7 +773,10 @@ export const useAppStore = create<AppState>()(
       libraryItems: mockLibraryItems,
       metaLearningFilter: {},
       sidebarOpen: true,
+      sidebarCollapsed: false,
+      rightSidebarCollapsed: false,
       activeSection: 'new-proposal',
+      isLoggedIn: false,
 
       setCurrentUser: (user) => set({ currentUser: user }),
 
@@ -618,7 +956,10 @@ export const useAppStore = create<AppState>()(
 
       // UI actions
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+      setRightSidebarCollapsed: (collapsed) => set({ rightSidebarCollapsed: collapsed }),
       setActiveSection: (section) => set({ activeSection: section }),
+      setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),
 
       // Search
       searchProposals: (query, searchAll) => {
@@ -680,10 +1021,12 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'boltinsight-storage',
+      version: 3, // Increment this to reset localStorage and show new mock data
       partialize: (state) => ({
-        proposals: state.proposals,
-        projects: state.projects,
-        libraryItems: state.libraryItems,
+        // Only persist user-created data, not mock data
+        isLoggedIn: state.isLoggedIn,
+        sidebarCollapsed: state.sidebarCollapsed,
+        rightSidebarCollapsed: state.rightSidebarCollapsed,
       }),
     }
   )
