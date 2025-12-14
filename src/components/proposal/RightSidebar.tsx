@@ -236,6 +236,44 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
         )}
       </div>
 
+      {/* Required Sections Alert - Show incomplete required sections */}
+      {!collapsed && (
+        <div className="px-4 py-2">
+          {(() => {
+            const requiredSections = SECTIONS.filter(s => s.fields.some(f => f.required));
+            const incompleteRequired = requiredSections.filter(s => !sectionStatus[s.id]?.complete);
+
+            if (incompleteRequired.length > 0) {
+              return (
+                <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-3">
+                  <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-2">
+                    Required sections to complete:
+                  </p>
+                  <div className="space-y-1">
+                    {incompleteRequired.slice(0, 3).map((section) => (
+                      <button
+                        key={section.id}
+                        onClick={() => onSectionClick?.(section.id)}
+                        className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 w-full text-left"
+                      >
+                        <Circle className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{section.label}</span>
+                      </button>
+                    ))}
+                    {incompleteRequired.length > 3 && (
+                      <p className="text-xs text-amber-600 dark:text-amber-500 ml-5">
+                        +{incompleteRequired.length - 3} more
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
+        </div>
+      )}
+
       {/* Sections List */}
       <div className="flex-1 overflow-y-auto">
         <nav className={cn("space-y-1", collapsed ? "p-1" : "p-2")}>

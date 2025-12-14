@@ -503,21 +503,21 @@ interface StatCardProps {
 
 function StatCard({ title, value, subtitle, icon, color }: StatCardProps) {
   const colorClasses = {
-    blue: 'bg-blue-50 border-blue-200',
-    green: 'bg-green-50 border-green-200',
-    red: 'bg-red-50 border-red-200',
-    yellow: 'bg-yellow-50 border-yellow-200',
+    blue: 'bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-700',
+    green: 'bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-700',
+    red: 'bg-red-50 border-red-200 dark:bg-red-900/30 dark:border-red-700',
+    yellow: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/30 dark:border-yellow-700',
   };
 
   return (
     <div className={cn('rounded-xl border p-6', colorClasses[color])}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className="mt-1 text-3xl font-semibold text-gray-900">{value}</p>
-          {subtitle && <p className="mt-1 text-sm text-gray-500">{subtitle}</p>}
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-300">{title}</p>
+          <p className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">{value}</p>
+          {subtitle && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
         </div>
-        <div className="rounded-full bg-white p-3 shadow-sm">{icon}</div>
+        <div className="rounded-full bg-white dark:bg-gray-800 p-3 shadow-sm">{icon}</div>
       </div>
     </div>
   );
@@ -536,10 +536,10 @@ function StatusBar({ label, count, total, color }: StatusBarProps) {
   return (
     <div>
       <div className="mb-1 flex items-center justify-between text-sm">
-        <span className="text-gray-600">{label}</span>
-        <span className="font-medium text-gray-900">{count} ({percentage}%)</span>
+        <span className="text-gray-600 dark:text-gray-300">{label}</span>
+        <span className="font-medium text-gray-900 dark:text-white">{count} ({percentage}%)</span>
       </div>
-      <div className="h-2 rounded-full bg-gray-200">
+      <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-700">
         <div
           className={cn('h-full rounded-full', color)}
           style={{ width: `${percentage}%` }}

@@ -95,12 +95,73 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
   };
 
   const handleExport = (format: 'word' | 'pdf') => {
-    // In real app, this would generate and download the document
     toast.info(`Exporting as ${format.toUpperCase()}`, 'Your document is being prepared for download...');
-    // Simulate export delay
+
+    // Generate document content
+    const docContent = generateDocumentContent(content, proposal);
+
+    // Create downloadable file
     setTimeout(() => {
-      toast.success('Export complete', `Your ${format.toUpperCase()} file is ready.`);
-    }, 1500);
+      const blob = new Blob([docContent], {
+        type: format === 'word'
+          ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          : 'application/pdf'
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${content.title || 'proposal'}_${proposal.code || proposal.id}.${format === 'word' ? 'docx' : 'pdf'}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success('Export complete', `Your ${format.toUpperCase()} file has been downloaded.`);
+    }, 1000);
+  };
+
+  // Generate document content for export
+  const generateDocumentContent = (content: ProposalContent, proposal: Proposal): string => {
+    const sections = [
+      `PROPOSAL: ${content.title || 'Untitled'}`,
+      `Code: ${proposal.code || 'Draft'}`,
+      `Status: ${proposal.status}`,
+      ``,
+      `CLIENT INFORMATION`,
+      `Client: ${content.client || 'N/A'}`,
+      `Contact: ${content.contact || 'N/A'}`,
+      ``,
+      `BACKGROUND / CONTEXT`,
+      content.background || 'Not specified',
+      ``,
+      `BUSINESS OBJECTIVES`,
+      ...(content.businessObjectives?.map((obj, i) => `${i + 1}. ${obj}`) || ['Not specified']),
+      ``,
+      `RESEARCH OBJECTIVES`,
+      ...(content.researchObjectives?.map((obj, i) => `${i + 1}. ${obj}`) || ['Not specified']),
+      ``,
+      `BURNING QUESTIONS`,
+      ...(content.burningQuestions?.map((q, i) => `${i + 1}. ${q}`) || ['Not specified']),
+      ``,
+      `TARGET DEFINITION`,
+      content.targetDefinition || 'Not specified',
+      ``,
+      `SAMPLE SIZE`,
+      `Total: ${content.sampleSize?.toLocaleString() || 'N/A'}`,
+      ``,
+      `MARKETS`,
+      ...(content.markets?.map(m => `- ${m.country} (${m.language}): n=${m.sampleSize}`) || ['Not specified']),
+      ``,
+      `ADVANCED ANALYSIS`,
+      ...(content.advancedAnalysis?.map((a, i) => `${i + 1}. ${a}`) || ['Not specified']),
+      ``,
+      `---`,
+      `Generated on: ${new Date().toLocaleString()}`,
+      `Author: ${proposal.author.name}`,
+    ];
+
+    return sections.join('\n');
   };
 
   const handleAIRephrase = (sectionId: string) => {
@@ -202,22 +263,23 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
                 Unsaved changes
               </Badge>
             )}
-            <Button variant="secondary" size="sm" onClick={handleSave}>
-              <Save className="mr-2 h-4 w-4" />
-              Save Draft
+            <Button variant="secondary" size="sm" onClick={handleSave} className="whitespace-nowrap">
+              <Save className="mr-1.5 h-4 w-4 flex-shrink-0" />
+              <span>Save</span>
             </Button>
             <Button
               variant="primary"
               size="sm"
               onClick={() => setApprovalModalOpen(true)}
               disabled={!isProposalComplete()}
+              className="whitespace-nowrap"
             >
-              <Send className="mr-2 h-4 w-4" />
-              Send to Approval
+              <Send className="mr-1.5 h-4 w-4 flex-shrink-0" />
+              <span>Submit</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setExportModalOpen(true)}>
-              <Download className="mr-2 h-4 w-4" />
-              Export
+            <Button variant="outline" size="sm" onClick={() => setExportModalOpen(true)} className="whitespace-nowrap">
+              <Download className="mr-1.5 h-4 w-4 flex-shrink-0" />
+              <span>Export</span>
             </Button>
           </div>
         </div>
