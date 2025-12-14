@@ -26,6 +26,7 @@ import {
   Percent,
   Users,
   ClipboardCheck,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
@@ -82,6 +83,12 @@ const menuItems = [
     id: 'library',
     label: 'Library',
     icon: Library,
+    expandable: false,
+  },
+  {
+    id: 'architecture',
+    label: 'Architecture',
+    icon: Layers,
     expandable: false,
   },
 ];

@@ -8,6 +8,7 @@ import { ProposalEditor, RightSidebar } from '@/components/proposal';
 import { MetaLearnings } from '@/components/meta-learnings';
 import { MarginOfErrorCalculator, DemographicDistribution, FeasibilityCheck } from '@/components/tools';
 import { Library } from '@/components/library';
+import { Architecture } from '@/components/architecture';
 import { cn } from '@/lib/utils';
 import type { Proposal, ProposalContent } from '@/types';
 
@@ -181,6 +182,9 @@ export function MainContent() {
 
       case 'library':
         return <Library />;
+
+      case 'architecture':
+        return <Architecture />;
 
       default:
         // Handle project views
