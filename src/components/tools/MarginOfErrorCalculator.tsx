@@ -56,7 +56,7 @@ export function MarginOfErrorCalculator() {
         </CardHeader>
         <CardContent>
           {/* Mode Selector */}
-          <div className="mb-6 flex rounded-lg bg-gray-100 p-1">
+          <div className="mb-6 flex rounded-lg bg-gray-100 dark:bg-gray-800 p-1">
             <button
               onClick={() => {
                 setMode('moe');
@@ -64,7 +64,7 @@ export function MarginOfErrorCalculator() {
               }}
               className={cn(
                 'flex-1 rounded-md py-2 text-sm font-medium transition-colors',
-                mode === 'moe' ? 'bg-white shadow' : 'text-gray-600 hover:text-gray-900'
+                mode === 'moe' ? 'bg-white dark:bg-gray-700 shadow text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               )}
             >
               Calculate Margin of Error
@@ -76,7 +76,7 @@ export function MarginOfErrorCalculator() {
               }}
               className={cn(
                 'flex-1 rounded-md py-2 text-sm font-medium transition-colors',
-                mode === 'sample' ? 'bg-white shadow' : 'text-gray-600 hover:text-gray-900'
+                mode === 'sample' ? 'bg-white dark:bg-gray-700 shadow text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               )}
             >
               Calculate Sample Size
@@ -87,7 +87,7 @@ export function MarginOfErrorCalculator() {
             {/* Sample Size Input (for MOE mode) */}
             {mode === 'moe' && (
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Sample Size <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -97,7 +97,7 @@ export function MarginOfErrorCalculator() {
                   placeholder="e.g., 1000"
                   min="1"
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   Number of respondents in your study
                 </p>
               </div>
@@ -106,7 +106,7 @@ export function MarginOfErrorCalculator() {
             {/* Margin of Error Input (for Sample Size mode) */}
             {mode === 'sample' && (
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Desired Margin of Error (%) <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -118,7 +118,7 @@ export function MarginOfErrorCalculator() {
                   max="50"
                   step="0.1"
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   Typical ranges: 3-5% for quantitative, 15-20% for qualitative
                 </p>
               </div>
@@ -126,7 +126,7 @@ export function MarginOfErrorCalculator() {
 
             {/* Confidence Level */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Confidence Level <span className="text-red-500">*</span>
               </label>
               <Select
@@ -134,14 +134,14 @@ export function MarginOfErrorCalculator() {
                 value={confidenceLevel}
                 onChange={(e) => setConfidenceLevel(e.target.value)}
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 95% is standard for most market research
               </p>
             </div>
 
             {/* Population Size (Optional) */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Population Size (Optional)
               </label>
               <Input
@@ -151,7 +151,7 @@ export function MarginOfErrorCalculator() {
                 placeholder="Leave blank for infinite population"
                 min="1"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Include for finite population correction (FPC)
               </p>
             </div>
@@ -171,24 +171,24 @@ export function MarginOfErrorCalculator() {
 
           {/* Result Display */}
           {result !== null && (
-            <div className="mt-6 rounded-lg bg-blue-50 p-4">
-              <h3 className="mb-2 font-medium text-blue-900">Result</h3>
+            <div className="mt-6 rounded-lg bg-blue-50 dark:bg-blue-900/30 p-4 border border-blue-200 dark:border-blue-800">
+              <h3 className="mb-2 font-medium text-blue-900 dark:text-blue-100">Result</h3>
               {mode === 'moe' ? (
                 <div>
-                  <p className="text-3xl font-bold text-blue-600">
+                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                     ±{result}%
                   </p>
-                  <p className="mt-2 text-sm text-blue-700">
+                  <p className="mt-2 text-sm text-blue-700 dark:text-blue-300">
                     With a sample size of {sampleSize} and {confidenceLevel}% confidence level,
                     your margin of error is ±{result}%.
                   </p>
                 </div>
               ) : (
                 <div>
-                  <p className="text-3xl font-bold text-blue-600">
+                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                     n = {result.toLocaleString()}
                   </p>
-                  <p className="mt-2 text-sm text-blue-700">
+                  <p className="mt-2 text-sm text-blue-700 dark:text-blue-300">
                     To achieve a ±{marginOfError}% margin of error with {confidenceLevel}% confidence,
                     you need a sample size of {result.toLocaleString()} respondents.
                   </p>
@@ -198,11 +198,11 @@ export function MarginOfErrorCalculator() {
           )}
 
           {/* Information Box */}
-          <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <div className="mt-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
             <div className="flex gap-2">
-              <Info className="h-5 w-5 flex-shrink-0 text-gray-400" />
-              <div className="text-sm text-gray-600">
-                <p className="mb-2 font-medium">Quick Reference:</p>
+              <Info className="h-5 w-5 flex-shrink-0 text-gray-400 dark:text-gray-500" />
+              <div className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="mb-2 font-medium text-gray-700 dark:text-gray-200">Quick Reference:</p>
                 <ul className="space-y-1 text-xs">
                   <li>• n=100: ~10% MOE (subgroup minimum)</li>
                   <li>• n=400: ~5% MOE (standard tracking)</li>

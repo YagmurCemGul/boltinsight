@@ -22,11 +22,109 @@ interface ChatInterfaceProps {
 }
 
 const templateOptions = [
-  { id: 'blank', label: 'Blank Proposal' },
-  { id: 'concept-test', label: 'Concept Testing Template' },
-  { id: 'brand-tracking', label: 'Brand Tracking Template' },
-  { id: 'segmentation', label: 'Segmentation Study Template' },
-  { id: 'uat', label: 'Usage & Attitude Template' },
+  { id: 'blank', label: 'Blank Proposal', response: '' },
+  {
+    id: 'concept-test',
+    label: 'Concept Testing Template',
+    response: `Great choice! I've loaded the **Concept Testing Template**.
+
+**This template is optimized for:**
+- Testing new product/service concepts
+- Evaluating advertising or packaging designs
+- Comparing multiple concepts against each other
+
+**Pre-configured sections:**
+- Concept appeal metrics (Relevance, Uniqueness, Believability)
+- Purchase intent scales
+- Open-ended improvement questions
+- Comparative analysis framework
+
+**To customize this proposal, please tell me:**
+1. **Client Name:** Who is this for?
+2. **Number of Concepts:** How many concepts to test?
+3. **Target Audience:** Who should evaluate?
+4. **Markets:** Which countries?
+5. **Sample Size:** Usually n=150-200 per concept
+
+What information can you provide?`
+  },
+  {
+    id: 'brand-tracking',
+    label: 'Brand Tracking Template',
+    response: `Excellent! I've loaded the **Brand Tracking Template**.
+
+**This template includes:**
+- Brand funnel metrics (Awareness → Consideration → Usage → Loyalty)
+- Brand image and attribute tracking
+- Competitive benchmarking framework
+- NPS and satisfaction measures
+
+**Standard wave structure:**
+- Quarterly or monthly tracking
+- Consistent sample per wave for trending
+- Competitor comparison included
+
+**To customize, please share:**
+1. **Client/Brand:** Which brand are we tracking?
+2. **Markets:** Countries and languages
+3. **Sample Size:** Typically n=500-1000 per market
+4. **Competitors:** Any specific competitors to include?
+5. **Key Metrics:** Any specific KPIs to prioritize?
+
+What would you like to start with?`
+  },
+  {
+    id: 'segmentation',
+    label: 'Segmentation Study Template',
+    response: `Perfect! I've loaded the **Segmentation Study Template**.
+
+**This template is designed for:**
+- Identifying distinct consumer segments
+- Understanding segment needs and motivations
+- Developing targeted marketing strategies
+
+**Included methodology:**
+- Attitudinal and behavioral questions
+- Cluster analysis approach
+- Segment profiling variables
+- Persona development framework
+
+**Requirements for this study:**
+1. **Category:** What product/service category?
+2. **Markets:** Which countries?
+3. **Sample Size:** Minimum n=1000-1500 for robust segments
+4. **Segmentation Base:** Attitudes, behaviors, or hybrid?
+5. **Business Questions:** What decisions will this inform?
+
+Tell me about your segmentation needs!`
+  },
+  {
+    id: 'uat',
+    label: 'Usage & Attitude Template',
+    response: `Great! I've loaded the **Usage & Attitude (U&A) Template**.
+
+**This comprehensive template covers:**
+- Category usage behavior and frequency
+- Brand funnel and switching patterns
+- Need states and usage occasions
+- Attitudes and perceptions
+- Media consumption habits
+
+**Typical U&A sections:**
+- Category penetration and frequency
+- Brand repertoire and loyalty
+- Decision journey mapping
+- Unmet needs identification
+
+**To build your U&A study, I need:**
+1. **Category:** What category are we studying?
+2. **Client/Brand:** Who is this for?
+3. **Markets:** Which countries?
+4. **Target:** Category users or broader population?
+5. **Sample Size:** Usually n=1000+ per market
+
+What details can you provide?`
+  },
 ];
 
 const SYSTEM_PROMPTS = {
@@ -68,6 +166,34 @@ export function ChatInterface({ onProposalGenerated }: ChatInterfaceProps) {
       });
     }
   }, []);
+
+  // Handle template selection
+  const handleTemplateSelect = (templateId: string) => {
+    if (templateId === selectedTemplate) return;
+
+    setSelectedTemplate(templateId);
+
+    const template = templateOptions.find(t => t.id === templateId);
+    if (template && template.response) {
+      // Add user message indicating template selection
+      addChatMessage({
+        role: 'user',
+        content: `I'd like to use the ${template.label}`,
+      });
+
+      // Simulate AI typing
+      setAiTyping(true);
+
+      // Add template response after delay
+      setTimeout(() => {
+        addChatMessage({
+          role: 'assistant',
+          content: template.response,
+        });
+        setAiTyping(false);
+      }, 800);
+    }
+  };
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -303,12 +429,14 @@ You can share these in any order, or click **Editor Mode** above to fill in the 
           {templateOptions.map((template) => (
             <button
               key={template.id}
-              onClick={() => setSelectedTemplate(template.id)}
+              onClick={() => handleTemplateSelect(template.id)}
+              disabled={isAiTyping}
               className={cn(
                 'rounded-full px-3 py-1.5 text-sm transition-colors',
                 selectedTemplate === template.id
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+                isAiTyping && 'opacity-50 cursor-not-allowed'
               )}
             >
               {template.label}

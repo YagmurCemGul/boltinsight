@@ -35,16 +35,49 @@ interface FeasibilityResult {
   recommendations: string[];
 }
 
+const AGE_RANGES = [
+  { value: '18-24', label: '18-24' },
+  { value: '25-34', label: '25-34' },
+  { value: '35-44', label: '35-44' },
+  { value: '45-54', label: '45-54' },
+  { value: '55-64', label: '55-64' },
+  { value: '65+', label: '65+' },
+];
+
+const AUDIENCE_TYPES = [
+  { value: 'general_population', label: 'General Population' },
+  { value: 'category_users', label: 'Category Users' },
+  { value: 'brand_users', label: 'Brand Users' },
+  { value: 'lapsed_users', label: 'Lapsed Users' },
+  { value: 'non_users', label: 'Non-Users' },
+  { value: 'b2b', label: 'B2B / Decision Makers' },
+];
+
+const GENDER_OPTIONS = [
+  { value: 'all', label: 'All Genders' },
+  { value: 'male', label: 'Male Only' },
+  { value: 'female', label: 'Female Only' },
+];
+
 export function FeasibilityCheck() {
   const [market, setMarket] = useState('');
   const [methodology, setMethodology] = useState('');
   const [sampleSize, setSampleSize] = useState('');
   const [targetAudience, setTargetAudience] = useState('');
+  const [audienceType, setAudienceType] = useState('');
+  const [gender, setGender] = useState('all');
+  const [selectedAges, setSelectedAges] = useState<string[]>([]);
   const [isChecking, setIsChecking] = useState(false);
   const [result, setResult] = useState<FeasibilityResult | null>(null);
 
+  const toggleAge = (age: string) => {
+    setSelectedAges(prev =>
+      prev.includes(age) ? prev.filter(a => a !== age) : [...prev, age]
+    );
+  };
+
   const checkFeasibility = () => {
-    if (!market || !methodology || !sampleSize || !targetAudience) return;
+    if (!market || !methodology || !sampleSize || !audienceType) return;
 
     setIsChecking(true);
 
@@ -52,8 +85,8 @@ export function FeasibilityCheck() {
     setTimeout(() => {
       // Generate mock result based on inputs
       const sample = parseInt(sampleSize);
-      const isB2B = targetAudience.toLowerCase().includes('b2b') || targetAudience.toLowerCase().includes('business');
-      const isNiche = targetAudience.toLowerCase().includes('specific') || targetAudience.toLowerCase().includes('rare');
+      const isB2B = audienceType === 'b2b';
+      const isNiche = audienceType === 'lapsed_users' || audienceType === 'non_users' || selectedAges.length === 1;
 
       let incidenceRate = 50;
       if (isB2B) incidenceRate = 15;
@@ -112,6 +145,9 @@ export function FeasibilityCheck() {
     setMethodology('');
     setSampleSize('');
     setTargetAudience('');
+    setAudienceType('');
+    setGender('all');
+    setSelectedAges([]);
     setResult(null);
   };
 
@@ -126,7 +162,7 @@ export function FeasibilityCheck() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="mb-6 text-sm text-gray-600">
+          <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
             Get a quick assessment of your research feasibility including estimated incidence rate,
             timeline, and cost projections.
           </p>
@@ -134,7 +170,7 @@ export function FeasibilityCheck() {
           <div className="space-y-4">
             {/* Market */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Market <span className="text-red-500">*</span>
               </label>
               <Select
@@ -147,7 +183,7 @@ export function FeasibilityCheck() {
 
             {/* Methodology */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Methodology <span className="text-red-500">*</span>
               </label>
               <Select
@@ -160,7 +196,7 @@ export function FeasibilityCheck() {
 
             {/* Sample Size */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Sample Size <span className="text-red-500">*</span>
               </label>
               <Input
@@ -172,16 +208,64 @@ export function FeasibilityCheck() {
               />
             </div>
 
-            {/* Target Audience */}
+            {/* Audience Type */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
-                Target Audience Description <span className="text-red-500">*</span>
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Audience Type <span className="text-red-500">*</span>
+              </label>
+              <Select
+                options={[{ value: '', label: 'Select audience type' }, ...AUDIENCE_TYPES]}
+                value={audienceType}
+                onChange={(e) => setAudienceType(e.target.value)}
+              />
+            </div>
+
+            {/* Gender */}
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Gender
+              </label>
+              <Select
+                options={GENDER_OPTIONS}
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+              />
+            </div>
+
+            {/* Age Range Selection */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Age Range
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {AGE_RANGES.map((age) => (
+                  <button
+                    key={age.value}
+                    type="button"
+                    onClick={() => toggleAge(age.value)}
+                    className={cn(
+                      'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
+                      selectedAges.includes(age.value)
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                    )}
+                  >
+                    {age.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Additional Target Description */}
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Additional Criteria
               </label>
               <Textarea
                 value={targetAudience}
                 onChange={(e) => setTargetAudience(e.target.value)}
-                placeholder="e.g., Adults 25-54, primary grocery shoppers, purchased soft drinks in past month..."
-                className="min-h-[100px]"
+                placeholder="e.g., Primary grocery shoppers, purchased soft drinks in past month..."
+                className="min-h-[80px]"
               />
             </div>
 
@@ -189,7 +273,7 @@ export function FeasibilityCheck() {
             <div className="flex gap-2 pt-2">
               <Button
                 onClick={checkFeasibility}
-                disabled={isChecking || !market || !methodology || !sampleSize || !targetAudience}
+                disabled={isChecking || !market || !methodology || !sampleSize || !audienceType}
                 className="flex-1"
               >
                 {isChecking ? (
@@ -216,20 +300,22 @@ export function FeasibilityCheck() {
               {/* Feasibility Status */}
               <div
                 className={cn(
-                  'flex items-center gap-3 rounded-lg p-4',
-                  result.feasible ? 'bg-green-50' : 'bg-red-50'
+                  'flex items-center gap-3 rounded-lg p-4 border',
+                  result.feasible
+                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                    : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
                 )}
               >
                 {result.feasible ? (
-                  <CheckCircle className="h-6 w-6 text-green-600" />
+                  <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                 ) : (
-                  <AlertCircle className="h-6 w-6 text-red-600" />
+                  <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
                 )}
                 <div>
-                  <p className={cn('font-medium', result.feasible ? 'text-green-900' : 'text-red-900')}>
+                  <p className={cn('font-medium', result.feasible ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100')}>
                     {result.feasible ? 'Feasible' : 'Potential Challenges'}
                   </p>
-                  <p className={cn('text-sm', result.feasible ? 'text-green-700' : 'text-red-700')}>
+                  <p className={cn('text-sm', result.feasible ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300')}>
                     Confidence: {result.confidence.charAt(0).toUpperCase() + result.confidence.slice(1)}
                   </p>
                 </div>
@@ -237,31 +323,51 @@ export function FeasibilityCheck() {
 
               {/* Key Metrics */}
               <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-lg border p-4 text-center">
-                  <p className="text-sm text-gray-500">Incidence Rate</p>
-                  <p className="text-2xl font-bold text-gray-900">{result.incidenceRate}%</p>
+                <div className={cn(
+                  'rounded-lg border-2 p-4 text-center',
+                  result.incidenceRate >= 30 ? 'border-green-300 bg-green-50 dark:bg-green-900/20' :
+                  result.incidenceRate >= 10 ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20' :
+                  'border-red-300 bg-red-50 dark:bg-red-900/20'
+                )}>
+                  <div className={cn(
+                    'mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full',
+                    result.incidenceRate >= 30 ? 'bg-green-100 dark:bg-green-800' :
+                    result.incidenceRate >= 10 ? 'bg-yellow-100 dark:bg-yellow-800' :
+                    'bg-red-100 dark:bg-red-800'
+                  )}>
+                    <span className={cn(
+                      'text-lg font-bold',
+                      result.incidenceRate >= 30 ? 'text-green-700 dark:text-green-300' :
+                      result.incidenceRate >= 10 ? 'text-yellow-700 dark:text-yellow-300' :
+                      'text-red-700 dark:text-red-300'
+                    )}>{result.incidenceRate}%</span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Incidence Rate</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {result.incidenceRate >= 30 ? 'Good' : result.incidenceRate >= 10 ? 'Moderate' : 'Low'}
+                  </p>
                 </div>
-                <div className="rounded-lg border p-4 text-center">
-                  <Clock className="mx-auto mb-1 h-5 w-5 text-gray-400" />
-                  <p className="text-sm text-gray-500">Est. Timeline</p>
-                  <p className="text-lg font-semibold text-gray-900">{result.estimatedTimeline}</p>
+                <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center bg-white dark:bg-gray-800">
+                  <Clock className="mx-auto mb-2 h-8 w-8 text-blue-500" />
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{result.estimatedTimeline}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Est. Timeline</p>
                 </div>
-                <div className="rounded-lg border p-4 text-center">
-                  <DollarSign className="mx-auto mb-1 h-5 w-5 text-gray-400" />
-                  <p className="text-sm text-gray-500">Est. Cost</p>
-                  <p className="text-lg font-semibold text-gray-900">
+                <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center bg-white dark:bg-gray-800">
+                  <DollarSign className="mx-auto mb-2 h-8 w-8 text-green-500" />
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
                     ${result.estimatedCost.toLocaleString()}
                   </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Est. Cost</p>
                 </div>
               </div>
 
               {/* Risks */}
               {result.risks.length > 0 && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                  <h4 className="mb-2 font-medium text-amber-900">Potential Risks</h4>
+                <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4">
+                  <h4 className="mb-2 font-medium text-amber-900 dark:text-amber-100">Potential Risks</h4>
                   <ul className="space-y-1">
                     {result.risks.map((risk, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-amber-800">
+                      <li key={i} className="flex items-start gap-2 text-sm text-amber-800 dark:text-amber-200">
                         <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
                         {risk}
                       </li>
@@ -272,11 +378,11 @@ export function FeasibilityCheck() {
 
               {/* Recommendations */}
               {result.recommendations.length > 0 && (
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                  <h4 className="mb-2 font-medium text-blue-900">Recommendations</h4>
+                <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4">
+                  <h4 className="mb-2 font-medium text-blue-900 dark:text-blue-100">Recommendations</h4>
                   <ul className="space-y-1">
                     {result.recommendations.map((rec, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-blue-800">
+                      <li key={i} className="flex items-start gap-2 text-sm text-blue-800 dark:text-blue-200">
                         <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
                         {rec}
                       </li>

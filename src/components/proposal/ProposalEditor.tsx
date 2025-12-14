@@ -20,6 +20,9 @@ import {
   FileText,
   FileDown,
 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
+import { saveAs } from 'file-saver';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { Button, Input, Textarea, Select, Badge, Modal, toast } from '@/components/ui';
@@ -126,74 +129,213 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
     toast.success('Submitted for approval', 'Your proposal has been sent to the approver.');
   };
 
-  const handleExport = (format: 'word' | 'pdf') => {
+  const handleExport = async (format: 'word' | 'pdf') => {
     toast.info(`Exporting as ${format.toUpperCase()}`, 'Your document is being prepared for download...');
 
-    // Generate document content
-    const docContent = generateDocumentContent(content, proposal);
+    const fileName = `${content.title || 'proposal'}_${proposal.code || proposal.id}`;
 
-    // Create downloadable file
-    setTimeout(() => {
-      const blob = new Blob([docContent], {
-        type: format === 'word'
-          ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-          : 'application/pdf'
-      });
+    try {
+      if (format === 'pdf') {
+        // Generate PDF using jsPDF
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        let y = 20;
+        const lineHeight = 7;
+        const margin = 20;
+        const maxWidth = pageWidth - 2 * margin;
 
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${content.title || 'proposal'}_${proposal.code || proposal.id}.${format === 'word' ? 'docx' : 'pdf'}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+        // Helper to add text and handle page breaks
+        const addText = (text: string, fontSize: number = 12, isBold: boolean = false) => {
+          doc.setFontSize(fontSize);
+          doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+          const lines = doc.splitTextToSize(text, maxWidth);
+          lines.forEach((line: string) => {
+            if (y > 270) {
+              doc.addPage();
+              y = 20;
+            }
+            doc.text(line, margin, y);
+            y += lineHeight;
+          });
+        };
+
+        const addSection = (title: string, content: string | string[] | undefined) => {
+          y += 5;
+          addText(title, 14, true);
+          y += 2;
+          if (Array.isArray(content)) {
+            content.forEach((item, i) => addText(`${i + 1}. ${item}`));
+          } else {
+            addText(content || 'Not specified');
+          }
+        };
+
+        // Title
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.text(content.title || 'Untitled Proposal', margin, y);
+        y += 10;
+
+        // Meta info
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100);
+        doc.text(`Code: ${proposal.code || 'Draft'} | Status: ${proposal.status} | Generated: ${new Date().toLocaleDateString()}`, margin, y);
+        y += 15;
+        doc.setTextColor(0);
+
+        // Client
+        addSection('CLIENT INFORMATION', `Client: ${content.client || 'N/A'}\nContact: ${content.contact || 'N/A'}`);
+
+        // Background
+        addSection('BACKGROUND / CONTEXT', content.background);
+
+        // Business Objectives
+        addSection('BUSINESS OBJECTIVES', content.businessObjectives);
+
+        // Research Objectives
+        addSection('RESEARCH OBJECTIVES', content.researchObjectives);
+
+        // Burning Questions
+        addSection('BURNING QUESTIONS', content.burningQuestions);
+
+        // Target Definition
+        addSection('TARGET DEFINITION', content.targetDefinition);
+
+        // Sample Size
+        addSection('SAMPLE SIZE', `Total: ${content.sampleSize?.toLocaleString() || 'N/A'}`);
+
+        // Markets
+        if (content.markets && content.markets.length > 0) {
+          y += 5;
+          addText('MARKETS', 14, true);
+          y += 2;
+          content.markets.forEach(m => addText(`• ${m.country} (${m.language}): n=${m.sampleSize}`));
+        }
+
+        // Advanced Analysis
+        addSection('ADVANCED ANALYSIS', content.advancedAnalysis);
+
+        // Footer
+        y += 10;
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Author: ${proposal.author.name}`, margin, y);
+
+        doc.save(`${fileName}.pdf`);
+      } else {
+        // Generate DOCX using docx library
+        const docChildren: Paragraph[] = [];
+
+        // Title
+        docChildren.push(
+          new Paragraph({
+            children: [new TextRun({ text: content.title || 'Untitled Proposal', bold: true, size: 48 })],
+            heading: HeadingLevel.TITLE,
+            spacing: { after: 200 },
+          })
+        );
+
+        // Meta info
+        docChildren.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: `Code: ${proposal.code || 'Draft'} | Status: ${proposal.status} | Generated: ${new Date().toLocaleDateString()}`, size: 20, color: '666666' }),
+            ],
+            spacing: { after: 400 },
+          })
+        );
+
+        // Helper to add sections
+        const addDocSection = (title: string, items: string | string[] | undefined) => {
+          docChildren.push(
+            new Paragraph({
+              children: [new TextRun({ text: title, bold: true, size: 28 })],
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 400, after: 200 },
+            })
+          );
+
+          if (Array.isArray(items) && items.length > 0) {
+            items.forEach((item, i) => {
+              docChildren.push(
+                new Paragraph({
+                  children: [new TextRun({ text: `${i + 1}. ${item}`, size: 24 })],
+                  spacing: { after: 100 },
+                })
+              );
+            });
+          } else if (typeof items === 'string' && items) {
+            docChildren.push(
+              new Paragraph({
+                children: [new TextRun({ text: items, size: 24 })],
+                spacing: { after: 100 },
+              })
+            );
+          } else {
+            docChildren.push(
+              new Paragraph({
+                children: [new TextRun({ text: 'Not specified', size: 24, italics: true, color: '999999' })],
+                spacing: { after: 100 },
+              })
+            );
+          }
+        };
+
+        // Add sections
+        addDocSection('Client Information', `Client: ${content.client || 'N/A'}\nContact: ${content.contact || 'N/A'}`);
+        addDocSection('Background / Context', content.background);
+        addDocSection('Business Objectives', content.businessObjectives);
+        addDocSection('Research Objectives', content.researchObjectives);
+        addDocSection('Burning Questions', content.burningQuestions);
+        addDocSection('Target Definition', content.targetDefinition);
+        addDocSection('Sample Size', `Total: ${content.sampleSize?.toLocaleString() || 'N/A'}`);
+
+        // Markets
+        if (content.markets && content.markets.length > 0) {
+          docChildren.push(
+            new Paragraph({
+              children: [new TextRun({ text: 'Markets', bold: true, size: 28 })],
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 400, after: 200 },
+            })
+          );
+          content.markets.forEach(m => {
+            docChildren.push(
+              new Paragraph({
+                children: [new TextRun({ text: `• ${m.country} (${m.language}): n=${m.sampleSize}`, size: 24 })],
+                spacing: { after: 100 },
+              })
+            );
+          });
+        }
+
+        addDocSection('Advanced Analysis', content.advancedAnalysis);
+
+        // Author footer
+        docChildren.push(
+          new Paragraph({
+            children: [new TextRun({ text: `Author: ${proposal.author.name}`, size: 20, color: '666666' })],
+            spacing: { before: 400 },
+          })
+        );
+
+        const doc = new Document({
+          sections: [{
+            properties: {},
+            children: docChildren,
+          }],
+        });
+
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `${fileName}.docx`);
+      }
 
       toast.success('Export complete', `Your ${format.toUpperCase()} file has been downloaded.`);
-    }, 1000);
-  };
-
-  // Generate document content for export
-  const generateDocumentContent = (content: ProposalContent, proposal: Proposal): string => {
-    const sections = [
-      `PROPOSAL: ${content.title || 'Untitled'}`,
-      `Code: ${proposal.code || 'Draft'}`,
-      `Status: ${proposal.status}`,
-      ``,
-      `CLIENT INFORMATION`,
-      `Client: ${content.client || 'N/A'}`,
-      `Contact: ${content.contact || 'N/A'}`,
-      ``,
-      `BACKGROUND / CONTEXT`,
-      content.background || 'Not specified',
-      ``,
-      `BUSINESS OBJECTIVES`,
-      ...(content.businessObjectives?.map((obj, i) => `${i + 1}. ${obj}`) || ['Not specified']),
-      ``,
-      `RESEARCH OBJECTIVES`,
-      ...(content.researchObjectives?.map((obj, i) => `${i + 1}. ${obj}`) || ['Not specified']),
-      ``,
-      `BURNING QUESTIONS`,
-      ...(content.burningQuestions?.map((q, i) => `${i + 1}. ${q}`) || ['Not specified']),
-      ``,
-      `TARGET DEFINITION`,
-      content.targetDefinition || 'Not specified',
-      ``,
-      `SAMPLE SIZE`,
-      `Total: ${content.sampleSize?.toLocaleString() || 'N/A'}`,
-      ``,
-      `MARKETS`,
-      ...(content.markets?.map(m => `- ${m.country} (${m.language}): n=${m.sampleSize}`) || ['Not specified']),
-      ``,
-      `ADVANCED ANALYSIS`,
-      ...(content.advancedAnalysis?.map((a, i) => `${i + 1}. ${a}`) || ['Not specified']),
-      ``,
-      `---`,
-      `Generated on: ${new Date().toLocaleString()}`,
-      `Author: ${proposal.author.name}`,
-    ];
-
-    return sections.join('\n');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Export failed', 'There was an error generating your document.');
+    }
   };
 
   const handleAIRephrase = (sectionId: string) => {
@@ -223,9 +365,9 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full min-w-0 overflow-hidden">
       {/* Left Panel - Content Sections Navigation */}
-      <div className="w-64 border-r border-gray-200 bg-gray-50">
+      <div className="w-48 flex-shrink-0 border-r border-gray-200 bg-gray-50 overflow-y-auto hidden md:block">
         <div className="p-4">
           <h3 className="mb-2 text-sm font-medium text-gray-700">Proposal Sections</h3>
           <div className="mb-4 h-2 rounded-full bg-gray-200">
@@ -271,10 +413,10 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         {/* Header Actions */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-3">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center justify-between border-b border-gray-200 px-4 py-2 gap-2">
+          <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setVersionsModalOpen(true)} className="whitespace-nowrap px-2.5">
               <History className="h-4 w-4 sm:mr-1.5" />
               <span className="hidden sm:inline">Versions</span>
@@ -289,7 +431,7 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
             </Button>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             {hasChanges && (
               <Badge variant="warning" className="mr-1 hidden sm:flex">
                 Unsaved
