@@ -347,6 +347,7 @@ const mockProposals: Proposal[] = [
     id: 'proposal-8',
     code: 'BI-2412-0005',
     status: 'pending_approval',
+    projectId: 'project-samsung',
     content: {
       title: 'Mobile App UX Research',
       client: 'Samsung',
@@ -382,6 +383,7 @@ const mockProposals: Proposal[] = [
   {
     id: 'proposal-9',
     status: 'draft',
+    projectId: 'project-louis-vuitton',
     content: {
       title: 'Price Elasticity Study - Premium Segment',
       client: 'Louis Vuitton',
@@ -408,7 +410,7 @@ const mockProposals: Proposal[] = [
     id: 'proposal-10',
     code: 'BI-2412-0006',
     status: 'approved',
-    projectId: 'project-3',
+    projectId: 'project-microsoft',
     content: {
       title: 'Employee Engagement Survey',
       client: 'Microsoft',
@@ -452,6 +454,7 @@ const mockProposals: Proposal[] = [
   {
     id: 'proposal-11',
     status: 'draft',
+    projectId: 'project-kraft-heinz',
     content: {
       title: 'Packaging Innovation Test',
       client: 'Kraft Heinz',
@@ -475,6 +478,7 @@ const mockProposals: Proposal[] = [
     id: 'proposal-12',
     code: 'BI-2411-0007',
     status: 'approved',
+    projectId: 'project-disney-plus',
     content: {
       title: 'Streaming Service Competitive Analysis',
       client: 'Disney+',
@@ -520,6 +524,7 @@ const mockProposals: Proposal[] = [
   {
     id: 'proposal-13',
     status: 'pending_approval',
+    projectId: 'project-pfizer',
     content: {
       title: 'Healthcare Provider Satisfaction Study',
       client: 'Pfizer',
@@ -546,6 +551,7 @@ const mockProposals: Proposal[] = [
   {
     id: 'proposal-14',
     status: 'on_hold',
+    projectId: 'project-toyota',
     content: {
       title: 'Electric Vehicle Purchase Journey',
       client: 'Toyota',
@@ -586,7 +592,7 @@ const mockProjects: Project[] = [
     name: 'BoltChatAI Credit Sales',
     description: 'Default project for credit sales and financial services research',
     client: 'Various',
-    proposals: ['proposal-4', 'proposal-6', 'proposal-8', 'proposal-9', 'proposal-10', 'proposal-11', 'proposal-12', 'proposal-13', 'proposal-14'],
+    proposals: ['proposal-4', 'proposal-6'],
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-12-08T00:00:00Z',
     isDefault: true,
@@ -608,6 +614,69 @@ const mockProjects: Project[] = [
     proposals: ['proposal-7'],
     createdAt: '2024-03-01T00:00:00Z',
     updatedAt: '2024-12-02T00:00:00Z',
+  },
+  {
+    id: 'project-samsung',
+    name: 'Samsung',
+    description: 'Samsung mobile and technology research projects',
+    client: 'Samsung',
+    proposals: ['proposal-8'],
+    createdAt: '2024-06-01T00:00:00Z',
+    updatedAt: '2024-12-14T00:00:00Z',
+  },
+  {
+    id: 'project-louis-vuitton',
+    name: 'Louis Vuitton',
+    description: 'Louis Vuitton luxury brand and pricing research projects',
+    client: 'Louis Vuitton',
+    proposals: ['proposal-9'],
+    createdAt: '2024-07-01T00:00:00Z',
+    updatedAt: '2024-12-14T00:00:00Z',
+  },
+  {
+    id: 'project-microsoft',
+    name: 'Microsoft',
+    description: 'Microsoft employee engagement and enterprise research projects',
+    client: 'Microsoft',
+    proposals: ['proposal-10'],
+    createdAt: '2024-05-01T00:00:00Z',
+    updatedAt: '2024-11-28T00:00:00Z',
+  },
+  {
+    id: 'project-kraft-heinz',
+    name: 'Kraft Heinz',
+    description: 'Kraft Heinz packaging and product innovation research projects',
+    client: 'Kraft Heinz',
+    proposals: ['proposal-11'],
+    createdAt: '2024-08-01T00:00:00Z',
+    updatedAt: '2024-12-13T00:00:00Z',
+  },
+  {
+    id: 'project-disney-plus',
+    name: 'Disney+',
+    description: 'Disney+ streaming service and content research projects',
+    client: 'Disney+',
+    proposals: ['proposal-12'],
+    createdAt: '2024-04-01T00:00:00Z',
+    updatedAt: '2024-12-01T00:00:00Z',
+  },
+  {
+    id: 'project-pfizer',
+    name: 'Pfizer',
+    description: 'Pfizer healthcare provider and pharmaceutical research projects',
+    client: 'Pfizer',
+    proposals: ['proposal-13'],
+    createdAt: '2024-09-01T00:00:00Z',
+    updatedAt: '2024-12-14T00:00:00Z',
+  },
+  {
+    id: 'project-toyota',
+    name: 'Toyota',
+    description: 'Toyota automotive and electric vehicle research projects',
+    client: 'Toyota',
+    proposals: ['proposal-14'],
+    createdAt: '2024-10-01T00:00:00Z',
+    updatedAt: '2024-12-13T00:00:00Z',
   },
 ];
 

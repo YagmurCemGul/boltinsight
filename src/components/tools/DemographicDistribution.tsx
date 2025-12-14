@@ -297,9 +297,9 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
           )}
 
           {/* Census Data Note */}
-          <div className="mt-6 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-4">
+          <div className="mt-6 rounded-lg bg-amber-50 dark:bg-amber-950 border-2 border-amber-300 dark:border-amber-700 p-4">
             <p className="text-sm text-amber-800 dark:text-amber-200">
-              <strong>Note:</strong> Quota calculations are based on publicly available census data.
+              <strong className="text-amber-900 dark:text-amber-100">Note:</strong> Quota calculations are based on publicly available census data.
               For the most accurate quotas, please consult the latest official census data for your target market.
             </p>
           </div>
