@@ -58,15 +58,22 @@ const menuItems = [
     expandable: false,
   },
   {
-    id: 'tools',
-    label: 'Tools',
+    id: 'moe-calculator',
+    label: 'Margin of Error',
     icon: Calculator,
-    expandable: true,
-    children: [
-      { id: 'moe-calculator', label: 'Margin of Error Calculator' },
-      { id: 'demographics', label: 'Demographic Distribution' },
-      { id: 'feasibility', label: 'Feasibility Check' },
-    ],
+    expandable: false,
+  },
+  {
+    id: 'demographics',
+    label: 'Demographics & Quota',
+    icon: Calculator,
+    expandable: false,
+  },
+  {
+    id: 'feasibility',
+    label: 'Feasibility Check',
+    icon: Calculator,
+    expandable: false,
   },
   {
     id: 'library',
@@ -186,27 +193,6 @@ export function Sidebar() {
                   {!sidebarCollapsed && item.id === 'search-all' && expandedItems.includes(item.id) && (
                     <div className="mt-2 px-2">
                       <SearchSection searchAll={true} />
-                    </div>
-                  )}
-
-                  {/* Tools Sub-menu */}
-                  {!sidebarCollapsed && item.children && expandedItems.includes(item.id) && (
-                    <div className="ml-4 mt-1 space-y-1">
-                      {item.children.map((child) => (
-                        <button
-                          key={child.id}
-                          onClick={() => setActiveSection(child.id)}
-                          className={cn(
-                            'flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm transition-colors',
-                            activeSection === child.id
-                              ? 'bg-blue-50 text-blue-600'
-                              : 'text-gray-600 hover:bg-gray-100'
-                          )}
-                        >
-                          <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                          {child.label}
-                        </button>
-                      ))}
                     </div>
                   )}
                 </div>

@@ -122,6 +122,8 @@ export function MainContent() {
                   <ProposalEditor
                     proposal={workingProposal}
                     onSave={handleSaveProposal}
+                    externalActiveSection={activeSidebarSection}
+                    onSectionChange={setActiveSidebarSection}
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center">
@@ -149,6 +151,8 @@ export function MainContent() {
               <ProposalEditor
                 proposal={currentProposal}
                 onSave={(content) => updateProposal(currentProposal.id, { content })}
+                externalActiveSection={activeSidebarSection}
+                onSectionChange={setActiveSidebarSection}
               />
             </div>
             <RightSidebar

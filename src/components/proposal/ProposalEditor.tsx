@@ -28,6 +28,8 @@ import type { Proposal, ProposalContent, User, Market } from '@/types';
 interface ProposalEditorProps {
   proposal: Proposal;
   onSave: (content: ProposalContent) => void;
+  externalActiveSection?: string;
+  onSectionChange?: (sectionId: string) => void;
 }
 
 const SECTION_CONFIG = [
@@ -45,10 +47,10 @@ const SECTION_CONFIG = [
   { id: 'referenceProjects', label: 'Reference Projects', icon: LinkIcon, required: false },
 ];
 
-export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
+export function ProposalEditor({ proposal, onSave, externalActiveSection, onSectionChange }: ProposalEditorProps) {
   const { projects, currentUser, submitForApproval, updateProposal, setActiveSection: setGlobalActiveSection } = useAppStore();
   const [content, setContent] = useState<ProposalContent>(proposal.content);
-  const [activeSection, setActiveSection] = useState('title');
+  const [activeSection, setActiveSectionInternal] = useState('title');
   const [approvalModalOpen, setApprovalModalOpen] = useState(false);
   const [coworkingModalOpen, setCoworkingModalOpen] = useState(false);
   const [versionsModalOpen, setVersionsModalOpen] = useState(false);
@@ -58,6 +60,36 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
   const [hasChanges, setHasChanges] = useState(false);
   const [coworkingEmail, setCoworkingEmail] = useState('');
   const [invitedUsers, setInvitedUsers] = useState<string[]>([]);
+
+  // Wrapper for setActiveSection that also calls callback
+  const setActiveSection = (sectionId: string) => {
+    setActiveSectionInternal(sectionId);
+    onSectionChange?.(sectionId);
+  };
+
+  // Sync with external active section (from RightSidebar)
+  useEffect(() => {
+    if (externalActiveSection) {
+      // Map RightSidebar section IDs to ProposalEditor section IDs
+      const sectionMap: Record<string, string> = {
+        'header': 'title',
+        'background': 'background',
+        'businessObjectives': 'businessObjectives',
+        'researchObjectives': 'researchObjectives',
+        'burningQuestions': 'burningQuestions',
+        'targetDefinition': 'targetDefinition',
+        'sampleSize': 'sampleSize',
+        'markets': 'markets',
+        'quotas': 'quotas',
+        'advancedAnalysis': 'advancedAnalysis',
+        'referenceProjects': 'referenceProjects',
+      };
+      const mappedSection = sectionMap[externalActiveSection] || externalActiveSection;
+      if (mappedSection && SECTION_CONFIG.some(s => s.id === mappedSection)) {
+        setActiveSectionInternal(mappedSection);
+      }
+    }
+  }, [externalActiveSection]);
 
   // Track changes
   useEffect(() => {
@@ -242,44 +274,44 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
       <div className="flex flex-1 flex-col">
         {/* Header Actions */}
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-3">
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setVersionsModalOpen(true)}>
-              <History className="mr-2 h-4 w-4" />
-              Versions
+          <div className="flex items-center gap-1.5">
+            <Button variant="outline" size="sm" onClick={() => setVersionsModalOpen(true)} className="whitespace-nowrap px-2.5">
+              <History className="h-4 w-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">Versions</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setCoworkingModalOpen(true)}>
-              <Users className="mr-2 h-4 w-4" />
-              Coworking
+            <Button variant="outline" size="sm" onClick={() => setCoworkingModalOpen(true)} className="whitespace-nowrap px-2.5">
+              <Users className="h-4 w-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">Coworking</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setFeasibilityModalOpen(true)}>
-              <ClipboardCheck className="mr-2 h-4 w-4" />
-              Feasibility Check
+            <Button variant="outline" size="sm" onClick={() => setFeasibilityModalOpen(true)} className="whitespace-nowrap px-2.5">
+              <ClipboardCheck className="h-4 w-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">Feasibility</span>
             </Button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {hasChanges && (
-              <Badge variant="warning" className="mr-2">
-                Unsaved changes
+              <Badge variant="warning" className="mr-1 hidden sm:flex">
+                Unsaved
               </Badge>
             )}
-            <Button variant="secondary" size="sm" onClick={handleSave} className="whitespace-nowrap">
-              <Save className="mr-1.5 h-4 w-4 flex-shrink-0" />
-              <span>Save</span>
+            <Button variant="secondary" size="sm" onClick={handleSave} className="whitespace-nowrap px-3">
+              <Save className="h-4 w-4 sm:mr-1.5 flex-shrink-0" />
+              <span className="hidden sm:inline">Save Draft</span>
             </Button>
             <Button
               variant="primary"
               size="sm"
               onClick={() => setApprovalModalOpen(true)}
               disabled={!isProposalComplete()}
-              className="whitespace-nowrap"
+              className="whitespace-nowrap px-3"
             >
-              <Send className="mr-1.5 h-4 w-4 flex-shrink-0" />
-              <span>Submit</span>
+              <Send className="h-4 w-4 sm:mr-1.5 flex-shrink-0" />
+              <span className="hidden sm:inline">Submit</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setExportModalOpen(true)} className="whitespace-nowrap">
-              <Download className="mr-1.5 h-4 w-4 flex-shrink-0" />
-              <span>Export</span>
+            <Button variant="outline" size="sm" onClick={() => setExportModalOpen(true)} className="whitespace-nowrap px-3">
+              <Download className="h-4 w-4 sm:mr-1.5 flex-shrink-0" />
+              <span className="hidden sm:inline">Export</span>
             </Button>
           </div>
         </div>
