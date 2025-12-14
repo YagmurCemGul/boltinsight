@@ -15,12 +15,18 @@ import {
   User,
   Menu,
   X,
+  Moon,
+  Sun,
+  Bell,
+  Globe,
+  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { SearchSection } from './SearchSection';
 import { ProjectsList } from './ProjectsList';
 import { HistoryList } from './HistoryList';
+import { Modal, Button, Input, Select } from '@/components/ui';
 
 const menuItems = [
   {
@@ -69,6 +75,10 @@ const menuItems = [
 export function Sidebar() {
   const { sidebarOpen, setSidebarOpen, activeSection, setActiveSection, currentUser } = useAppStore();
   const [expandedItems, setExpandedItems] = useState<string[]>(['projects', 'history']);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [notifications, setNotifications] = useState(true);
+  const [language, setLanguage] = useState('en');
 
   const toggleExpand = (id: string) => {
     setExpandedItems((prev) =>
@@ -251,7 +261,10 @@ export function Sidebar() {
                 <p className="text-sm font-medium text-gray-900">{currentUser.name}</p>
                 <p className="text-xs text-gray-500">{currentUser.email}</p>
               </div>
-              <button className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+              <button
+                onClick={() => setSettingsOpen(true)}
+                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              >
                 <Settings className="h-5 w-5" />
               </button>
             </div>
@@ -266,6 +279,106 @@ export function Sidebar() {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+      {/* Settings Modal */}
+      <Modal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        title="Settings"
+        size="md"
+      >
+        <div className="space-y-6">
+          {/* User Info */}
+          <div className="rounded-lg bg-gray-50 p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                <User className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">{currentUser.name}</p>
+                <p className="text-sm text-gray-500">{currentUser.email}</p>
+                <p className="text-xs text-gray-400 capitalize">{currentUser.role}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Appearance */}
+          <div>
+            <h3 className="mb-3 text-sm font-medium text-gray-900">Appearance</h3>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="flex items-center gap-2">
+                {darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                <span className="text-sm">Dark Mode</span>
+              </div>
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className={cn(
+                  'relative h-6 w-11 rounded-full transition-colors',
+                  darkMode ? 'bg-blue-600' : 'bg-gray-200'
+                )}
+              >
+                <span
+                  className={cn(
+                    'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform shadow',
+                    darkMode ? 'left-5' : 'left-0.5'
+                  )}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* Notifications */}
+          <div>
+            <h3 className="mb-3 text-sm font-medium text-gray-900">Notifications</h3>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="flex items-center gap-2">
+                <Bell className="h-4 w-4" />
+                <span className="text-sm">Email Notifications</span>
+              </div>
+              <button
+                onClick={() => setNotifications(!notifications)}
+                className={cn(
+                  'relative h-6 w-11 rounded-full transition-colors',
+                  notifications ? 'bg-blue-600' : 'bg-gray-200'
+                )}
+              >
+                <span
+                  className={cn(
+                    'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform shadow',
+                    notifications ? 'left-5' : 'left-0.5'
+                  )}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* Language */}
+          <div>
+            <h3 className="mb-3 text-sm font-medium text-gray-900">Language</h3>
+            <Select
+              options={[
+                { value: 'en', label: 'English' },
+                { value: 'tr', label: 'Türkçe' },
+                { value: 'de', label: 'Deutsch' },
+                { value: 'fr', label: 'Français' },
+              ]}
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-between border-t pt-4">
+            <Button variant="outline" className="text-red-600 hover:bg-red-50">
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </Button>
+            <Button onClick={() => setSettingsOpen(false)}>
+              Save Changes
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

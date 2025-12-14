@@ -17,10 +17,12 @@ import {
   FileQuestion,
   BookOpen,
   Link as LinkIcon,
+  FileText,
+  FileDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Button, Input, Textarea, Select, Badge, Modal } from '@/components/ui';
+import { Button, Input, Textarea, Select, Badge, Modal, toast } from '@/components/ui';
 import type { Proposal, ProposalContent, User, Market } from '@/types';
 
 interface ProposalEditorProps {
@@ -44,14 +46,18 @@ const SECTION_CONFIG = [
 ];
 
 export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
-  const { projects, currentUser, submitForApproval, updateProposal } = useAppStore();
+  const { projects, currentUser, submitForApproval, updateProposal, setActiveSection: setGlobalActiveSection } = useAppStore();
   const [content, setContent] = useState<ProposalContent>(proposal.content);
   const [activeSection, setActiveSection] = useState('title');
   const [approvalModalOpen, setApprovalModalOpen] = useState(false);
   const [coworkingModalOpen, setCoworkingModalOpen] = useState(false);
   const [versionsModalOpen, setVersionsModalOpen] = useState(false);
+  const [feasibilityModalOpen, setFeasibilityModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [selectedApprover, setSelectedApprover] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
+  const [coworkingEmail, setCoworkingEmail] = useState('');
+  const [invitedUsers, setInvitedUsers] = useState<string[]>([]);
 
   // Track changes
   useEffect(() => {
@@ -70,6 +76,7 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
     onSave(content);
     updateProposal(proposal.id, { content, status: 'draft' });
     setHasChanges(false);
+    toast.success('Draft saved', 'Your proposal has been saved successfully.');
   };
 
   const handleSubmitForApproval = () => {
@@ -84,16 +91,21 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
 
     submitForApproval(proposal.id, approver);
     setApprovalModalOpen(false);
+    toast.success('Submitted for approval', 'Your proposal has been sent to the approver.');
   };
 
   const handleExport = (format: 'word' | 'pdf') => {
     // In real app, this would generate and download the document
-    alert(`Exporting as ${format.toUpperCase()}...`);
+    toast.info(`Exporting as ${format.toUpperCase()}`, 'Your document is being prepared for download...');
+    // Simulate export delay
+    setTimeout(() => {
+      toast.success('Export complete', `Your ${format.toUpperCase()} file is ready.`);
+    }, 1500);
   };
 
   const handleAIRephrase = (sectionId: string) => {
     // In real app, this would call AI API to rephrase content
-    alert(`AI rephrasing ${sectionId}...`);
+    toast.info('AI Processing', `Rephrasing ${sectionId} content...`);
   };
 
   const isProposalComplete = () => {
@@ -178,7 +190,7 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
               <Users className="mr-2 h-4 w-4" />
               Coworking
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => setFeasibilityModalOpen(true)}>
               <ClipboardCheck className="mr-2 h-4 w-4" />
               Feasibility Check
             </Button>
@@ -203,7 +215,7 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
               <Send className="mr-2 h-4 w-4" />
               Send to Approval
             </Button>
-            <Button variant="outline" size="sm" onClick={() => handleExport('word')}>
+            <Button variant="outline" size="sm" onClick={() => setExportModalOpen(true)}>
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
@@ -461,14 +473,56 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
           <p className="text-sm text-gray-600">
             Invite team members to collaborate on this proposal in real-time.
           </p>
-          <Input placeholder="Enter email address" />
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter email address"
+              value={coworkingEmail}
+              onChange={(e) => setCoworkingEmail(e.target.value)}
+              className="flex-1"
+            />
+            <Button
+              onClick={() => {
+                if (coworkingEmail && !invitedUsers.includes(coworkingEmail)) {
+                  setInvitedUsers([...invitedUsers, coworkingEmail]);
+                  setCoworkingEmail('');
+                }
+              }}
+            >
+              Add
+            </Button>
+          </div>
+          {invitedUsers.length > 0 && (
+            <div className="rounded-lg border p-3">
+              <p className="mb-2 text-xs font-medium text-gray-500">Invited Users</p>
+              <div className="space-y-2">
+                {invitedUsers.map((email, i) => (
+                  <div key={i} className="flex items-center justify-between rounded bg-gray-50 px-3 py-2 text-sm">
+                    <span>{email}</span>
+                    <button
+                      onClick={() => setInvitedUsers(invitedUsers.filter((_, idx) => idx !== i))}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setCoworkingModalOpen(false)}>
               Cancel
             </Button>
-            <Button>
+            <Button
+              onClick={() => {
+                toast.success('Invitations sent', `${invitedUsers.length} team member(s) have been invited.`);
+                setInvitedUsers([]);
+                setCoworkingModalOpen(false);
+              }}
+              disabled={invitedUsers.length === 0}
+            >
               <Users className="mr-2 h-4 w-4" />
-              Invite
+              Send Invites
             </Button>
           </div>
         </div>
@@ -483,7 +537,11 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
       >
         <div className="space-y-4">
           {proposal.versions.length === 0 ? (
-            <p className="text-center text-sm text-gray-500">No previous versions</p>
+            <div className="text-center py-8">
+              <History className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+              <p className="text-sm text-gray-500">No previous versions</p>
+              <p className="text-xs text-gray-400 mt-1">Versions are created when you save changes</p>
+            </div>
           ) : (
             proposal.versions.map((version) => (
               <div
@@ -496,12 +554,132 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
                     {version.createdBy.name} - {new Date(version.createdAt).toLocaleString()}
                   </p>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setContent(version.content);
+                    setVersionsModalOpen(false);
+                    toast.success('Version restored', 'Click Save Draft to keep changes.');
+                  }}
+                >
                   Restore
                 </Button>
               </div>
             ))
           )}
+        </div>
+      </Modal>
+
+      {/* Feasibility Check Modal */}
+      <Modal
+        isOpen={feasibilityModalOpen}
+        onClose={() => setFeasibilityModalOpen(false)}
+        title="Quick Feasibility Check"
+        size="md"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Based on current proposal details, here's a quick feasibility assessment.
+          </p>
+
+          <div className="rounded-lg bg-gray-50 p-4 space-y-3">
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Total Sample Size</span>
+              <span className="font-medium">{content.sampleSize?.toLocaleString() || 'Not set'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Markets</span>
+              <span className="font-medium">{content.markets?.length || 0} countries</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Target Audience</span>
+              <span className="font-medium text-right max-w-[200px] truncate">
+                {content.targetDefinition || 'Not defined'}
+              </span>
+            </div>
+          </div>
+
+          {content.sampleSize && content.markets && content.markets.length > 0 ? (
+            <div className="rounded-lg bg-green-50 border border-green-200 p-4">
+              <div className="flex items-center gap-2 text-green-700">
+                <ClipboardCheck className="h-5 w-5" />
+                <span className="font-medium">Likely Feasible</span>
+              </div>
+              <p className="text-sm text-green-600 mt-1">
+                Estimated timeline: 2-4 weeks for {content.sampleSize} completes
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-lg bg-amber-50 border border-amber-200 p-4">
+              <p className="text-sm text-amber-700">
+                Please complete sample size and markets to get feasibility estimate.
+              </p>
+            </div>
+          )}
+
+          <div className="flex justify-between pt-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFeasibilityModalOpen(false);
+                setGlobalActiveSection('feasibility');
+              }}
+            >
+              Full Feasibility Tool
+            </Button>
+            <Button onClick={() => setFeasibilityModalOpen(false)}>
+              Close
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Export Modal */}
+      <Modal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        title="Export Proposal"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Choose a format to export your proposal.
+          </p>
+
+          <div className="space-y-2">
+            <button
+              onClick={() => {
+                handleExport('word');
+                setExportModalOpen(false);
+              }}
+              className="flex w-full items-center gap-3 rounded-lg border p-4 text-left hover:bg-gray-50 transition-colors"
+            >
+              <FileText className="h-8 w-8 text-blue-600" />
+              <div>
+                <p className="font-medium">Word Document</p>
+                <p className="text-sm text-gray-500">Export as .docx file</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => {
+                handleExport('pdf');
+                setExportModalOpen(false);
+              }}
+              className="flex w-full items-center gap-3 rounded-lg border p-4 text-left hover:bg-gray-50 transition-colors"
+            >
+              <FileDown className="h-8 w-8 text-red-600" />
+              <div>
+                <p className="font-medium">PDF Document</p>
+                <p className="text-sm text-gray-500">Export as .pdf file</p>
+              </div>
+            </button>
+          </div>
+
+          <Button variant="outline" onClick={() => setExportModalOpen(false)} className="w-full">
+            Cancel
+          </Button>
         </div>
       </Modal>
     </div>

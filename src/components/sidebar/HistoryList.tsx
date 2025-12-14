@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { FileText, MoreVertical, Copy, Trash2, FolderInput } from 'lucide-react';
+import { FileText, MoreVertical, Copy, Trash2, FolderInput, AlertTriangle } from 'lucide-react';
 import { cn, formatDate, getStatusColor, truncateText } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Badge, Dropdown, DropdownItem, DropdownSeparator, Modal, Select, Button } from '@/components/ui';
+import { Badge, Dropdown, DropdownItem, DropdownSeparator, Modal, Select, Button, toast } from '@/components/ui';
 
 export function HistoryList() {
   const {
@@ -19,6 +19,7 @@ export function HistoryList() {
   } = useAppStore();
 
   const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState<string | null>(null);
   const [targetProject, setTargetProject] = useState('');
 
@@ -47,11 +48,20 @@ export function HistoryList() {
       comments: [],
       collaborators: [],
     });
+    toast.success('Proposal duplicated', 'A copy has been created as a draft.');
   };
 
-  const handleDelete = (proposalId: string) => {
-    if (confirm('Are you sure you want to delete this proposal?')) {
-      deleteProposal(proposalId);
+  const openDeleteModal = (proposalId: string) => {
+    setSelectedProposal(proposalId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = () => {
+    if (selectedProposal) {
+      deleteProposal(selectedProposal);
+      setDeleteModalOpen(false);
+      setSelectedProposal(null);
+      toast.success('Proposal deleted', 'The proposal has been moved to trash.');
     }
   };
 
@@ -63,10 +73,12 @@ export function HistoryList() {
 
   const handleMove = () => {
     if (selectedProposal && targetProject) {
+      const project = projects.find(p => p.id === targetProject);
       moveProposalToProject(selectedProposal, targetProject);
       setMoveModalOpen(false);
       setSelectedProposal(null);
       setTargetProject('');
+      toast.success('Proposal moved', `Moved to "${project?.name || 'project'}".`);
     }
   };
 
@@ -134,7 +146,7 @@ export function HistoryList() {
               <DropdownSeparator />
               <DropdownItem
                 variant="destructive"
-                onClick={() => handleDelete(proposal.id)}
+                onClick={() => openDeleteModal(proposal.id)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
@@ -169,6 +181,40 @@ export function HistoryList() {
             </Button>
             <Button onClick={handleMove} disabled={!targetProject}>
               Move
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title="Delete Proposal"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 rounded-lg bg-red-50 p-4">
+            <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-red-800">
+                Are you sure you want to delete this proposal?
+              </p>
+              <p className="mt-1 text-xs text-red-600">
+                This action cannot be undone.
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
             </Button>
           </div>
         </div>

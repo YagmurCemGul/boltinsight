@@ -107,65 +107,172 @@ export function ChatInterface({ onProposalGenerated }: ChatInterfaceProps) {
   const generateAIResponse = (userMessage: string): string => {
     const lowerMessage = userMessage.toLowerCase();
 
-    // Simple pattern matching for demo
-    if (lowerMessage.includes('brand') && lowerMessage.includes('track')) {
-      return `I understand you're looking to set up a brand tracking study. Here's what I've gathered:
+    // Brand tracking study
+    if (lowerMessage.includes('brand') && (lowerMessage.includes('track') || lowerMessage.includes('health'))) {
+      return `I understand you're looking to set up a **Brand Health Tracking** study. This is great for measuring brand awareness, perception, and equity over time.
 
-**Research Type:** Brand Health Tracking
+**Recommended Structure:**
+- Frequency: Quarterly or Monthly waves
+- Core metrics: Awareness, Consideration, Usage, NPS
+- Competitive benchmarking included
 
-I'll need a few more details:
-1. Which markets/countries should this cover?
-2. What's the target audience definition?
-3. What sample size are you considering per market?
-4. Are there specific competitors to track?
+**I'll need a few details:**
+1. **Markets:** Which countries should this cover?
+2. **Target Audience:** Who are we surveying? (e.g., Adults 18-54, category users)
+3. **Sample Size:** Typically n=500-1000 per market for ±3-4% margin of error
+4. **Competitors:** Any specific brands to track alongside?
 
-Please provide these details so I can build out the complete proposal.`;
+Please share these details and I'll build out the complete proposal.`;
     }
 
+    // Concept testing
     if (lowerMessage.includes('concept') && lowerMessage.includes('test')) {
-      return `Great! A concept test is a solid approach. Let me help structure this:
+      return `Great choice! **Concept Testing** is ideal for evaluating new ideas before launch.
 
-**Research Type:** Concept Testing
+**Recommended Approach:**
+- Monadic or Sequential Monadic design
+- Key metrics: Appeal, Relevance, Uniqueness, Purchase Intent
+- Include open-ends for improvement ideas
 
-To proceed, I'll need:
-1. How many concepts are being tested?
-2. Target audience description
-3. Markets/regions for the study
-4. Desired sample size
-5. Any specific metrics beyond standard appeal/purchase intent?
+**To proceed, I need:**
+1. **Number of concepts:** How many are we testing?
+2. **Target Audience:** Who should evaluate these?
+3. **Markets:** Where will this launch?
+4. **Sample Size:** Min n=150-200 per concept for robust results
+5. **Comparison:** Any benchmark or control concept?
 
-Share what you have and I'll fill in the proposal sections.`;
+Share what you have and I'll structure the proposal!`;
     }
 
+    // U&A / Usage and Attitude
+    if (lowerMessage.includes('u&a') || lowerMessage.includes('usage') && lowerMessage.includes('attitude')) {
+      return `**Usage & Attitude (U&A)** studies are perfect for deep-diving into consumer behavior and market dynamics.
+
+**Typical U&A Structure:**
+- Category usage behavior
+- Brand funnel metrics
+- Need states and occasions
+- Attitudes and perceptions
+- Demographics and segmentation variables
+
+**What I need from you:**
+1. **Category:** What product/service category?
+2. **Markets:** Which countries?
+3. **Target:** Category users or broader population?
+4. **Sample Size:** Usually n=1000+ for segmentation capability
+5. **Key Questions:** What business decisions will this inform?
+
+Let me know these details to build your proposal!`;
+    }
+
+    // Sample size questions
     if (lowerMessage.includes('sample') && lowerMessage.includes('size')) {
-      return `For sample size recommendations, I consider:
+      return `Great question! **Sample size** depends on several factors:
 
-- **Margin of error tolerance** (typically 3-5% for quantitative)
-- **Subgroup analysis needs** (min n=100 per subgroup)
-- **Statistical power requirements**
+**Key Considerations:**
+| Margin of Error | Sample Size (95% CI) |
+|-----------------|---------------------|
+| ±5% | n=385 |
+| ±4% | n=600 |
+| ±3% | n=1,067 |
+| ±2% | n=2,401 |
 
-Based on typical brand tracking studies:
-- Single market: n=500-1000
-- Multi-market: n=300-500 per market
+**My Recommendations:**
+- **Brand Tracking:** n=500-1000 per market
+- **Concept Test:** n=150-200 per concept
+- **U&A Study:** n=1000+ for segmentation
+- **Subgroup Analysis:** Min n=100 per subgroup
 
-Would you like me to calculate a specific margin of error, or shall we proceed with standard recommendations?`;
+Would you like me to calculate a specific sample size for your needs? Just tell me:
+1. Desired margin of error
+2. Number of subgroups to analyze
+3. Population size (if limited)`;
     }
 
-    // Default response
-    return `Thank you for that information. I'm processing the details you've provided.
+    // Segmentation
+    if (lowerMessage.includes('segment')) {
+      return `**Segmentation** studies help identify distinct consumer groups for targeted marketing.
 
-Based on what you've shared, I'm building out the proposal sections. Here's what I have so far:
+**Common Approaches:**
+- Attitudinal segmentation (needs/motivations)
+- Behavioral segmentation (usage patterns)
+- Hybrid approach (combining both)
 
-**Completed Sections:**
-- Basic project information captured
-- Initial context noted
+**Requirements:**
+1. **Sample Size:** Minimum n=1000-1500 for robust segments
+2. **Segmentation Base:** What should define segments?
+3. **Profiling Variables:** Demographics, media, shopping behavior
+4. **Deliverables:** Segment personas, sizing, targeting recommendations
 
-**Still Needed:**
-- Target Definition
-- Sample Size
-- Markets (with languages)
+What category or brand is this for? I'll tailor the approach accordingly.`;
+    }
 
-Would you like to continue providing details, or should I show you the current draft?`;
+    // Pricing / price research
+    if (lowerMessage.includes('price') || lowerMessage.includes('pricing')) {
+      return `For **Pricing Research**, I recommend considering these methodologies:
+
+**Options:**
+1. **Van Westendorp PSM:** Quick price sensitivity meter (n=200+)
+2. **Gabor-Granger:** Direct price acceptance (n=300+)
+3. **Conjoint Analysis:** Trade-off based pricing (n=400+)
+
+**Key Questions:**
+- New product or existing?
+- Do you need competitive price positioning?
+- Is this for a single market or multi-market?
+
+Let me know your specific pricing questions and I'll recommend the best approach!`;
+    }
+
+    // Client name detection
+    if (lowerMessage.includes('coca-cola') || lowerMessage.includes('nestle') || lowerMessage.includes('unilever') || lowerMessage.includes('pepsico')) {
+      const clientMatch = lowerMessage.match(/coca-cola|nestle|unilever|pepsico|danone|p&g|procter/i);
+      const client = clientMatch ? clientMatch[0] : 'the client';
+      return `I see this is for **${client.charAt(0).toUpperCase() + client.slice(1)}**. I've noted this in the proposal.
+
+**Client:** ${client.charAt(0).toUpperCase() + client.slice(1)}
+
+Now I need to understand the research objectives:
+1. What business decision will this research inform?
+2. What type of study is needed? (Brand tracking, Concept test, U&A, etc.)
+3. Which markets should we include?
+4. What's the timeline for this project?
+
+Please share more details!`;
+    }
+
+    // Market/country mention
+    if (lowerMessage.includes('usa') || lowerMessage.includes('uk') || lowerMessage.includes('germany') || lowerMessage.includes('france') || lowerMessage.includes('market')) {
+      return `Great, I'm capturing the market information.
+
+**For each market, please confirm:**
+1. **Country name**
+2. **Language** for the survey
+3. **Sample size** allocation
+
+**Typical Sample Distribution:**
+- Lead market: 40-50% of total sample
+- Secondary markets: 25-30% each
+- Tertiary markets: 10-15% each
+
+Would you like me to suggest a sample distribution, or do you have specific allocations in mind?`;
+    }
+
+    // Default contextual response
+    return `Thank you for that information! I'm analyzing what you've shared.
+
+**Here's what I've captured:**
+✓ Initial project context received
+✓ Building proposal structure
+
+**To complete the proposal, I'll need:**
+- **Client Name:** Who is this research for?
+- **Research Type:** Brand tracking, Concept test, U&A, Segmentation?
+- **Target Audience:** Who should we survey?
+- **Sample Size:** Total completes needed
+- **Markets:** Countries and languages
+
+You can share these in any order, or click **Editor Mode** above to fill in the details manually. What would you like to provide next?`;
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

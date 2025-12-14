@@ -116,8 +116,9 @@ export function FeasibilityCheck() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl p-6">
-      <Card>
+    <div className="h-full overflow-y-auto">
+      <div className="mx-auto max-w-2xl p-6">
+        <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClipboardCheck className="h-5 w-5" />
@@ -287,6 +288,7 @@ export function FeasibilityCheck() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
