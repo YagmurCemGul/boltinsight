@@ -91,6 +91,16 @@ const mockProposals: Proposal[] = [
         'Understand consumer segments',
         'Identify growth opportunities',
       ],
+      researchObjectives: [
+        'To identify distinct consumer segments based on health attitudes',
+        'To understand purchase drivers by segment',
+        'To map brand positioning vs competitors',
+      ],
+      burningQuestions: [
+        'What percentage of consumers prioritize health over taste?',
+        'How price sensitive are health-conscious segments?',
+        'What is the optimal pack size for different occasions?',
+      ],
       targetDefinition: 'Adults 25-54, health-conscious consumers',
       sampleSize: 2000,
       markets: [
@@ -102,7 +112,22 @@ const mockProposals: Proposal[] = [
     author: currentUser,
     createdAt: '2024-12-12T09:00:00Z',
     updatedAt: '2024-12-12T09:00:00Z',
-    versions: [],
+    versions: [
+      {
+        id: 'v2-1',
+        version: 1,
+        content: { title: 'Consumer Study', client: 'Danone' },
+        createdAt: '2024-12-11T10:00:00Z',
+        createdBy: currentUser,
+      },
+      {
+        id: 'v2-2',
+        version: 2,
+        content: { title: 'Consumer Segmentation Study', client: 'Danone', targetDefinition: 'Adults 25-54' },
+        createdAt: '2024-12-12T09:00:00Z',
+        createdBy: currentUser,
+      },
+    ],
   },
   {
     id: 'proposal-3',
@@ -131,7 +156,29 @@ const mockProposals: Proposal[] = [
     author: currentUser,
     createdAt: '2024-12-13T11:00:00Z',
     updatedAt: '2024-12-14T08:00:00Z',
-    versions: [],
+    versions: [
+      {
+        id: 'v3-1',
+        version: 1,
+        content: { title: 'Concept Testing', client: 'Nestle', sampleSize: 1000 },
+        createdAt: '2024-12-13T11:00:00Z',
+        createdBy: currentUser,
+      },
+      {
+        id: 'v3-2',
+        version: 2,
+        content: { title: 'Concept Testing - New Product Line', client: 'Nestle', sampleSize: 1500 },
+        createdAt: '2024-12-13T15:00:00Z',
+        createdBy: currentUser,
+      },
+      {
+        id: 'v3-3',
+        version: 3,
+        content: { title: 'Concept Testing - New Product Line', client: 'Nestle', sampleSize: 1500, markets: [{ country: 'Germany', language: 'German', sampleSize: 500 }] },
+        createdAt: '2024-12-14T08:00:00Z',
+        createdBy: currentUser,
+      },
+    ],
   },
   {
     id: 'proposal-4',

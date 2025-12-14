@@ -237,21 +237,41 @@ export function FeasibilityCheck() {
 
               {/* Key Metrics */}
               <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-lg border p-4 text-center">
-                  <p className="text-sm text-gray-500">Incidence Rate</p>
-                  <p className="text-2xl font-bold text-gray-900">{result.incidenceRate}%</p>
+                <div className={cn(
+                  'rounded-lg border-2 p-4 text-center',
+                  result.incidenceRate >= 30 ? 'border-green-300 bg-green-50 dark:bg-green-900/20' :
+                  result.incidenceRate >= 10 ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20' :
+                  'border-red-300 bg-red-50 dark:bg-red-900/20'
+                )}>
+                  <div className={cn(
+                    'mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full',
+                    result.incidenceRate >= 30 ? 'bg-green-100 dark:bg-green-800' :
+                    result.incidenceRate >= 10 ? 'bg-yellow-100 dark:bg-yellow-800' :
+                    'bg-red-100 dark:bg-red-800'
+                  )}>
+                    <span className={cn(
+                      'text-lg font-bold',
+                      result.incidenceRate >= 30 ? 'text-green-700 dark:text-green-300' :
+                      result.incidenceRate >= 10 ? 'text-yellow-700 dark:text-yellow-300' :
+                      'text-red-700 dark:text-red-300'
+                    )}>{result.incidenceRate}%</span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Incidence Rate</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {result.incidenceRate >= 30 ? 'Good' : result.incidenceRate >= 10 ? 'Moderate' : 'Low'}
+                  </p>
                 </div>
-                <div className="rounded-lg border p-4 text-center">
-                  <Clock className="mx-auto mb-1 h-5 w-5 text-gray-400" />
-                  <p className="text-sm text-gray-500">Est. Timeline</p>
-                  <p className="text-lg font-semibold text-gray-900">{result.estimatedTimeline}</p>
+                <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center bg-white dark:bg-gray-800">
+                  <Clock className="mx-auto mb-2 h-8 w-8 text-blue-500" />
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{result.estimatedTimeline}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Est. Timeline</p>
                 </div>
-                <div className="rounded-lg border p-4 text-center">
-                  <DollarSign className="mx-auto mb-1 h-5 w-5 text-gray-400" />
-                  <p className="text-sm text-gray-500">Est. Cost</p>
-                  <p className="text-lg font-semibold text-gray-900">
+                <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center bg-white dark:bg-gray-800">
+                  <DollarSign className="mx-auto mb-2 h-8 w-8 text-green-500" />
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
                     ${result.estimatedCost.toLocaleString()}
                   </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Est. Cost</p>
                 </div>
               </div>
 

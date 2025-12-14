@@ -236,44 +236,6 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
         )}
       </div>
 
-      {/* Required Sections Alert - Show incomplete required sections */}
-      {!collapsed && (
-        <div className="px-4 py-2">
-          {(() => {
-            const requiredSections = SECTIONS.filter(s => s.fields.some(f => f.required));
-            const incompleteRequired = requiredSections.filter(s => !sectionStatus[s.id]?.complete);
-
-            if (incompleteRequired.length > 0) {
-              return (
-                <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-3">
-                  <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-2">
-                    Required sections to complete:
-                  </p>
-                  <div className="space-y-1">
-                    {incompleteRequired.slice(0, 3).map((section) => (
-                      <button
-                        key={section.id}
-                        onClick={() => onSectionClick?.(section.id)}
-                        className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 w-full text-left"
-                      >
-                        <Circle className="h-3 w-3 flex-shrink-0" />
-                        <span className="truncate">{section.label}</span>
-                      </button>
-                    ))}
-                    {incompleteRequired.length > 3 && (
-                      <p className="text-xs text-amber-600 dark:text-amber-500 ml-5">
-                        +{incompleteRequired.length - 3} more
-                      </p>
-                    )}
-                  </div>
-                </div>
-              );
-            }
-            return null;
-          })()}
-        </div>
-      )}
-
       {/* Sections List */}
       <div className="flex-1 overflow-y-auto">
         <nav className={cn("space-y-1", collapsed ? "p-1" : "p-2")}>
@@ -281,6 +243,8 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
             const status = sectionStatus[section.id];
             const isActive = activeSection === section.id;
             const hasRequired = section.fields.some((f) => f.required);
+
+            const isIncompleteRequired = hasRequired && !status?.complete;
 
             return (
               <button
@@ -291,6 +255,8 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                   collapsed ? 'p-2 flex items-center justify-center' : 'p-3',
                   isActive
                     ? 'bg-blue-50 ring-1 ring-blue-200'
+                    : isIncompleteRequired
+                    ? 'border border-red-300 dark:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
                     : 'hover:bg-gray-50'
                 )}
                 title={collapsed ? section.label : undefined}
@@ -300,10 +266,12 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                   <div className="relative">
                     <section.icon className={cn(
                       'h-5 w-5',
-                      isActive ? 'text-blue-600' : 'text-gray-400'
+                      isActive ? 'text-blue-600' : isIncompleteRequired ? 'text-red-400' : 'text-gray-400'
                     )} />
-                    {status?.complete && (
+                    {status?.complete ? (
                       <CheckCircle className="absolute -top-1 -right-1 h-3 w-3 text-green-500 bg-white rounded-full" />
+                    ) : isIncompleteRequired && (
+                      <Circle className="absolute -top-1 -right-1 h-3 w-3 text-red-400 bg-white rounded-full" />
                     )}
                   </div>
                 ) : (
@@ -313,8 +281,8 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                     <div className="mt-0.5">
                       {status?.complete ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
-                      ) : hasRequired ? (
-                        <Circle className="h-4 w-4 text-gray-300" />
+                      ) : isIncompleteRequired ? (
+                        <Circle className="h-4 w-4 text-red-400" />
                       ) : (
                         <Circle className="h-4 w-4 text-gray-200" />
                       )}

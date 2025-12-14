@@ -238,8 +238,8 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
           {quotas && (
             <div className="mt-6 space-y-6">
               {/* Age Distribution */}
-              <div className="rounded-lg border border-gray-200 p-4">
-                <h3 className="mb-4 flex items-center gap-2 font-medium text-gray-900">
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                <h3 className="mb-4 flex items-center gap-2 font-medium text-gray-900 dark:text-white">
                   <PieChart className="h-4 w-4" />
                   Age Distribution
                 </h3>
@@ -247,12 +247,12 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
                   {quotas.ageGroups.map((group) => (
                     <div key={group.range}>
                       <div className="mb-1 flex items-center justify-between text-sm">
-                        <span className="text-gray-600">{group.range}</span>
-                        <span className="font-medium">
+                        <span className="text-gray-600 dark:text-gray-300">{group.range}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
                           {group.percentage}% (n={group.count})
                         </span>
                       </div>
-                      <div className="h-2 rounded-full bg-gray-200">
+                      <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-700">
                         <div
                           className="h-full rounded-full bg-blue-500"
                           style={{ width: `${group.percentage}%` }}
@@ -264,8 +264,8 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
               </div>
 
               {/* Gender Distribution */}
-              <div className="rounded-lg border border-gray-200 p-4">
-                <h3 className="mb-4 flex items-center gap-2 font-medium text-gray-900">
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                <h3 className="mb-4 flex items-center gap-2 font-medium text-gray-900 dark:text-white">
                   <Users className="h-4 w-4" />
                   Gender Distribution
                 </h3>
@@ -275,12 +275,14 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
                       key={g.category}
                       className={cn(
                         'rounded-lg p-4 text-center',
-                        g.category === 'Male' ? 'bg-blue-50' : 'bg-pink-50'
+                        g.category === 'Male'
+                          ? 'bg-blue-50 dark:bg-blue-900/30'
+                          : 'bg-pink-50 dark:bg-pink-900/30'
                       )}
                     >
-                      <p className="text-sm text-gray-600">{g.category}</p>
-                      <p className="text-2xl font-bold text-gray-900">{g.percentage}%</p>
-                      <p className="text-sm text-gray-500">n = {g.count}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{g.category}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{g.percentage}%</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">n = {g.count}</p>
                     </div>
                   ))}
                 </div>

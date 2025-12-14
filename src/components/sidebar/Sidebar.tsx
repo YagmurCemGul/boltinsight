@@ -23,6 +23,9 @@ import {
   LogOut,
   PanelLeftClose,
   PanelLeft,
+  Percent,
+  Users,
+  ClipboardCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
@@ -60,19 +63,19 @@ const menuItems = [
   {
     id: 'moe-calculator',
     label: 'Margin of Error',
-    icon: Calculator,
+    icon: Percent,
     expandable: false,
   },
   {
     id: 'demographics',
     label: 'Demographics & Quota',
-    icon: Calculator,
+    icon: Users,
     expandable: false,
   },
   {
     id: 'feasibility',
     label: 'Feasibility Check',
-    icon: Calculator,
+    icon: ClipboardCheck,
     expandable: false,
   },
   {
@@ -388,9 +391,6 @@ export function Sidebar() {
             <Select
               options={[
                 { value: 'en', label: 'English' },
-                { value: 'tr', label: 'Türkçe' },
-                { value: 'de', label: 'Deutsch' },
-                { value: 'fr', label: 'Français' },
               ]}
               value={language}
               onChange={(e) => setLanguage(e.target.value)}

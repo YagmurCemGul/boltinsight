@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Search, Filter, Calendar, Tag, X } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Search, Filter, Calendar, Tag, X, User } from 'lucide-react';
 import { Input, Badge, Select } from '@/components/ui';
 import { useAppStore } from '@/lib/store';
 import { cn, formatDate, getStatusColor, getStatusLabel, truncateText } from '@/lib/utils';
@@ -21,46 +21,55 @@ const statusOptions = [
 ];
 
 export function SearchSection({ searchAll }: SearchSectionProps) {
-  const { searchProposals, setCurrentProposal, setActiveSection } = useAppStore();
+  const { proposals, currentUser, setCurrentProposal, setActiveSection } = useAppStore();
   const [query, setQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
-  const [results, setResults] = useState<ReturnType<typeof searchProposals>>([]);
-  const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = () => {
-    let searchResults = searchProposals(query, searchAll);
+  // Filter proposals based on search criteria
+  const results = useMemo(() => {
+    let filtered = proposals.filter(p => p.status !== 'deleted');
+
+    // For "My Proposals", filter by current user
+    if (!searchAll) {
+      filtered = filtered.filter(p => p.author.id === currentUser.id);
+    }
+
+    // Apply text search
+    if (query) {
+      const lowerQuery = query.toLowerCase();
+      filtered = filtered.filter(p =>
+        p.content.title?.toLowerCase().includes(lowerQuery) ||
+        p.content.client?.toLowerCase().includes(lowerQuery) ||
+        p.code?.toLowerCase().includes(lowerQuery)
+      );
+    }
 
     // Apply status filter
     if (statusFilter) {
-      searchResults = searchResults.filter((p) => p.status === statusFilter);
+      filtered = filtered.filter(p => p.status === statusFilter);
     }
 
-    // Apply date filter (last 7, 30, 90 days)
+    // Apply date filter
     if (dateFilter) {
       const days = parseInt(dateFilter);
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
-      searchResults = searchResults.filter((p) => new Date(p.createdAt) >= cutoffDate);
+      filtered = filtered.filter(p => new Date(p.createdAt) >= cutoffDate);
     }
 
-    setResults(searchResults);
-    setHasSearched(true);
-  };
+    // Sort by most recent
+    return filtered.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  }, [proposals, currentUser.id, searchAll, query, statusFilter, dateFilter]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const handleResultClick = (proposal: ReturnType<typeof searchProposals>[0]) => {
+  const handleResultClick = (proposal: typeof results[0]) => {
     setCurrentProposal(proposal);
     setActiveSection('view-proposal');
   };
 
   const clearFilters = () => {
+    setQuery('');
     setStatusFilter('');
     setDateFilter('');
   };
@@ -74,7 +83,6 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
           placeholder={searchAll ? 'Search all proposals...' : 'Search my proposals...'}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
           className="pl-9 pr-10"
         />
         <button
@@ -90,7 +98,7 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
 
       {/* Filters */}
       {showFilters && (
-        <div className="space-y-2 rounded-lg bg-gray-50 p-3">
+        <div className="space-y-2 rounded-lg bg-gray-50 dark:bg-gray-800 p-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-500">Filters</span>
             {(statusFilter || dateFilter) && (
@@ -133,51 +141,41 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
         </div>
       )}
 
-      {/* Search Button */}
-      <button
-        onClick={handleSearch}
-        className="w-full rounded-lg bg-gray-100 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
-      >
-        Search
-      </button>
-
       {/* Results */}
-      {hasSearched && (
-        <div className="space-y-2">
-          <p className="text-xs text-gray-500">
-            {results.length} {results.length === 1 ? 'result' : 'results'} found
-          </p>
+      <div className="space-y-2">
+        <p className="text-xs text-gray-500">
+          {results.length} {results.length === 1 ? 'proposal' : 'proposals'} {query || statusFilter || dateFilter ? 'found' : ''}
+        </p>
 
-          {results.length > 0 ? (
-            <div className="max-h-60 space-y-1 overflow-y-auto">
-              {results.map((proposal) => (
-                <button
-                  key={proposal.id}
-                  onClick={() => handleResultClick(proposal)}
-                  className="flex w-full flex-col items-start gap-1 rounded-lg bg-white p-2 text-left transition-colors hover:bg-gray-50"
-                >
-                  <div className="flex w-full items-center justify-between">
-                    <span className="text-xs font-medium text-gray-900">
-                      {proposal.code || 'Draft'}
-                    </span>
-                    <span className={cn('rounded px-1.5 py-0.5 text-[10px]', getStatusColor(proposal.status))}>
-                      {getStatusLabel(proposal.status)}
-                    </span>
-                  </div>
-                  <span className="text-xs text-gray-600">
-                    {truncateText(proposal.content.title || 'Untitled', 35)}
+        {results.length > 0 ? (
+          <div className="max-h-60 space-y-1 overflow-y-auto">
+            {results.map((proposal) => (
+              <button
+                key={proposal.id}
+                onClick={() => handleResultClick(proposal)}
+                className="flex w-full flex-col items-start gap-1 rounded-lg bg-white p-2 text-left transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+              >
+                <div className="flex w-full items-center justify-between">
+                  <span className="text-xs font-medium text-gray-900 dark:text-white">
+                    {proposal.code || 'Draft'}
                   </span>
-                  <span className="text-[10px] text-gray-400">
-                    {proposal.content.client} - {formatDate(proposal.createdAt)}
+                  <span className={cn('rounded px-1.5 py-0.5 text-[10px]', getStatusColor(proposal.status))}>
+                    {getStatusLabel(proposal.status)}
                   </span>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-xs text-gray-400">No proposals found</p>
-          )}
-        </div>
-      )}
+                </div>
+                <span className="text-xs text-gray-600 dark:text-gray-300">
+                  {truncateText(proposal.content.title || 'Untitled', 35)}
+                </span>
+                <span className="text-[10px] text-gray-400">
+                  {proposal.content.client} - {formatDate(proposal.createdAt)}
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-xs text-gray-400">No proposals found</p>
+        )}
+      </div>
     </div>
   );
 }
