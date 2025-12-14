@@ -7,3 +7,4 @@ export { Modal } from './modal';
 export { Select } from './select';
 export { Dropdown, DropdownItem, DropdownSeparator } from './dropdown';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+export { ToastContainer, toast, useToastStore } from './toast';

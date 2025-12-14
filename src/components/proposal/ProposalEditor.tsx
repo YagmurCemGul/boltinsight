@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Button, Input, Textarea, Select, Badge, Modal } from '@/components/ui';
+import { Button, Input, Textarea, Select, Badge, Modal, toast } from '@/components/ui';
 import type { Proposal, ProposalContent, User, Market } from '@/types';
 
 interface ProposalEditorProps {
@@ -76,6 +76,7 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
     onSave(content);
     updateProposal(proposal.id, { content, status: 'draft' });
     setHasChanges(false);
+    toast.success('Draft saved', 'Your proposal has been saved successfully.');
   };
 
   const handleSubmitForApproval = () => {
@@ -90,16 +91,21 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
 
     submitForApproval(proposal.id, approver);
     setApprovalModalOpen(false);
+    toast.success('Submitted for approval', 'Your proposal has been sent to the approver.');
   };
 
   const handleExport = (format: 'word' | 'pdf') => {
     // In real app, this would generate and download the document
-    alert(`Exporting as ${format.toUpperCase()}...`);
+    toast.info(`Exporting as ${format.toUpperCase()}`, 'Your document is being prepared for download...');
+    // Simulate export delay
+    setTimeout(() => {
+      toast.success('Export complete', `Your ${format.toUpperCase()} file is ready.`);
+    }, 1500);
   };
 
   const handleAIRephrase = (sectionId: string) => {
     // In real app, this would call AI API to rephrase content
-    alert(`AI rephrasing ${sectionId}...`);
+    toast.info('AI Processing', `Rephrasing ${sectionId} content...`);
   };
 
   const isProposalComplete = () => {
@@ -509,7 +515,8 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
             </Button>
             <Button
               onClick={() => {
-                alert(`Invitations sent to ${invitedUsers.length} users!`);
+                toast.success('Invitations sent', `${invitedUsers.length} team member(s) have been invited.`);
+                setInvitedUsers([]);
                 setCoworkingModalOpen(false);
               }}
               disabled={invitedUsers.length === 0}
@@ -553,7 +560,7 @@ export function ProposalEditor({ proposal, onSave }: ProposalEditorProps) {
                   onClick={() => {
                     setContent(version.content);
                     setVersionsModalOpen(false);
-                    alert('Version restored! Click Save Draft to keep changes.');
+                    toast.success('Version restored', 'Click Save Draft to keep changes.');
                   }}
                 >
                   Restore
