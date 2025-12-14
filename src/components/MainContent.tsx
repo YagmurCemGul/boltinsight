@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { Sidebar } from '@/components/sidebar';
 import { ChatInterface } from '@/components/chat';
-import { ProposalEditor } from '@/components/proposal';
+import { ProposalEditor, RightSidebar } from '@/components/proposal';
 import { MetaLearnings } from '@/components/meta-learnings';
 import { MarginOfErrorCalculator, DemographicDistribution, FeasibilityCheck } from '@/components/tools';
 import { Library } from '@/components/library';
@@ -25,6 +25,13 @@ export function MainContent() {
 
   const [proposalMode, setProposalMode] = useState<'chat' | 'editor'>('chat');
   const [workingProposal, setWorkingProposal] = useState<Proposal | null>(null);
+  const [activeSidebarSection, setActiveSidebarSection] = useState<string | undefined>();
+
+  // Get current proposal content for RightSidebar
+  const currentProposalContent: ProposalContent = workingProposal?.content || {
+    title: '',
+    client: '',
+  };
 
   // Create new proposal when starting from chat
   const handleStartNewProposal = () => {
@@ -63,69 +70,88 @@ export function MainContent() {
     switch (activeSection) {
       case 'new-proposal':
         return (
-          <div className="flex h-full flex-col">
-            {/* Mode Toggle */}
-            <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">
-                  {proposalMode === 'chat' ? 'Create New Proposal' : 'Edit Proposal'}
-                </h1>
-                <p className="text-sm text-gray-500">
-                  {proposalMode === 'chat'
-                    ? 'Start a conversation to build your proposal'
-                    : 'Edit and refine your proposal content'}
-                </p>
+          <div className="flex h-full">
+            {/* Main Content Area */}
+            <div className="flex flex-1 flex-col overflow-hidden">
+              {/* Mode Toggle */}
+              <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
+                <div>
+                  <h1 className="text-lg font-semibold text-gray-900">
+                    {proposalMode === 'chat' ? 'Create New Proposal' : 'Edit Proposal'}
+                  </h1>
+                  <p className="text-sm text-gray-500">
+                    {proposalMode === 'chat'
+                      ? 'Start a conversation to build your proposal'
+                      : 'Edit and refine your proposal content'}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setProposalMode('chat')}
+                    className={cn(
+                      'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                      proposalMode === 'chat'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    )}
+                  >
+                    Chat Mode
+                  </button>
+                  <button
+                    onClick={handleSwitchToEditor}
+                    className={cn(
+                      'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                      proposalMode === 'editor'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    )}
+                  >
+                    Editor Mode
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setProposalMode('chat')}
-                  className={cn(
-                    'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
-                    proposalMode === 'chat'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  )}
-                >
-                  Chat Mode
-                </button>
-                <button
-                  onClick={handleSwitchToEditor}
-                  className={cn(
-                    'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
-                    proposalMode === 'editor'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  )}
-                >
-                  Editor Mode
-                </button>
+
+              {/* Content */}
+              <div className="flex-1 overflow-hidden">
+                {proposalMode === 'chat' ? (
+                  <ChatInterface />
+                ) : workingProposal ? (
+                  <ProposalEditor
+                    proposal={workingProposal}
+                    onSave={handleSaveProposal}
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center">
+                    <p className="text-gray-500">Loading...</p>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-hidden">
-              {proposalMode === 'chat' ? (
-                <ChatInterface />
-              ) : workingProposal ? (
-                <ProposalEditor
-                  proposal={workingProposal}
-                  onSave={handleSaveProposal}
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-gray-500">Loading...</p>
-                </div>
-              )}
-            </div>
+            {/* Right Sidebar */}
+            <RightSidebar
+              content={currentProposalContent}
+              activeSection={activeSidebarSection}
+              onSectionClick={setActiveSidebarSection}
+            />
           </div>
         );
 
       case 'view-proposal':
         return currentProposal ? (
-          <ProposalEditor
-            proposal={currentProposal}
-            onSave={(content) => updateProposal(currentProposal.id, { content })}
-          />
+          <div className="flex h-full">
+            <div className="flex-1 overflow-hidden">
+              <ProposalEditor
+                proposal={currentProposal}
+                onSave={(content) => updateProposal(currentProposal.id, { content })}
+              />
+            </div>
+            <RightSidebar
+              content={currentProposal.content}
+              activeSection={activeSidebarSection}
+              onSectionClick={setActiveSidebarSection}
+            />
+          </div>
         ) : (
           <EmptyState message="Select a proposal to view" />
         );
