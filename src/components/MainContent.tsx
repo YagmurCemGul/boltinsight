@@ -73,9 +73,9 @@ export function MainContent() {
     switch (activeSection) {
       case 'new-proposal':
         return (
-          <div className="flex h-full">
+          <div className="flex h-full overflow-hidden">
             {/* Main Content Area */}
-            <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
               {/* Mode Toggle */}
               <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
                 <div>
@@ -146,8 +146,8 @@ export function MainContent() {
 
       case 'view-proposal':
         return currentProposal ? (
-          <div className="flex h-full">
-            <div className="flex-1 overflow-hidden">
+          <div className="flex h-full overflow-hidden">
+            <div className="flex-1 min-w-0 overflow-hidden">
               <ProposalEditor
                 proposal={currentProposal}
                 onSave={(content) => updateProposal(currentProposal.id, { content })}

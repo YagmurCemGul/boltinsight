@@ -4,14 +4,9 @@ import { useState } from 'react';
 import {
   Library as LibraryIcon,
   Plus,
-  ExternalLink,
-  Video,
   FileText,
-  BookOpen,
   Search,
-  Tag,
   Trash2,
-  Edit2,
   FolderOpen,
   Eye,
 } from 'lucide-react';
@@ -35,17 +30,11 @@ import {
 import type { LibraryItem, Proposal } from '@/types';
 
 const CATEGORY_OPTIONS = [
-  { value: 'external_link', label: 'External Link' },
-  { value: 'video', label: 'Video' },
   { value: 'template', label: 'Template' },
-  { value: 'methodology', label: 'Methodology' },
 ];
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
-  external_link: ExternalLink,
-  video: Video,
   template: FileText,
-  methodology: BookOpen,
 };
 
 export function Library() {
@@ -144,7 +133,7 @@ export function Library() {
           <div>
             <h1 className="text-xl font-semibold text-gray-900">Library</h1>
             <p className="text-sm text-gray-500">
-              Resources, external links, videos, and methodology guides
+              Proposals and templates
             </p>
           </div>
           <Button onClick={() => setIsAddModalOpen(true)}>
@@ -180,10 +169,6 @@ export function Library() {
         <Tabs defaultValue="proposals">
           <TabsList className="mb-6">
             <TabsTrigger value="proposals">Proposals</TabsTrigger>
-            <TabsTrigger value="all">All Resources</TabsTrigger>
-            <TabsTrigger value="external_link">External Links</TabsTrigger>
-            <TabsTrigger value="video">Videos</TabsTrigger>
-            <TabsTrigger value="methodology">Methodologies</TabsTrigger>
             <TabsTrigger value="template">Templates</TabsTrigger>
           </TabsList>
 
@@ -232,31 +217,17 @@ export function Library() {
             )}
           </TabsContent>
 
-          <TabsContent value="all">
-            {filteredItems.length === 0 ? (
-              <EmptyState onAdd={() => setIsAddModalOpen(true)} />
+          <TabsContent value="template">
+            {!groupedItems['template'] || groupedItems['template'].length === 0 ? (
+              <EmptyState onAdd={() => setIsAddModalOpen(true)} category="template" />
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredItems.map((item) => (
-                  <LibraryCard key={item.id} item={item} onDelete={handleDelete} />
+                {groupedItems['template'].map((item) => (
+                  <TemplateCard key={item.id} item={item} onDelete={handleDelete} />
                 ))}
               </div>
             )}
           </TabsContent>
-
-          {['external_link', 'video', 'methodology', 'template'].map((category) => (
-            <TabsContent key={category} value={category}>
-              {!groupedItems[category] || groupedItems[category].length === 0 ? (
-                <EmptyState onAdd={() => setIsAddModalOpen(true)} category={category} />
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {groupedItems[category].map((item) => (
-                    <LibraryCard key={item.id} item={item} onDelete={handleDelete} />
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-          ))}
         </Tabs>
       </div>
 
@@ -337,71 +308,6 @@ export function Library() {
   );
 }
 
-function LibraryCard({ item, onDelete }: { item: LibraryItem; onDelete: (id: string) => void }) {
-  const Icon = CATEGORY_ICONS[item.category] || ExternalLink;
-
-  return (
-    <Card className="group relative transition-shadow hover:shadow-md">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <div
-            className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-lg',
-              item.category === 'video' ? 'bg-red-100 text-red-600' :
-              item.category === 'methodology' ? 'bg-purple-100 text-purple-600' :
-              item.category === 'template' ? 'bg-green-100 text-green-600' :
-              'bg-blue-100 text-blue-600'
-            )}
-          >
-            <Icon className="h-5 w-5" />
-          </div>
-
-          <div className="flex-1 overflow-hidden">
-            <h3 className="font-medium text-gray-900">{item.name}</h3>
-            {item.description && (
-              <p className="mt-1 text-sm text-gray-500 line-clamp-2">{item.description}</p>
-            )}
-
-            {item.tags && item.tags.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1">
-                {item.tags.map((tag) => (
-                  <Badge key={tag} variant="default" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-3 flex items-center gap-2">
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
-              >
-                <ExternalLink className="h-3 w-3" />
-                Open
-              </a>
-              <span className="text-gray-300">|</span>
-              <span className="text-xs text-gray-400">
-                Added {formatDate(item.createdAt)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Delete button */}
-        <button
-          onClick={() => onDelete(item.id)}
-          className="absolute right-2 top-2 rounded p-1 text-gray-400 opacity-0 transition-opacity hover:bg-gray-100 hover:text-red-600 group-hover:opacity-100"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
-      </CardContent>
-    </Card>
-  );
-}
-
 function EmptyState({ onAdd, category }: { onAdd: () => void; category?: string }) {
   const categoryLabel = category ?
     CATEGORY_OPTIONS.find((c) => c.value === category)?.label || category :
@@ -470,6 +376,115 @@ function ProposalCard({ proposal, onView }: { proposal: Proposal; onView: () => 
             </div>
           </div>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function TemplateCard({ item, onDelete }: { item: LibraryItem; onDelete: (id: string) => void }) {
+  const { addProposal, setCurrentProposal, setActiveSection, currentUser } = useAppStore();
+
+  const handleUseTemplate = () => {
+    // Template content mapping based on template name
+    const templateContent: Record<string, Partial<Proposal['content']>> = {
+      'Brand Health Tracking Template': {
+        businessObjectives: ['Track brand awareness over time', 'Monitor brand perception changes', 'Measure competitive positioning'],
+        researchObjectives: ['To measure aided and unaided brand awareness', 'To track brand funnel metrics', 'To assess brand image attributes'],
+        burningQuestions: ['How has brand awareness changed since last quarter?', 'What are the key drivers of brand preference?'],
+      },
+      'Customer Satisfaction Survey Template': {
+        businessObjectives: ['Measure overall customer satisfaction', 'Identify improvement areas', 'Track NPS over time'],
+        researchObjectives: ['To measure satisfaction with products/services', 'To identify key drivers of satisfaction', 'To calculate Net Promoter Score'],
+        burningQuestions: ['What is our current NPS score?', 'Which touchpoints need improvement?'],
+      },
+      'Concept Testing Template': {
+        businessObjectives: ['Identify winning concept', 'Understand improvement areas', 'Validate pricing strategy'],
+        researchObjectives: ['To evaluate concept appeal', 'To measure purchase intent', 'To assess price sensitivity'],
+        burningQuestions: ['Which concept has the highest purchase intent?', 'What improvements would increase appeal?'],
+        advancedAnalysis: ['MaxDiff Analysis', 'Conjoint Analysis'],
+      },
+      'U&A Study Template': {
+        businessObjectives: ['Understand category usage patterns', 'Identify growth opportunities', 'Map competitive landscape'],
+        researchObjectives: ['To understand usage frequency and occasions', 'To identify unmet needs', 'To map brand funnel'],
+        burningQuestions: ['What drives category choice?', 'Where are the growth opportunities?'],
+      },
+      'Ad Testing Template': {
+        businessObjectives: ['Evaluate ad effectiveness', 'Optimize creative elements', 'Measure brand lift'],
+        researchObjectives: ['To measure ad recall and recognition', 'To assess message comprehension', 'To evaluate emotional response'],
+        burningQuestions: ['Does the ad communicate the key message?', 'What elements drive engagement?'],
+      },
+      'Price Sensitivity Template': {
+        businessObjectives: ['Determine optimal price point', 'Understand price elasticity', 'Assess competitive pricing'],
+        researchObjectives: ['To identify price thresholds', 'To measure price-value perception', 'To model demand curves'],
+        burningQuestions: ['What is the optimal price for maximizing revenue?', 'How price sensitive are our customers?'],
+        advancedAnalysis: ['Van Westendorp PSM', 'Gabor-Granger Analysis'],
+      },
+    };
+
+    const templateData = templateContent[item.name] || {};
+
+    // Create a new proposal based on the template
+    const newProposal = addProposal({
+      status: 'draft',
+      content: {
+        title: `New ${item.name.replace(' Template', '')}`,
+        client: '',
+        ...templateData,
+      },
+      author: currentUser,
+    });
+
+    setCurrentProposal(newProposal);
+    setActiveSection('view-proposal');
+  };
+
+  return (
+    <Card className="group relative transition-shadow hover:shadow-md">
+      <CardContent className="p-4">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-600">
+            <FileText className="h-5 w-5" />
+          </div>
+
+          <div className="flex-1 overflow-hidden">
+            <h3 className="font-medium text-gray-900">{item.name}</h3>
+            {item.description && (
+              <p className="mt-1 text-sm text-gray-500 line-clamp-2">{item.description}</p>
+            )}
+
+            {item.tags && item.tags.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {item.tags.map((tag) => (
+                  <Badge key={tag} variant="default" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-3 flex items-center gap-2">
+              <button
+                onClick={handleUseTemplate}
+                className="inline-flex items-center gap-1 text-sm text-green-600 hover:text-green-700 font-medium"
+              >
+                <Plus className="h-3 w-3" />
+                Use Template
+              </button>
+              <span className="text-gray-300">|</span>
+              <span className="text-xs text-gray-400">
+                Added {formatDate(item.createdAt)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Delete button */}
+        <button
+          onClick={() => onDelete(item.id)}
+          className="absolute right-2 top-2 rounded p-1 text-gray-400 opacity-0 transition-opacity hover:bg-gray-100 hover:text-red-600 group-hover:opacity-100"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
       </CardContent>
     </Card>
   );

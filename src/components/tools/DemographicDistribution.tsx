@@ -162,14 +162,14 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="mb-6 text-sm text-gray-600">
+          <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
             Calculate quota distributions based on census data for your target population.
           </p>
 
           <div className="grid gap-4 md:grid-cols-2">
             {/* Country Selection */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Country <span className="text-red-500">*</span>
               </label>
               <Select
@@ -181,7 +181,7 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
 
             {/* Sample Size */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Total Sample Size <span className="text-red-500">*</span>
               </label>
               <Input
@@ -195,7 +195,7 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
 
             {/* Age Range */}
             <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Target Age Range
               </label>
               <div className="flex items-center gap-2">
@@ -208,7 +208,7 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
                   max="99"
                   className="w-24"
                 />
-                <span className="text-gray-500">to</span>
+                <span className="text-gray-500 dark:text-gray-400">to</span>
                 <Input
                   type="number"
                   value={ageRange.max}
@@ -297,8 +297,8 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
           )}
 
           {/* Census Data Note */}
-          <div className="mt-6 rounded-lg bg-amber-50 p-4">
-            <p className="text-sm text-amber-800">
+          <div className="mt-6 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-4">
+            <p className="text-sm text-amber-800 dark:text-amber-200">
               <strong>Note:</strong> Quota calculations are based on publicly available census data.
               For the most accurate quotas, please consult the latest official census data for your target market.
             </p>

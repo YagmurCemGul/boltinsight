@@ -365,9 +365,9 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full min-w-0 overflow-hidden">
       {/* Left Panel - Content Sections Navigation */}
-      <div className="w-64 border-r border-gray-200 bg-gray-50">
+      <div className="w-48 flex-shrink-0 border-r border-gray-200 bg-gray-50 overflow-y-auto hidden md:block">
         <div className="p-4">
           <h3 className="mb-2 text-sm font-medium text-gray-700">Proposal Sections</h3>
           <div className="mb-4 h-2 rounded-full bg-gray-200">
@@ -413,9 +413,9 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         {/* Header Actions */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-3">
+        <div className="flex flex-wrap items-center justify-between border-b border-gray-200 px-4 py-2 gap-2">
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setVersionsModalOpen(true)} className="whitespace-nowrap px-2.5">
               <History className="h-4 w-4 sm:mr-1.5" />

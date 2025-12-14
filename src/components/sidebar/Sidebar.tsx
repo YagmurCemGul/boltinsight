@@ -45,13 +45,13 @@ const menuItems = [
   {
     id: 'search-my',
     label: 'Search My Proposals',
-    icon: Search,
+    icon: User,
     expandable: true,
   },
   {
     id: 'search-all',
     label: 'Search All Proposals',
-    icon: Search,
+    icon: Users,
     expandable: true,
   },
   {
