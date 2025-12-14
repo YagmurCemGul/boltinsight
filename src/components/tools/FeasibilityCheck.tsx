@@ -300,10 +300,10 @@ export function FeasibilityCheck() {
               {/* Feasibility Status */}
               <div
                 className={cn(
-                  'flex items-center gap-3 rounded-lg p-4 border',
+                  'flex items-center gap-3 rounded-lg p-4 border-2',
                   result.feasible
-                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                    : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                    ? 'bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700'
+                    : 'bg-red-50 dark:bg-red-950 border-red-300 dark:border-red-700'
                 )}
               >
                 {result.feasible ? (
@@ -312,10 +312,10 @@ export function FeasibilityCheck() {
                   <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
                 )}
                 <div>
-                  <p className={cn('font-medium', result.feasible ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100')}>
+                  <p className={cn('font-semibold', result.feasible ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100')}>
                     {result.feasible ? 'Feasible' : 'Potential Challenges'}
                   </p>
-                  <p className={cn('text-sm', result.feasible ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300')}>
+                  <p className={cn('text-sm', result.feasible ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200')}>
                     Confidence: {result.confidence.charAt(0).toUpperCase() + result.confidence.slice(1)}
                   </p>
                 </div>
@@ -325,50 +325,55 @@ export function FeasibilityCheck() {
               <div className="grid gap-4 md:grid-cols-3">
                 <div className={cn(
                   'rounded-lg border-2 p-4 text-center',
-                  result.incidenceRate >= 30 ? 'border-green-300 bg-green-50 dark:bg-green-900/20' :
-                  result.incidenceRate >= 10 ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20' :
-                  'border-red-300 bg-red-50 dark:bg-red-900/20'
+                  result.incidenceRate >= 30 ? 'border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-950' :
+                  result.incidenceRate >= 10 ? 'border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-950' :
+                  'border-red-400 dark:border-red-600 bg-red-50 dark:bg-red-950'
                 )}>
                   <div className={cn(
                     'mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full',
-                    result.incidenceRate >= 30 ? 'bg-green-100 dark:bg-green-800' :
-                    result.incidenceRate >= 10 ? 'bg-yellow-100 dark:bg-yellow-800' :
-                    'bg-red-100 dark:bg-red-800'
+                    result.incidenceRate >= 30 ? 'bg-green-200 dark:bg-green-800' :
+                    result.incidenceRate >= 10 ? 'bg-yellow-200 dark:bg-yellow-800' :
+                    'bg-red-200 dark:bg-red-800'
                   )}>
                     <span className={cn(
                       'text-lg font-bold',
-                      result.incidenceRate >= 30 ? 'text-green-700 dark:text-green-300' :
-                      result.incidenceRate >= 10 ? 'text-yellow-700 dark:text-yellow-300' :
-                      'text-red-700 dark:text-red-300'
+                      result.incidenceRate >= 30 ? 'text-green-800 dark:text-green-200' :
+                      result.incidenceRate >= 10 ? 'text-yellow-800 dark:text-yellow-200' :
+                      'text-red-800 dark:text-red-200'
                     )}>{result.incidenceRate}%</span>
                   </div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Incidence Rate</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Incidence Rate</p>
+                  <p className={cn(
+                    'text-xs font-medium',
+                    result.incidenceRate >= 30 ? 'text-green-700 dark:text-green-300' :
+                    result.incidenceRate >= 10 ? 'text-yellow-700 dark:text-yellow-300' :
+                    'text-red-700 dark:text-red-300'
+                  )}>
                     {result.incidenceRate >= 30 ? 'Good' : result.incidenceRate >= 10 ? 'Moderate' : 'Low'}
                   </p>
                 </div>
-                <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center bg-white dark:bg-gray-800">
-                  <Clock className="mx-auto mb-2 h-8 w-8 text-blue-500" />
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{result.estimatedTimeline}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Est. Timeline</p>
+                <div className="rounded-lg border-2 border-blue-200 dark:border-blue-700 p-4 text-center bg-blue-50 dark:bg-blue-950">
+                  <Clock className="mx-auto mb-2 h-8 w-8 text-blue-600 dark:text-blue-400" />
+                  <p className="text-lg font-semibold text-blue-900 dark:text-blue-100">{result.estimatedTimeline}</p>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">Est. Timeline</p>
                 </div>
-                <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center bg-white dark:bg-gray-800">
-                  <DollarSign className="mx-auto mb-2 h-8 w-8 text-green-500" />
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                <div className="rounded-lg border-2 border-green-200 dark:border-green-700 p-4 text-center bg-green-50 dark:bg-green-950">
+                  <DollarSign className="mx-auto mb-2 h-8 w-8 text-green-600 dark:text-green-400" />
+                  <p className="text-lg font-semibold text-green-900 dark:text-green-100">
                     ${result.estimatedCost.toLocaleString()}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Est. Cost</p>
+                  <p className="text-sm text-green-700 dark:text-green-300">Est. Cost</p>
                 </div>
               </div>
 
               {/* Risks */}
               {result.risks.length > 0 && (
-                <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4">
-                  <h4 className="mb-2 font-medium text-amber-900 dark:text-amber-100">Potential Risks</h4>
+                <div className="rounded-lg border-2 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 p-4">
+                  <h4 className="mb-2 font-semibold text-amber-900 dark:text-amber-100">Potential Risks</h4>
                   <ul className="space-y-1">
                     {result.risks.map((risk, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-amber-800 dark:text-amber-200">
-                        <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                        <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                         {risk}
                       </li>
                     ))}
@@ -378,12 +383,12 @@ export function FeasibilityCheck() {
 
               {/* Recommendations */}
               {result.recommendations.length > 0 && (
-                <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4">
-                  <h4 className="mb-2 font-medium text-blue-900 dark:text-blue-100">Recommendations</h4>
+                <div className="rounded-lg border-2 border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950 p-4">
+                  <h4 className="mb-2 font-semibold text-blue-900 dark:text-blue-100">Recommendations</h4>
                   <ul className="space-y-1">
                     {result.recommendations.map((rec, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-blue-800 dark:text-blue-200">
-                        <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                        <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
                         {rec}
                       </li>
                     ))}

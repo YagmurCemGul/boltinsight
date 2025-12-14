@@ -168,16 +168,72 @@ body {
   color: #60a5fa !important;
 }
 
+.dark .text-blue-700 {
+  color: #93c5fd !important;
+}
+
+.dark .text-blue-800 {
+  color: #bfdbfe !important;
+}
+
+.dark .text-blue-900 {
+  color: #dbeafe !important;
+}
+
 .dark .text-green-600 {
   color: #4ade80 !important;
+}
+
+.dark .text-green-700 {
+  color: #86efac !important;
+}
+
+.dark .text-green-800 {
+  color: #bbf7d0 !important;
+}
+
+.dark .text-green-900 {
+  color: #dcfce7 !important;
 }
 
 .dark .text-red-600 {
   color: #f87171 !important;
 }
 
+.dark .text-red-700 {
+  color: #fca5a5 !important;
+}
+
+.dark .text-red-800 {
+  color: #fecaca !important;
+}
+
+.dark .text-red-900 {
+  color: #fee2e2 !important;
+}
+
 .dark .text-yellow-600 {
   color: #facc15 !important;
+}
+
+.dark .text-yellow-700 {
+  color: #fde047 !important;
+}
+
+.dark .text-yellow-800 {
+  color: #fef08a !important;
+}
+
+.dark .text-amber-700 {
+  color: #fbbf24 !important;
+}
+
+.dark .text-amber-800 {
+  color: #fcd34d !important;
+}
+
+.dark .text-amber-900 {
+  color: #fde68a !important;
 }
 
 /* Dark mode border colors */
@@ -199,6 +255,23 @@ body {
 
 .dark .border-amber-200 {
   border-color: #78350f !important;
+}
+
+.dark .border-pink-200 {
+  border-color: #9d174d !important;
+}
+
+/* Dark mode pink backgrounds for gender distribution */
+.dark .bg-pink-50 {
+  background-color: rgba(131, 24, 67, 0.2) !important;
+}
+
+.dark .text-pink-600 {
+  color: #f472b6 !important;
+}
+
+.dark .text-pink-700 {
+  color: #f9a8d4 !important;
 }
 
 /* Dark mode for input fields */

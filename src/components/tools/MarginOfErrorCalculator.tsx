@@ -171,24 +171,24 @@ export function MarginOfErrorCalculator() {
 
           {/* Result Display */}
           {result !== null && (
-            <div className="mt-6 rounded-lg bg-blue-50 dark:bg-blue-900/30 p-4 border border-blue-200 dark:border-blue-800">
-              <h3 className="mb-2 font-medium text-blue-900 dark:text-blue-100">Result</h3>
+            <div className="mt-6 rounded-lg bg-blue-50 dark:bg-blue-950 p-4 border-2 border-blue-300 dark:border-blue-700">
+              <h3 className="mb-2 font-semibold text-blue-900 dark:text-blue-100">Result</h3>
               {mode === 'moe' ? (
                 <div>
-                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                  <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">
                     ±{result}%
                   </p>
-                  <p className="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                  <p className="mt-2 text-sm text-blue-800 dark:text-blue-200">
                     With a sample size of {sampleSize} and {confidenceLevel}% confidence level,
                     your margin of error is ±{result}%.
                   </p>
                 </div>
               ) : (
                 <div>
-                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                  <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">
                     n = {result.toLocaleString()}
                   </p>
-                  <p className="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                  <p className="mt-2 text-sm text-blue-800 dark:text-blue-200">
                     To achieve a ±{marginOfError}% margin of error with {confidenceLevel}% confidence,
                     you need a sample size of {result.toLocaleString()} respondents.
                   </p>
