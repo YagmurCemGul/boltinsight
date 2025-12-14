@@ -15,6 +15,9 @@ export function MainContent() {
   const {
     activeSection,
     sidebarOpen,
+    sidebarCollapsed,
+    rightSidebarCollapsed,
+    setRightSidebarCollapsed,
     currentProposal,
     setCurrentProposal,
     addProposal,
@@ -133,6 +136,8 @@ export function MainContent() {
               content={currentProposalContent}
               activeSection={activeSidebarSection}
               onSectionClick={setActiveSidebarSection}
+              collapsed={rightSidebarCollapsed}
+              onToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
             />
           </div>
         );
@@ -150,6 +155,8 @@ export function MainContent() {
               content={currentProposal.content}
               activeSection={activeSidebarSection}
               onSectionClick={setActiveSidebarSection}
+              collapsed={rightSidebarCollapsed}
+              onToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
             />
           </div>
         ) : (
@@ -196,7 +203,7 @@ export function MainContent() {
       <main
         className={cn(
           'flex-1 transition-all duration-200',
-          sidebarOpen ? 'lg:ml-72' : ''
+          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-72'
         )}
       >
         <div className="h-full overflow-hidden">{renderContent()}</div>

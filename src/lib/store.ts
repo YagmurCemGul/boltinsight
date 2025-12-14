@@ -383,7 +383,10 @@ interface AppState {
 
   // UI State
   sidebarOpen: boolean;
+  sidebarCollapsed: boolean;
+  rightSidebarCollapsed: boolean;
   activeSection: string;
+  isLoggedIn: boolean;
 
   // Actions
   setCurrentUser: (user: User) => void;
@@ -418,7 +421,10 @@ interface AppState {
 
   // UI actions
   setSidebarOpen: (open: boolean) => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  setRightSidebarCollapsed: (collapsed: boolean) => void;
   setActiveSection: (section: string) => void;
+  setLoggedIn: (loggedIn: boolean) => void;
 
   // Search
   searchProposals: (query: string, searchAll: boolean) => Proposal[];
@@ -438,7 +444,10 @@ export const useAppStore = create<AppState>()(
       libraryItems: mockLibraryItems,
       metaLearningFilter: {},
       sidebarOpen: true,
+      sidebarCollapsed: false,
+      rightSidebarCollapsed: false,
       activeSection: 'new-proposal',
+      isLoggedIn: false,
 
       setCurrentUser: (user) => set({ currentUser: user }),
 
@@ -618,7 +627,10 @@ export const useAppStore = create<AppState>()(
 
       // UI actions
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+      setRightSidebarCollapsed: (collapsed) => set({ rightSidebarCollapsed: collapsed }),
       setActiveSection: (section) => set({ activeSection: section }),
+      setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),
 
       // Search
       searchProposals: (query, searchAll) => {
