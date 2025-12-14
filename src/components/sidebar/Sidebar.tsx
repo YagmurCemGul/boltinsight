@@ -91,6 +91,12 @@ const menuItems = [
     icon: Layers,
     expandable: false,
   },
+  {
+    id: 'architecture-presentation',
+    label: 'Architecture (Sunum)',
+    icon: Layers,
+    expandable: false,
+  },
 ];
 
 export function Sidebar() {
