@@ -152,8 +152,9 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
   };
 
   return (
-    <div className="mx-auto max-w-3xl p-6">
-      <Card>
+    <div className="h-full overflow-y-auto">
+      <div className="mx-auto max-w-3xl p-6">
+        <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
@@ -302,6 +303,7 @@ ${quotas.gender.map(g => `${g.category}: ${g.percentage}% (n=${g.count})`).join(
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
