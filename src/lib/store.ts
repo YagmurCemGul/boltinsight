@@ -1021,9 +1021,16 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'boltinsight-storage',
-      version: 3, // Increment this to reset localStorage and show new mock data
+      version: 3,
+      migrate: (persistedState: unknown, version: number) => {
+        // Reset to default state when version changes
+        return {
+          isLoggedIn: false,
+          sidebarCollapsed: false,
+          rightSidebarCollapsed: false,
+        };
+      },
       partialize: (state) => ({
-        // Only persist user-created data, not mock data
         isLoggedIn: state.isLoggedIn,
         sidebarCollapsed: state.sidebarCollapsed,
         rightSidebarCollapsed: state.rightSidebarCollapsed,
