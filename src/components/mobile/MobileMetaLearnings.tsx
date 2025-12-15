@@ -13,6 +13,8 @@ import {
   ChevronDown,
   MessageSquare,
   PieChart,
+  Building2,
+  Users,
 } from 'lucide-react';
 import { cn, formatDate, groupBy } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
@@ -76,11 +78,27 @@ export function MobileMetaLearnings() {
         return acc;
       }, {} as Record<string, { total: number; approved: number }>)
     )
-      .map(([name, data]) => ({ name, count: data.total, approved: data.approved }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+      .map(([name, data]) => ({ name, count: data.total, approved: data.approved, rate: Math.round((data.approved / data.total) * 100) }))
+      .sort((a, b) => b.count - a.count);
 
-    return { total, approved, rejected, pending, draft, byClient };
+    const byAuthor = Object.entries(
+      filteredProposals.reduce((acc, p) => {
+        const name = p.author.name;
+        if (!acc[name]) acc[name] = { total: 0, approved: 0 };
+        acc[name].total++;
+        if (p.status === 'approved') acc[name].approved++;
+        return acc;
+      }, {} as Record<string, { total: number; approved: number }>)
+    )
+      .map(([name, data]) => ({
+        name,
+        count: data.total,
+        approved: data.approved,
+        rate: Math.round((data.approved / data.total) * 100),
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    return { total, approved, rejected, pending, draft, byClient, byAuthor };
   }, [filteredProposals]);
 
   const handleAnalyze = () => {
@@ -171,103 +189,192 @@ export function MobileMetaLearnings() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 pb-24">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <StatCard
-            title="Total"
-            value={analytics.total}
-            icon={<BarChart3 className="h-5 w-5 text-blue-600" />}
-            color="blue"
-          />
-          <StatCard
-            title="Approved"
-            value={analytics.approved}
-            subtitle={`${Math.round((analytics.approved / analytics.total) * 100) || 0}%`}
-            icon={<FileCheck className="h-5 w-5 text-green-600" />}
-            color="green"
-          />
-          <StatCard
-            title="Rejected"
-            value={analytics.rejected}
-            icon={<FileX className="h-5 w-5 text-red-600" />}
-            color="red"
-          />
-          <StatCard
-            title="Pending"
-            value={analytics.pending}
-            icon={<Clock className="h-5 w-5 text-yellow-600" />}
-            color="yellow"
-          />
-        </div>
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-24">
+        <Tabs defaultValue="overview" className="h-full">
+          {/* Tab Navigation */}
+          <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 px-4 pt-3">
+            <TabsList className="w-full grid grid-cols-4 gap-1">
+              <TabsTrigger value="overview" className="text-xs px-2">Overview</TabsTrigger>
+              <TabsTrigger value="by-client" className="text-xs px-2">Clients</TabsTrigger>
+              <TabsTrigger value="by-author" className="text-xs px-2">Authors</TabsTrigger>
+              <TabsTrigger value="chat" className="text-xs px-2">AI</TabsTrigger>
+            </TabsList>
+          </div>
 
-        {/* Top Clients */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Top Clients
-            </h3>
-            <div className="space-y-3">
-              {analytics.byClient.map((client, i) => (
-                <div key={client.name} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-medium text-blue-600 dark:text-blue-400">
-                      {i + 1}
-                    </span>
-                    <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[150px]">
-                      {client.name}
-                    </span>
-                  </div>
-                  <Badge variant="info">{client.count}</Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* AI Analysis */}
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              AI Analysis
-            </h3>
-
-            {chatResponse && (
-              <div className="mb-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 p-3">
-                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                  {chatResponse.replace(/\*\*(.*?)\*\*/g, '$1')}
-                </p>
-              </div>
-            )}
-
-            <div className="flex gap-2">
-              <Input
-                placeholder="Ask about your proposals..."
-                value={chatQuery}
-                onChange={(e) => setChatQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
-                className="flex-1"
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="px-4 py-4">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <StatCard
+                title="Total"
+                value={analytics.total}
+                icon={<BarChart3 className="h-5 w-5 text-blue-600" />}
+                color="blue"
               />
-              <Button onClick={handleAnalyze} disabled={isAnalyzing || !chatQuery.trim()}>
-                {isAnalyzing ? '...' : 'Ask'}
-              </Button>
+              <StatCard
+                title="Approved"
+                value={analytics.approved}
+                subtitle={`${Math.round((analytics.approved / analytics.total) * 100) || 0}%`}
+                icon={<FileCheck className="h-5 w-5 text-green-600" />}
+                color="green"
+              />
+              <StatCard
+                title="Rejected"
+                value={analytics.rejected}
+                icon={<FileX className="h-5 w-5 text-red-600" />}
+                color="red"
+              />
+              <StatCard
+                title="Pending"
+                value={analytics.pending}
+                icon={<Clock className="h-5 w-5 text-yellow-600" />}
+                color="yellow"
+              />
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              {['Success patterns?', 'Why rejected?', 'Show trends'].map((q) => (
-                <button
-                  key={q}
-                  onClick={() => setChatQuery(q)}
-                  className="rounded-full bg-gray-100 dark:bg-gray-700 px-3 py-1 text-xs text-gray-600 dark:text-gray-300"
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+            {/* Top Clients */}
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Top Clients
+                </h3>
+                <div className="space-y-3">
+                  {analytics.byClient.slice(0, 5).map((client, i) => (
+                    <div key={client.name} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-medium text-blue-600 dark:text-blue-400">
+                          {i + 1}
+                        </span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                          {client.name}
+                        </span>
+                      </div>
+                      <Badge variant="info" className="shrink-0 ml-2">{client.count}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* By Client Tab */}
+          <TabsContent value="by-client" className="px-4 py-4">
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Proposals by Client
+                </h3>
+                <div className="space-y-3">
+                  {analytics.byClient.map((client) => (
+                    <div key={client.name} className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900 dark:text-white truncate flex-1 mr-2">
+                          {client.name}
+                        </span>
+                        <Badge variant={client.rate >= 70 ? 'success' : client.rate >= 40 ? 'warning' : 'error'}>
+                          {client.rate}%
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                        <span>Total: {client.count}</span>
+                        <span>Approved: {client.approved}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* By Author Tab */}
+          <TabsContent value="by-author" className="px-4 py-4">
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Performance by Author
+                </h3>
+                <div className="space-y-3">
+                  {analytics.byAuthor.map((author) => (
+                    <div key={author.name} className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900 dark:text-white truncate flex-1 mr-2">
+                          {author.name}
+                        </span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {author.rate}%
+                        </span>
+                      </div>
+                      <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-700 mb-2">
+                        <div
+                          className={cn(
+                            'h-full rounded-full',
+                            author.rate >= 70 ? 'bg-green-500' : author.rate >= 40 ? 'bg-yellow-500' : 'bg-red-500'
+                          )}
+                          style={{ width: `${author.rate}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                        <span>Total: {author.count}</span>
+                        <span>Approved: {author.approved}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* AI Analysis Tab */}
+          <TabsContent value="chat" className="px-4 py-4">
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  AI Analysis
+                </h3>
+
+                {chatResponse && (
+                  <div className="mb-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 p-3">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                      {chatResponse.replace(/\*\*(.*?)\*\*/g, '$1')}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Ask about proposals..."
+                    value={chatQuery}
+                    onChange={(e) => setChatQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
+                    className="flex-1 min-w-0"
+                  />
+                  <Button onClick={handleAnalyze} disabled={isAnalyzing || !chatQuery.trim()} className="shrink-0">
+                    {isAnalyzing ? '...' : 'Ask'}
+                  </Button>
+                </div>
+
+                <div className="mt-3">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Suggestions:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {['Success patterns?', 'Why rejected?', 'Show trends'].map((q) => (
+                      <button
+                        key={q}
+                        onClick={() => setChatQuery(q)}
+                        className="rounded-full bg-gray-100 dark:bg-gray-700 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 active:bg-gray-200"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

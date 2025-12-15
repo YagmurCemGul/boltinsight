@@ -20,7 +20,6 @@ import {
   Users,
   Percent,
   ClipboardCheck,
-  Layers,
   ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -44,7 +43,6 @@ const menuItems = [
   { id: 'feasibility', label: 'Feasibility Check', icon: ClipboardCheck },
   { id: 'divider-2', type: 'divider' },
   { id: 'library', label: 'Library', icon: Library },
-  { id: 'architecture', label: 'Architecture', icon: Layers },
 ];
 
 export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
@@ -78,19 +76,19 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
       >
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-4">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center border-b border-gray-200 dark:border-gray-800 px-4 py-4">
+            <button
+              onClick={onClose}
+              className="rounded-lg p-2 -ml-2 mr-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <X className="h-6 w-6" />
+            </button>
+            <div className="flex items-center gap-2 flex-1">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600">
                 <Zap className="h-6 w-6 text-white" />
               </div>
               <span className="text-xl font-bold text-blue-600">BoltInsight</span>
             </div>
-            <button
-              onClick={onClose}
-              className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <X className="h-6 w-6" />
-            </button>
           </div>
 
           {/* Menu Items */}

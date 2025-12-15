@@ -11,7 +11,6 @@ import { MobileProposalEditor } from './MobileProposalEditor';
 import { MobileMetaLearnings } from './MobileMetaLearnings';
 import { MobileLibrary } from './MobileLibrary';
 import { MobileSearch } from './MobileSearch';
-import { MobileArchitecture } from './MobileArchitecture';
 import { MobileMOECalculator, MobileDemographics, MobileFeasibility } from './MobileTools';
 
 export function MobileApp() {
@@ -25,7 +24,7 @@ export function MobileApp() {
   }
 
   // Determine if we need back button and which section we're in
-  const needsBackButton = ['view-proposal', 'moe-calculator', 'demographics', 'feasibility', 'architecture'].includes(activeSection) ||
+  const needsBackButton = ['view-proposal', 'moe-calculator', 'demographics', 'feasibility'].includes(activeSection) ||
     activeSection.startsWith('project-');
 
   const handleBack = () => {
@@ -70,9 +69,6 @@ export function MobileApp() {
 
       case 'library':
         return <MobileLibrary />;
-
-      case 'architecture':
-        return <MobileArchitecture />;
 
       default:
         if (activeSection.startsWith('project-')) {

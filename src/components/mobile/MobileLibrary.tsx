@@ -91,32 +91,32 @@ export function MobileLibrary() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
       {/* Search Bar */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-        <div className="flex gap-2 mb-3">
-          <div className="relative flex-1">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 shrink-0">
+        <div className="flex gap-2">
+          <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <Input
               placeholder="Search library..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 w-full"
             />
           </div>
-          <Button onClick={() => setAddModalOpen(true)}>
+          <Button onClick={() => setAddModalOpen(true)} className="shrink-0">
             <Plus className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-24">
         <Tabs defaultValue="proposals" className="h-full">
           <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 px-4 pt-3">
-            <TabsList className="w-full">
-              <TabsTrigger value="proposals" className="flex-1">Proposals</TabsTrigger>
-              <TabsTrigger value="templates" className="flex-1">Templates</TabsTrigger>
+            <TabsList className="w-full grid grid-cols-2">
+              <TabsTrigger value="proposals">Proposals</TabsTrigger>
+              <TabsTrigger value="templates">Templates</TabsTrigger>
             </TabsList>
           </div>
 
@@ -159,14 +159,14 @@ export function MobileLibrary() {
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">
                           <FileText className="h-5 w-5" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
                             {proposal.code && (
                               <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
                                 {proposal.code}
                               </span>
                             )}
-                            <Badge className={cn('text-xs', statusColors[proposal.status])}>
+                            <Badge className={cn('text-xs shrink-0', statusColors[proposal.status])}>
                               {proposal.status.replace('_', ' ')}
                             </Badge>
                           </div>
@@ -178,7 +178,7 @@ export function MobileLibrary() {
                               {proposal.content.client}
                             </p>
                           )}
-                          <div className="mt-2 flex items-center gap-3">
+                          <div className="mt-2 flex items-center gap-3 flex-wrap">
                             <button
                               onClick={() => handleViewProposal(proposal)}
                               className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400"

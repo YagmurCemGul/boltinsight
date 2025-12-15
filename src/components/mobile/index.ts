@@ -8,5 +8,4 @@ export { MobileProposalEditor } from './MobileProposalEditor';
 export { MobileMetaLearnings } from './MobileMetaLearnings';
 export { MobileLibrary } from './MobileLibrary';
 export { MobileSearch } from './MobileSearch';
-export { MobileArchitecture } from './MobileArchitecture';
 export { MobileMOECalculator, MobileDemographics, MobileFeasibility } from './MobileTools';
