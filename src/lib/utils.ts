@@ -33,6 +33,14 @@ export function formatDateTime(date: string | Date): string {
   });
 }
 
+export function formatTime(date: string | Date): string {
+  const d = new Date(date);
+  return d.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 export function calculateMarginOfError(
   sampleSize: number,
   confidenceLevel: number = 95,
