@@ -8,6 +8,7 @@ interface LoginScreenProps {
 }
 
 export function LoginScreen({ onLogin }: LoginScreenProps) {
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
@@ -16,6 +17,21 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
     setLoadingProvider(providerId);
 
     // Simulate SSO redirect
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    setIsLoading(false);
+    setLoadingProvider(null);
+    onLogin();
+  };
+
+  const handleEmailContinue = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setIsLoading(true);
+    setLoadingProvider('email');
+
+    // Simulate email login
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     setIsLoading(false);
@@ -90,6 +106,36 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             Continue with Okta
           </button>
         </div>
+
+        {/* Divider */}
+        <div className="my-6 flex items-center">
+          <div className="flex-1 border-t border-gray-300"></div>
+          <span className="px-4 text-sm text-gray-500">OR</span>
+          <div className="flex-1 border-t border-gray-300"></div>
+        </div>
+
+        {/* Email Form */}
+        <form onSubmit={handleEmailContinue} className="space-y-3">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email address"
+            className="w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            disabled={isLoading}
+          />
+          <button
+            type="submit"
+            disabled={isLoading || !email}
+            className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loadingProvider === 'email' ? (
+              <Loader2 className="mx-auto h-5 w-5 animate-spin" />
+            ) : (
+              'Continue'
+            )}
+          </button>
+        </form>
 
         {/* Footer */}
         <div className="mt-8 text-center">
