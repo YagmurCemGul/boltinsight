@@ -21,8 +21,14 @@ import {
   HelpCircle,
   Building2,
   MessageSquare,
+  History,
+  UserPlus,
+  ClipboardCheck,
+  MoreHorizontal,
+  Share2,
+  Edit3,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { Button, Input, Textarea, Select, Badge, Modal, toast } from '@/components/ui';
 import type { Proposal, Market, Quota } from '@/types';
@@ -58,6 +64,11 @@ export function MobileProposalEditor() {
   const [expandedSections, setExpandedSections] = useState<string[]>(['basic']);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const [versionsModalOpen, setVersionsModalOpen] = useState(false);
+  const [coworkingModalOpen, setCoworkingModalOpen] = useState(false);
+  const [addMarketModalOpen, setAddMarketModalOpen] = useState(false);
+  const [newMarket, setNewMarket] = useState({ name: '', language: '', sampleSize: '' });
 
   if (!currentProposal) {
     return (
@@ -106,6 +117,65 @@ export function MobileProposalEditor() {
     toast.success('Proposal deleted');
   };
 
+  const handleExport = () => {
+    toast.success('Exporting proposal...');
+    // In a real app, this would generate a PDF or other format
+    setTimeout(() => toast.success('Export completed'), 1000);
+  };
+
+  const handleFeasibilityCheck = () => {
+    setActiveSection('feasibility');
+  };
+
+  const addMarket = () => {
+    if (!newMarket.name) return;
+    const markets = currentProposal.content.markets || [];
+    const newMarketObj: Market = {
+      country: newMarket.name,
+      language: newMarket.language || 'English',
+      sampleSize: parseInt(newMarket.sampleSize) || 100,
+      quotas: [],
+    };
+    updateContent('markets', [...markets, newMarketObj]);
+    setNewMarket({ name: '', language: '', sampleSize: '' });
+    setAddMarketModalOpen(false);
+    toast.success('Market added');
+  };
+
+  const removeMarket = (index: number) => {
+    const markets = currentProposal.content.markets || [];
+    updateContent('markets', markets.filter((_, i) => i !== index));
+    toast.success('Market removed');
+  };
+
+  const addQuota = (marketIndex: number) => {
+    const markets = currentProposal.content.markets || [];
+    const updatedMarkets = markets.map((m, i) => {
+      if (i === marketIndex) {
+        return {
+          ...m,
+          quotas: [...(m.quotas || []), { dimension: 'Gender', categories: [{ name: 'Male', percentage: 50, count: Math.floor(m.sampleSize * 0.5) }] }],
+        };
+      }
+      return m;
+    });
+    updateContent('markets', updatedMarkets);
+  };
+
+  const removeQuota = (marketIndex: number, quotaIndex: number) => {
+    const markets = currentProposal.content.markets || [];
+    const updatedMarkets = markets.map((m, i) => {
+      if (i === marketIndex) {
+        return {
+          ...m,
+          quotas: (m.quotas || []).filter((_, qi) => qi !== quotaIndex),
+        };
+      }
+      return m;
+    });
+    updateContent('markets', updatedMarkets);
+  };
+
   const updateContent = (field: string, value: any) => {
     updateProposal(currentProposal.id, {
       content: { ...currentProposal.content, [field]: value },
@@ -137,19 +207,60 @@ export function MobileProposalEditor() {
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
+      {/* Compact Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-        <div className="flex items-center justify-between mb-2">
-          {currentProposal.code && (
-            <span className="text-sm font-medium text-blue-600">{currentProposal.code}</span>
-          )}
-          <Badge className={cn('text-xs', statusColor[currentProposal.status])}>
-            {currentProposal.status.replace('_', ' ')}
-          </Badge>
+        <div className="flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              {currentProposal.code && (
+                <span className="text-xs font-medium text-blue-600 dark:text-blue-400">{currentProposal.code}</span>
+              )}
+              <Badge className={cn('text-xs', statusColor[currentProposal.status])}>
+                {currentProposal.status.replace('_', ' ')}
+              </Badge>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowActions(!showActions)}
+            className="p-2 rounded-lg text-gray-500 active:bg-gray-100 dark:active:bg-gray-700"
+          >
+            <MoreHorizontal className="h-5 w-5" />
+          </button>
         </div>
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-          {currentProposal.content.title || 'Untitled Proposal'}
-        </h1>
+
+        {/* Action Buttons Row */}
+        {showActions && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              onClick={() => setVersionsModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-300"
+            >
+              <History className="h-4 w-4" />
+              Versions
+            </button>
+            <button
+              onClick={() => setCoworkingModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-300"
+            >
+              <UserPlus className="h-4 w-4" />
+              Coworking
+            </button>
+            <button
+              onClick={handleFeasibilityCheck}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-300"
+            >
+              <ClipboardCheck className="h-4 w-4" />
+              Feasibility
+            </button>
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-300"
+            >
+              <Download className="h-4 w-4" />
+              Export
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -360,8 +471,78 @@ export function MobileProposalEditor() {
                   )}
 
                   {section.id === 'markets' && (
-                    <div className="text-sm text-gray-500 dark:text-gray-400 py-4 text-center">
-                      Markets and quotas management available in desktop view
+                    <div className="space-y-4">
+                      {/* Markets List */}
+                      {(currentProposal.content.markets || []).length === 0 ? (
+                        <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                          No markets added yet
+                        </p>
+                      ) : (
+                        <div className="space-y-3">
+                          {(currentProposal.content.markets || []).map((market, marketIndex) => (
+                            <div
+                              key={`${market.country}-${marketIndex}`}
+                              className="p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
+                            >
+                              <div className="flex items-start justify-between mb-2">
+                                <div>
+                                  <p className="font-medium text-gray-900 dark:text-white">{market.country}</p>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    {market.language} • n={market.sampleSize}
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={() => removeMarket(marketIndex)}
+                                  className="p-1 text-red-500 hover:bg-red-50 rounded"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+
+                              {/* Quotas */}
+                              {(market.quotas || []).length > 0 && (
+                                <div className="mt-2 space-y-1">
+                                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Quotas:</p>
+                                  {(market.quotas || []).map((quota, quotaIndex) => (
+                                    <div key={`${quota.dimension}-${quotaIndex}`} className="flex items-center justify-between text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">
+                                      <span className="text-gray-700 dark:text-gray-300">
+                                        {quota.dimension}
+                                      </span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-gray-500">{quota.categories?.length || 0} categories</span>
+                                        <button
+                                          onClick={() => removeQuota(marketIndex, quotaIndex)}
+                                          className="text-red-400 hover:text-red-600"
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              <button
+                                onClick={() => addQuota(marketIndex)}
+                                className="mt-2 text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1"
+                              >
+                                <Plus className="h-3 w-3" />
+                                Add Quota
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setAddMarketModalOpen(true)}
+                        className="w-full"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Market
+                      </Button>
                     </div>
                   )}
 
@@ -483,6 +664,136 @@ export function MobileProposalEditor() {
           <Button onClick={handleDelete} className="flex-1 bg-red-600 hover:bg-red-700">
             Delete
           </Button>
+        </div>
+      </Modal>
+
+      {/* Versions Modal */}
+      <Modal
+        isOpen={versionsModalOpen}
+        onClose={() => setVersionsModalOpen(false)}
+        title="Version History"
+        size="md"
+      >
+        <div className="space-y-3">
+          <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-gray-900 dark:text-white">Current Version</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(currentProposal.updatedAt)}</p>
+              </div>
+              <Badge variant="info">Active</Badge>
+            </div>
+          </div>
+          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-gray-700 dark:text-gray-300">Initial Version</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(currentProposal.createdAt)}</p>
+              </div>
+              <Button variant="ghost" size="sm">Restore</Button>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end mt-4">
+          <Button onClick={() => setVersionsModalOpen(false)}>Close</Button>
+        </div>
+      </Modal>
+
+      {/* Coworking Modal */}
+      <Modal
+        isOpen={coworkingModalOpen}
+        onClose={() => setCoworkingModalOpen(false)}
+        title="Coworking"
+        size="md"
+      >
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              Invite team members to collaborate on this proposal.
+            </p>
+            <div className="flex gap-2">
+              <Input placeholder="Enter email address" className="flex-1" />
+              <Button>
+                <UserPlus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="border-t dark:border-gray-700 pt-4">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Collaborators</p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-800">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 text-sm font-medium">
+                    {currentProposal.author.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{currentProposal.author.name}</p>
+                    <p className="text-xs text-gray-500">Owner</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end mt-4">
+          <Button onClick={() => setCoworkingModalOpen(false)}>Done</Button>
+        </div>
+      </Modal>
+
+      {/* Add Market Modal */}
+      <Modal
+        isOpen={addMarketModalOpen}
+        onClose={() => setAddMarketModalOpen(false)}
+        title="Add Market"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Country <span className="text-red-500">*</span>
+            </label>
+            <Input
+              value={newMarket.name}
+              onChange={(e) => setNewMarket({ ...newMarket, name: e.target.value })}
+              placeholder="e.g., United States, Germany"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Language
+            </label>
+            <Select
+              options={[
+                { value: 'English', label: 'English' },
+                { value: 'German', label: 'German' },
+                { value: 'French', label: 'French' },
+                { value: 'Spanish', label: 'Spanish' },
+                { value: 'Chinese', label: 'Chinese' },
+                { value: 'Japanese', label: 'Japanese' },
+              ]}
+              value={newMarket.language || 'English'}
+              onChange={(e) => setNewMarket({ ...newMarket, language: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Sample Size
+            </label>
+            <Input
+              type="number"
+              value={newMarket.sampleSize}
+              onChange={(e) => setNewMarket({ ...newMarket, sampleSize: e.target.value })}
+              placeholder="e.g., 500"
+            />
+          </div>
+          <div className="flex gap-3 pt-2">
+            <Button variant="outline" onClick={() => setAddMarketModalOpen(false)} className="flex-1">
+              Cancel
+            </Button>
+            <Button onClick={addMarket} disabled={!newMarket.name} className="flex-1">
+              Add Market
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>

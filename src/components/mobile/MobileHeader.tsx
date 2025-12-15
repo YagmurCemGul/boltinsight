@@ -1,9 +1,46 @@
 'use client';
 
-import { useState } from 'react';
-import { Menu, Bell, Zap, ArrowLeft, Search, MoreVertical, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState, useRef, useEffect } from 'react';
+import { Menu, Bell, Zap, ArrowLeft, Search, MoreVertical, X, Check, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
+
+interface Notification {
+  id: string;
+  type: 'approval' | 'comment' | 'mention' | 'system';
+  title: string;
+  message: string;
+  time: Date;
+  read: boolean;
+}
+
+// Mock notifications for demo
+const MOCK_NOTIFICATIONS: Notification[] = [
+  {
+    id: '1',
+    type: 'approval',
+    title: 'Proposal Approved',
+    message: 'Brand Health Tracking Q1 2025 has been approved',
+    time: new Date(Date.now() - 1000 * 60 * 30),
+    read: false,
+  },
+  {
+    id: '2',
+    type: 'comment',
+    title: 'New Comment',
+    message: 'John added a comment on your proposal',
+    time: new Date(Date.now() - 1000 * 60 * 60 * 2),
+    read: false,
+  },
+  {
+    id: '3',
+    type: 'system',
+    title: 'System Update',
+    message: 'New features available in the mobile app',
+    time: new Date(Date.now() - 1000 * 60 * 60 * 24),
+    read: true,
+  },
+];
 
 interface MobileHeaderProps {
   onOpenMenu: () => void;
@@ -22,6 +59,46 @@ export function MobileHeader({
 }: MobileHeaderProps) {
   const { activeSection, setActiveSection, currentProposal } = useAppStore();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
+  const notificationRef = useRef<HTMLDivElement>(null);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Close notifications when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false);
+      }
+    };
+
+    if (notificationsOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [notificationsOpen]);
+
+  const markAsRead = (id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  const getNotificationIcon = (type: Notification['type']) => {
+    switch (type) {
+      case 'approval':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'comment':
+        return <FileText className="h-4 w-4 text-blue-500" />;
+      case 'mention':
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+      default:
+        return <Bell className="h-4 w-4 text-gray-500" />;
+    }
+  };
 
   // Dynamic title based on activeSection
   const getTitle = () => {
@@ -131,10 +208,73 @@ export function MobileHeader({
               <Search className="h-5 w-5" />
             </button>
           )}
-          <button className="rounded-lg p-2 text-gray-500 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800 relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
-          </button>
+          <div className="relative" ref={notificationRef}>
+            <button
+              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              className="rounded-lg p-2 text-gray-500 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800 relative"
+            >
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
+              )}
+            </button>
+
+            {/* Notifications Dropdown */}
+            {notificationsOpen && (
+              <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={markAllAsRead}
+                      className="text-xs text-blue-600 dark:text-blue-400"
+                    >
+                      Mark all read
+                    </button>
+                  )}
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                      No notifications
+                    </div>
+                  ) : (
+                    notifications.map((notification) => (
+                      <button
+                        key={notification.id}
+                        onClick={() => markAsRead(notification.id)}
+                        className={cn(
+                          'w-full flex items-start gap-3 p-4 text-left border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50',
+                          !notification.read && 'bg-blue-50/50 dark:bg-blue-900/20'
+                        )}
+                      >
+                        <div className="mt-0.5">
+                          {getNotificationIcon(notification.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={cn(
+                            'text-sm',
+                            !notification.read ? 'font-medium text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'
+                          )}>
+                            {notification.title}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                            {formatDate(notification.time)}
+                          </p>
+                        </div>
+                        {!notification.read && (
+                          <span className="h-2 w-2 rounded-full bg-blue-600 shrink-0 mt-1.5" />
+                        )}
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

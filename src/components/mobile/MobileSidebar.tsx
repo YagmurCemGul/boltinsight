@@ -21,8 +21,10 @@ import {
   Percent,
   ClipboardCheck,
   ChevronRight,
+  FileText,
+  Clock,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { useThemeStore } from '@/lib/theme';
 import { Modal, Button, Select, toast } from '@/components/ui';
@@ -46,14 +48,26 @@ const menuItems = [
 ];
 
 export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
-  const { activeSection, setActiveSection, currentUser, projects } = useAppStore();
+  const { activeSection, setActiveSection, currentUser, projects, proposals, setCurrentProposal } = useAppStore();
   const { isDarkMode, toggleDarkMode } = useThemeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
+  // Get recent proposals for history
+  const recentProposals = proposals
+    .filter(p => p.status !== 'deleted')
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, 10);
+
   const handleItemClick = (id: string) => {
     setActiveSection(id);
+    onClose();
+  };
+
+  const handleViewProposal = (proposal: typeof proposals[0]) => {
+    setCurrentProposal(proposal);
+    setActiveSection('view-proposal');
     onClose();
   };
 
@@ -92,89 +106,122 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           </div>
 
           {/* Menu Items */}
-          <nav className="flex-1 overflow-y-auto px-3 py-4">
-            {menuItems.map((item) => {
-              if (item.type === 'divider') {
-                return <div key={item.id} className="my-3 h-px bg-gray-200 dark:bg-gray-800" />;
-              }
+          <div className="flex-1 overflow-y-auto">
+            <nav className="px-3 py-4">
+              {menuItems.map((item) => {
+                if (item.type === 'divider') {
+                  return <div key={item.id} className="my-3 h-px bg-gray-200 dark:bg-gray-800" />;
+                }
 
-              const Icon = item.icon!;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleItemClick(item.id)}
-                  className={cn(
-                    'flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors mb-1',
-                    activeSection === item.id
-                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                      : 'text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-800'
-                  )}
-                >
-                  <Icon className={cn('h-5 w-5', item.color)} />
-                  <span className="font-medium">{item.label}</span>
-                </button>
-              );
-            })}
-
-            {/* Projects Section */}
-            <div className="my-3 h-px bg-gray-200 dark:bg-gray-800" />
-
-            <button
-              onClick={() => setShowProjects(!showProjects)}
-              className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-800"
-            >
-              <div className="flex items-center gap-3">
-                <FolderKanban className="h-5 w-5" />
-                <span className="font-medium">Projects</span>
-              </div>
-              <ChevronRight
-                className={cn(
-                  'h-5 w-5 transition-transform',
-                  showProjects && 'rotate-90'
-                )}
-              />
-            </button>
-
-            {showProjects && (
-              <div className="ml-4 mt-1 space-y-1">
-                {projects.slice(0, 5).map((project) => (
+                const Icon = item.icon!;
+                return (
                   <button
-                    key={project.id}
-                    onClick={() => {
-                      setActiveSection(`project-${project.id}`);
-                      onClose();
-                    }}
+                    key={item.id}
+                    onClick={() => handleItemClick(item.id)}
                     className={cn(
-                      'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-left',
-                      activeSection === `project-${project.id}`
-                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30'
-                        : 'text-gray-600 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800'
+                      'flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors mb-1',
+                      activeSection === item.id
+                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                        : 'text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-800'
                     )}
                   >
-                    <FolderKanban className="h-4 w-4" />
-                    <span className="truncate">{project.name}</span>
+                    <Icon className={cn('h-5 w-5', item.color)} />
+                    <span className="font-medium">{item.label}</span>
                   </button>
-                ))}
-              </div>
-            )}
+                );
+              })}
 
-            {/* History Section */}
-            <button
-              onClick={() => setShowHistory(!showHistory)}
-              className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-800"
-            >
-              <div className="flex items-center gap-3">
-                <History className="h-5 w-5" />
-                <span className="font-medium">History</span>
-              </div>
-              <ChevronRight
-                className={cn(
-                  'h-5 w-5 transition-transform',
-                  showHistory && 'rotate-90'
-                )}
-              />
-            </button>
-          </nav>
+              {/* Projects Section */}
+              <div className="my-3 h-px bg-gray-200 dark:bg-gray-800" />
+
+              <button
+                onClick={() => setShowProjects(!showProjects)}
+                className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-800"
+              >
+                <div className="flex items-center gap-3">
+                  <FolderKanban className="h-5 w-5" />
+                  <span className="font-medium">Projects</span>
+                </div>
+                <ChevronRight
+                  className={cn(
+                    'h-5 w-5 transition-transform',
+                    showProjects && 'rotate-90'
+                  )}
+                />
+              </button>
+
+              {showProjects && (
+                <div className="ml-4 mt-1 space-y-1 max-h-40 overflow-y-auto">
+                  {projects.length === 0 ? (
+                    <p className="text-sm text-gray-400 px-3 py-2">No projects yet</p>
+                  ) : (
+                    projects.slice(0, 10).map((project) => (
+                      <button
+                        key={project.id}
+                        onClick={() => {
+                          setActiveSection(`project-${project.id}`);
+                          onClose();
+                        }}
+                        className={cn(
+                          'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-left',
+                          activeSection === `project-${project.id}`
+                            ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30'
+                            : 'text-gray-600 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800'
+                        )}
+                      >
+                        <FolderKanban className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{project.name}</span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* History Section */}
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-800"
+              >
+                <div className="flex items-center gap-3">
+                  <History className="h-5 w-5" />
+                  <span className="font-medium">History</span>
+                </div>
+                <ChevronRight
+                  className={cn(
+                    'h-5 w-5 transition-transform',
+                    showHistory && 'rotate-90'
+                  )}
+                />
+              </button>
+
+              {showHistory && (
+                <div className="ml-4 mt-1 space-y-1 max-h-60 overflow-y-auto">
+                  {recentProposals.length === 0 ? (
+                    <p className="text-sm text-gray-400 px-3 py-2">No recent proposals</p>
+                  ) : (
+                    recentProposals.map((proposal) => (
+                      <button
+                        key={proposal.id}
+                        onClick={() => handleViewProposal(proposal)}
+                        className="flex w-full items-start gap-2 rounded-lg px-3 py-2 text-left active:bg-gray-100 dark:active:bg-gray-800"
+                      >
+                        <FileText className="h-4 w-4 shrink-0 mt-0.5 text-gray-400" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                            {proposal.content.title || 'Untitled'}
+                          </p>
+                          <p className="text-xs text-gray-400 flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {formatDate(proposal.updatedAt)}
+                          </p>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </nav>
+          </div>
 
           {/* Footer - User Profile */}
           <div className="border-t border-gray-200 dark:border-gray-800 p-4">
