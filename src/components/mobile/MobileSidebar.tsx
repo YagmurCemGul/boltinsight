@@ -48,7 +48,7 @@ const menuItems = [
 ];
 
 export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
-  const { activeSection, setActiveSection, currentUser, projects, proposals, setCurrentProposal } = useAppStore();
+  const { activeSection, setActiveSection, currentUser, projects, proposals, setCurrentProposal, setLoggedIn } = useAppStore();
   const { isDarkMode, toggleDarkMode } = useThemeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
@@ -69,6 +69,13 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
     setCurrentProposal(proposal);
     setActiveSection('view-proposal');
     onClose();
+  };
+
+  const handleSignOut = () => {
+    setSettingsOpen(false);
+    onClose();
+    setLoggedIn(false);
+    toast.success('Signed out successfully');
   };
 
   return (
@@ -224,7 +231,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           </div>
 
           {/* Footer - User Profile */}
-          <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+          <div className="border-t border-gray-200 dark:border-gray-800 p-4 pb-20 shrink-0">
             {/* Theme Toggle */}
             <button
               onClick={() => {
@@ -308,7 +315,11 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
           {/* Actions */}
           <div className="flex justify-between border-t dark:border-gray-700 pt-4">
-            <Button variant="outline" className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+            <Button
+              variant="outline"
+              className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              onClick={handleSignOut}
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
             </Button>
