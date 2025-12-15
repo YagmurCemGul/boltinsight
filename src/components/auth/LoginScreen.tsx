@@ -10,6 +10,7 @@ interface LoginScreenProps {
 export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
 
   const handleSSOLogin = async (providerId: string) => {
     setIsLoading(true);
@@ -23,15 +24,28 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
     onLogin();
   };
 
+  const handleEmailContinue = async () => {
+    if (!email) return;
+    setIsLoading(true);
+    setLoadingProvider('email');
+
+    // Simulate email login
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    setIsLoading(false);
+    setLoadingProvider(null);
+    onLogin();
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-md">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600">
-            <Zap className="h-7 w-7 text-white" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-lg">
+            <Zap className="h-9 w-9 text-white" />
           </div>
-          <h1 className="mt-4 text-2xl font-semibold text-gray-900">Welcome back</h1>
+          <h1 className="mt-6 text-2xl font-semibold text-gray-900">Welcome back</h1>
         </div>
 
         {/* SSO Buttons */}
@@ -40,7 +54,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           <button
             onClick={() => handleSSOLogin('google')}
             disabled={isLoading}
-            className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3.5 text-base font-normal text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             {loadingProvider === 'google' ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -59,7 +73,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           <button
             onClick={() => handleSSOLogin('microsoft')}
             disabled={isLoading}
-            className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3.5 text-base font-normal text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             {loadingProvider === 'microsoft' ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -78,7 +92,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           <button
             onClick={() => handleSSOLogin('okta')}
             disabled={isLoading}
-            className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3.5 text-base font-normal text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             {loadingProvider === 'okta' ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -91,11 +105,42 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           </button>
         </div>
 
+        {/* OR Divider */}
+        <div className="my-6 flex items-center">
+          <div className="flex-1 border-t border-gray-200"></div>
+          <span className="px-4 text-sm text-gray-400 uppercase">or</span>
+          <div className="flex-1 border-t border-gray-200"></div>
+        </div>
+
+        {/* Email Input */}
+        <div className="space-y-3">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email address"
+            className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3.5 text-base text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
+
+          {/* Continue Button */}
+          <button
+            onClick={handleEmailContinue}
+            disabled={isLoading || !email}
+            className="flex w-full items-center justify-center rounded-lg bg-blue-500 px-4 py-3.5 text-base font-medium text-white transition-colors hover:bg-blue-600 disabled:opacity-50"
+          >
+            {loadingProvider === 'email' ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              'Continue'
+            )}
+          </button>
+        </div>
+
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-sm text-gray-400">
             <a href="#" className="hover:underline">Terms of Use</a>
-            {' | '}
+            <span className="mx-2">|</span>
             <a href="#" className="hover:underline">Privacy Policy</a>
           </p>
         </div>

@@ -48,7 +48,7 @@ const menuItems = [
 ];
 
 export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
-  const { activeSection, setActiveSection, currentUser, projects } = useAppStore();
+  const { activeSection, setActiveSection, currentUser, projects, setLoggedIn } = useAppStore();
   const { isDarkMode, toggleDarkMode } = useThemeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
@@ -263,7 +263,15 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
           {/* Actions */}
           <div className="flex justify-between border-t dark:border-gray-700 pt-4">
-            <Button variant="outline" className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+            <Button
+              variant="outline"
+              className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              onClick={() => {
+                setSettingsOpen(false);
+                onClose();
+                setLoggedIn(false);
+              }}
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
             </Button>

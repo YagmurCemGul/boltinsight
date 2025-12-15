@@ -94,7 +94,7 @@ const menuItems = [
 ];
 
 export function Sidebar() {
-  const { sidebarOpen, setSidebarOpen, activeSection, setActiveSection, currentUser, sidebarCollapsed, setSidebarCollapsed } = useAppStore();
+  const { sidebarOpen, setSidebarOpen, activeSection, setActiveSection, currentUser, sidebarCollapsed, setSidebarCollapsed, setLoggedIn } = useAppStore();
   const { isDarkMode, toggleDarkMode } = useThemeStore();
   const [expandedItems, setExpandedItems] = useState<string[]>(['projects', 'history']);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -406,7 +406,14 @@ export function Sidebar() {
 
           {/* Actions */}
           <div className="flex justify-between border-t pt-4">
-            <Button variant="outline" className="text-red-600 hover:bg-red-50">
+            <Button
+              variant="outline"
+              className="text-red-600 hover:bg-red-50"
+              onClick={() => {
+                setSettingsOpen(false);
+                setLoggedIn(false);
+              }}
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
             </Button>
