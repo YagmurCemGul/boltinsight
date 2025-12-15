@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, Zap } from 'lucide-react';
+import { Loader2, Zap, ArrowLeft } from 'lucide-react';
 
 interface LoginScreenProps {
   onLogin: () => void;
 }
 
 export function LoginScreen({ onLogin }: LoginScreenProps) {
+  const [step, setStep] = useState<'email' | 'password'>('email');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
@@ -24,19 +26,30 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
     onLogin();
   };
 
-  const handleEmailContinue = async (e: React.FormEvent) => {
+  const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+    setStep('password');
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!password) return;
 
     setIsLoading(true);
-    setLoadingProvider('email');
+    setLoadingProvider('password');
 
-    // Simulate email login
+    // Simulate login
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     setIsLoading(false);
     setLoadingProvider(null);
     onLogin();
+  };
+
+  const handleBack = () => {
+    setStep('email');
+    setPassword('');
   };
 
   return (
@@ -47,95 +60,140 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600">
             <Zap className="h-7 w-7 text-white" />
           </div>
-          <h1 className="mt-4 text-2xl font-semibold text-gray-900">Welcome back</h1>
+          <h1 className="mt-4 text-2xl font-semibold text-gray-900">
+            {step === 'email' ? 'Welcome back' : 'Enter your password'}
+          </h1>
         </div>
 
-        {/* SSO Buttons */}
-        <div className="space-y-3">
-          {/* Google SSO */}
-          <button
-            onClick={() => handleSSOLogin('google')}
-            disabled={isLoading}
-            className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
-          >
-            {loadingProvider === 'google' ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <svg className="h-5 w-5" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-            )}
-            Continue with Google
-          </button>
+        {step === 'email' ? (
+          <>
+            {/* SSO Buttons */}
+            <div className="space-y-3">
+              {/* Google SSO */}
+              <button
+                onClick={() => handleSSOLogin('google')}
+                disabled={isLoading}
+                className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+              >
+                {loadingProvider === 'google' ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <svg className="h-5 w-5" viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                )}
+                Continue with Google
+              </button>
 
-          {/* Microsoft SSO */}
-          <button
-            onClick={() => handleSSOLogin('microsoft')}
-            disabled={isLoading}
-            className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
-          >
-            {loadingProvider === 'microsoft' ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <svg className="h-5 w-5" viewBox="0 0 21 21" fill="none">
-                <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
-                <rect x="11" y="1" width="9" height="9" fill="#7FBA00"/>
-                <rect x="1" y="11" width="9" height="9" fill="#00A4EF"/>
-                <rect x="11" y="11" width="9" height="9" fill="#FFB900"/>
-              </svg>
-            )}
-            Continue with Microsoft
-          </button>
+              {/* Microsoft SSO */}
+              <button
+                onClick={() => handleSSOLogin('microsoft')}
+                disabled={isLoading}
+                className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+              >
+                {loadingProvider === 'microsoft' ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <svg className="h-5 w-5" viewBox="0 0 21 21" fill="none">
+                    <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
+                    <rect x="11" y="1" width="9" height="9" fill="#7FBA00"/>
+                    <rect x="1" y="11" width="9" height="9" fill="#00A4EF"/>
+                    <rect x="11" y="11" width="9" height="9" fill="#FFB900"/>
+                  </svg>
+                )}
+                Continue with Microsoft
+              </button>
 
-          {/* Okta SSO */}
-          <button
-            onClick={() => handleSSOLogin('okta')}
-            disabled={isLoading}
-            className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
-          >
-            {loadingProvider === 'okta' ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="#007dc1">
-                <path d="M12 0C5.389 0 0 5.389 0 12s5.389 12 12 12 12-5.389 12-12S18.611 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"/>
-              </svg>
-            )}
-            Continue with Okta
-          </button>
-        </div>
+              {/* Okta SSO */}
+              <button
+                onClick={() => handleSSOLogin('okta')}
+                disabled={isLoading}
+                className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+              >
+                {loadingProvider === 'okta' ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="#007dc1">
+                    <path d="M12 0C5.389 0 0 5.389 0 12s5.389 12 12 12 12-5.389 12-12S18.611 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"/>
+                  </svg>
+                )}
+                Continue with Okta
+              </button>
+            </div>
 
-        {/* Divider */}
-        <div className="my-6 flex items-center">
-          <div className="flex-1 border-t border-gray-300"></div>
-          <span className="px-4 text-sm text-gray-500">OR</span>
-          <div className="flex-1 border-t border-gray-300"></div>
-        </div>
+            {/* Divider */}
+            <div className="my-6 flex items-center">
+              <div className="flex-1 border-t border-gray-300"></div>
+              <span className="px-4 text-sm text-gray-500">OR</span>
+              <div className="flex-1 border-t border-gray-300"></div>
+            </div>
 
-        {/* Email Form */}
-        <form onSubmit={handleEmailContinue} className="space-y-3">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email address"
-            className="w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            disabled={isLoading}
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !email}
-            className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loadingProvider === 'email' ? (
-              <Loader2 className="mx-auto h-5 w-5 animate-spin" />
-            ) : (
-              'Continue'
-            )}
-          </button>
-        </form>
+            {/* Email Form */}
+            <form onSubmit={handleEmailContinue} className="space-y-3">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email address"
+                className="w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !email}
+                className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+              >
+                Continue
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            {/* Back button and email display */}
+            <button
+              onClick={handleBack}
+              className="mb-4 flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+
+            <div className="mb-6 rounded-md bg-gray-50 px-4 py-3 text-sm text-gray-700">
+              {email}
+            </div>
+
+            {/* Password Form */}
+            <form onSubmit={handlePasswordSubmit} className="space-y-3">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                disabled={isLoading}
+                autoFocus
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !password}
+                className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+              >
+                {loadingProvider === 'password' ? (
+                  <Loader2 className="mx-auto h-5 w-5 animate-spin" />
+                ) : (
+                  'Continue'
+                )}
+              </button>
+            </form>
+
+            <button className="mt-4 w-full text-center text-sm text-blue-600 hover:text-blue-700">
+              Forgot password?
+            </button>
+          </>
+        )}
 
         {/* Footer */}
         <div className="mt-8 text-center">
