@@ -72,9 +72,10 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   };
 
   const handleSignOut = () => {
+    // Set logout first, then close UI elements
+    setLoggedIn(false);
     setSettingsOpen(false);
     onClose();
-    setLoggedIn(false);
     toast.success('Signed out successfully');
   };
 
