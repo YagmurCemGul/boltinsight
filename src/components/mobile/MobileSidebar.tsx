@@ -72,11 +72,14 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   };
 
   const handleSignOut = () => {
-    // Set logout first, then close UI elements
-    setLoggedIn(false);
+    // Close UI elements first
     setSettingsOpen(false);
     onClose();
-    toast.success('Signed out successfully');
+    // Use setTimeout to ensure React renders the closed state before logging out
+    setTimeout(() => {
+      setLoggedIn(false);
+      toast.success('Signed out successfully');
+    }, 100);
   };
 
   return (
