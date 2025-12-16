@@ -284,7 +284,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                       ) : isIncompleteRequired ? (
                         <Circle className="h-4 w-4 text-red-400" />
                       ) : (
-                        <Circle className="h-4 w-4 text-gray-200" />
+                        <Circle className="h-4 w-4 text-gray-300 dark:text-gray-500" />
                       )}
                     </div>
 
@@ -336,30 +336,30 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
 
       {/* Footer - Quick Stats */}
       {!collapsed ? (
-        <div className="border-t border-gray-200 p-4 bg-gray-50">
+        <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800">
           <div className="grid grid-cols-2 gap-3 text-center">
-            <div className="rounded-lg bg-white p-2 shadow-sm">
-              <p className="text-lg font-semibold text-gray-900">
+            <div className="rounded-lg bg-white dark:bg-gray-900 p-2 shadow-sm">
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
                 {content.sampleSize?.toLocaleString() || '-'}
               </p>
-              <p className="text-xs text-gray-500">Total Sample</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Total Sample</p>
             </div>
-            <div className="rounded-lg bg-white p-2 shadow-sm">
-              <p className="text-lg font-semibold text-gray-900">
+            <div className="rounded-lg bg-white dark:bg-gray-900 p-2 shadow-sm">
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
                 {content.markets?.length || 0}
               </p>
-              <p className="text-xs text-gray-500">Markets</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Markets</p>
             </div>
           </div>
 
           {/* Client Info */}
           {content.client && (
-            <div className="mt-3 flex items-center gap-2 text-xs text-gray-600">
+            <div className="mt-3 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
               <Building2 className="h-3 w-3" />
               <span className="truncate">{content.client}</span>
               {content.contact && (
                 <>
-                  <span className="text-gray-300">|</span>
+                  <span className="text-gray-300 dark:text-gray-600">|</span>
                   <User className="h-3 w-3" />
                   <span className="truncate">{content.contact}</span>
                 </>
@@ -368,17 +368,17 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
           )}
         </div>
       ) : (
-        <div className="border-t border-gray-200 p-2 bg-gray-50">
+        <div className="border-t border-gray-200 dark:border-gray-700 p-2 bg-gray-50 dark:bg-gray-800">
           <div className="flex flex-col items-center gap-2 text-center">
-            <div className="rounded-lg bg-white p-1.5 shadow-sm" title="Sample Size">
+            <div className="rounded-lg bg-white dark:bg-gray-900 p-1.5 shadow-sm" title="Sample Size">
               <BarChart3 className="h-4 w-4 text-gray-400 mx-auto" />
-              <p className="text-xs font-semibold text-gray-900">
+              <p className="text-xs font-semibold text-gray-900 dark:text-white">
                 {content.sampleSize ? (content.sampleSize >= 1000 ? `${(content.sampleSize / 1000).toFixed(0)}k` : content.sampleSize) : '-'}
               </p>
             </div>
-            <div className="rounded-lg bg-white p-1.5 shadow-sm" title="Markets">
+            <div className="rounded-lg bg-white dark:bg-gray-900 p-1.5 shadow-sm" title="Markets">
               <Globe className="h-4 w-4 text-gray-400 mx-auto" />
-              <p className="text-xs font-semibold text-gray-900">
+              <p className="text-xs font-semibold text-gray-900 dark:text-white">
                 {content.markets?.length || 0}
               </p>
             </div>

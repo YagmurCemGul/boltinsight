@@ -64,6 +64,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
   const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectDescription, setNewProjectDescription] = useState('');
 
   // Get recent proposals for history
   const recentProposals = proposals
@@ -114,10 +115,12 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
     if (!newProjectName.trim()) return;
     addProject({
       name: newProjectName.trim(),
+      description: newProjectDescription.trim() || undefined,
       proposals: [],
     });
     toast.success(`Project "${newProjectName}" created`);
     setNewProjectName('');
+    setNewProjectDescription('');
     setNewProjectModalOpen(false);
   };
 
@@ -223,7 +226,6 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                         </button>
                       }
                       align="right"
-                      className="z-[200]"
                     >
                       <DropdownItem onClick={() => {
                         setActiveSection(`project-${project.id}`);
@@ -310,7 +312,6 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                           </button>
                         }
                         align="right"
-                        className="z-[200]"
                       >
                         <DropdownItem onClick={() => handleCopyProposal(proposal)}>
                           <Copy className="mr-2 h-4 w-4" />
@@ -489,6 +490,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         onClose={() => {
           setNewProjectModalOpen(false);
           setNewProjectName('');
+          setNewProjectDescription('');
         }}
         title="Create New Project"
         size="sm"
@@ -500,6 +502,13 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             onChange={(e) => setNewProjectName(e.target.value)}
             autoFocus
           />
+          <textarea
+            placeholder="Project description (optional)"
+            value={newProjectDescription}
+            onChange={(e) => setNewProjectDescription(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-[#5B50BD] focus:ring-2 focus:ring-[#5B50BD]/20 resize-none"
+            rows={3}
+          />
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -507,6 +516,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               onClick={() => {
                 setNewProjectModalOpen(false);
                 setNewProjectName('');
+                setNewProjectDescription('');
               }}
             >
               Cancel

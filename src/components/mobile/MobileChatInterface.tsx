@@ -128,12 +128,12 @@ export function MobileChatInterface({ onSwitchToEditor }: MobileChatInterfacePro
               </p>
             </div>
 
-            <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            <div className="flex flex-wrap gap-2 justify-center">
               {TEMPLATES.map((template) => (
                 <button
                   key={template.id}
                   onClick={() => handleTemplateSelect(template)}
-                  className="inline-flex items-center rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 transition-colors active:bg-gray-100 dark:active:bg-gray-700 flex-shrink-0 whitespace-nowrap"
+                  className="inline-flex items-center rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 transition-colors active:bg-gray-100 dark:active:bg-gray-700"
                 >
                   {template.name}
                 </button>

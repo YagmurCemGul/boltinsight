@@ -96,14 +96,14 @@ export function calculateRequiredSampleSize(
 
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    draft: 'bg-neutral-200 text-neutral-700 dark:bg-neutral-600 dark:text-neutral-100',
-    pending_approval: 'bg-amber-200 text-amber-900 dark:bg-amber-500 dark:text-amber-950',
-    approved: 'bg-teal-100 text-teal-800 dark:bg-teal-600 dark:text-teal-50',
-    rejected: 'bg-rose-200 text-rose-900 dark:bg-rose-500 dark:text-rose-950',
-    on_hold: 'bg-slate-200 text-slate-900 dark:bg-slate-600 dark:text-slate-100',
-    deleted: 'bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-200',
+    draft: 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-white',
+    pending_approval: 'bg-amber-100 text-amber-800 dark:bg-amber-600 dark:text-white',
+    approved: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-600 dark:text-white',
+    rejected: 'bg-red-100 text-red-800 dark:bg-red-600 dark:text-white',
+    on_hold: 'bg-slate-200 text-slate-800 dark:bg-slate-600 dark:text-white',
+    deleted: 'bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-white',
   };
-  return colors[status] || 'bg-neutral-200 text-neutral-700 dark:bg-neutral-600 dark:text-neutral-100';
+  return colors[status] || 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-white';
 }
 
 export function getStatusLabel(status: string): string {
