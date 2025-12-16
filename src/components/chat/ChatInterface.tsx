@@ -425,14 +425,14 @@ You can share these in any order, or click **Editor Mode** above to fill in the 
         <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
           Start with a template (optional)
         </label>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
           {templateOptions.map((template) => (
             <button
               key={template.id}
               onClick={() => handleTemplateSelect(template.id)}
               disabled={isAiTyping}
               className={cn(
-                'rounded-full px-3 py-1 text-xs font-medium transition-colors whitespace-nowrap',
+                'rounded-full px-3 py-1 text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0',
                 selectedTemplate === template.id
                   ? 'bg-[#5B50BD] text-white'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700',

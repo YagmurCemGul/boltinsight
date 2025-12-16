@@ -124,14 +124,10 @@ export function MobileHeader({
           ) : (
             <button
               onClick={onOpenMenu}
-              className="rounded-lg p-2 -ml-2 text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-800"
+              className="-ml-1 active:opacity-70"
             >
-              <Menu className="h-5 w-5" />
+              <BoltLogo className="h-8 w-auto" variant={isDarkMode ? 'dark' : 'light'} />
             </button>
-          )}
-
-          {!showBack && activeSection === 'new-proposal' && (
-            <BoltLogo className="h-8 w-auto" variant={isDarkMode ? 'dark' : 'light'} />
           )}
         </div>
 

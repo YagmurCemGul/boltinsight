@@ -200,17 +200,17 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
 
   return (
     <aside className={cn(
-      "border-l border-gray-200 bg-white flex flex-col h-full transition-all duration-200",
+      "border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex flex-col h-full transition-all duration-200",
       collapsed ? "w-12" : "w-80"
     )}>
       {/* Header */}
-      <div className={cn("border-b border-gray-200", collapsed ? "p-2" : "p-4")}>
+      <div className={cn("border-b border-gray-200 dark:border-gray-700", collapsed ? "p-2" : "p-4")}>
         <div className="flex items-center justify-between">
-          {!collapsed && <h2 className="text-sm font-semibold text-gray-900">Section Content</h2>}
+          {!collapsed && <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Section Content</h2>}
           {onToggle && (
             <button
               onClick={onToggle}
-              className="flex items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              className="flex items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300"
               title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
               {collapsed ? <PanelRight className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
@@ -219,12 +219,12 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
         </div>
         {!collapsed && (
           <>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               {completionStats.requiredCompleted}/{completionStats.requiredTotal} required sections complete
             </p>
 
             {/* Progress Bar */}
-            <div className="mt-3 h-2 rounded-full bg-gray-100">
+            <div className="mt-3 h-2 rounded-full bg-gray-100 dark:bg-gray-700">
               <div
                 className="h-full rounded-full bg-[#5B50BD] transition-all duration-300"
                 style={{
@@ -257,7 +257,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                     ? 'bg-[#EDE9F9] ring-1 ring-[#C8C4E9] dark:bg-[#231E51] dark:ring-[#5B50BD]'
                     : isIncompleteRequired
                     ? 'border border-red-300 dark:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
-                    : 'hover:bg-gray-50'
+                    : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                 )}
                 title={collapsed ? section.label : undefined}
               >
@@ -297,7 +297,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                         )} />
                         <span className={cn(
                           'text-sm font-medium truncate',
-                          isActive ? 'text-blue-900' : 'text-gray-700'
+                          isActive ? 'text-[#5B50BD] dark:text-[#918AD3]' : 'text-gray-700 dark:text-gray-200'
                         )}>
                           {section.label}
                         </span>
@@ -307,7 +307,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                       </div>
 
                       {section.description && (
-                        <p className="mt-0.5 text-xs text-gray-400 truncate">
+                        <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500 truncate">
                           {section.description}
                         </p>
                       )}
@@ -315,7 +315,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                       {/* Preview Value */}
                       <p className={cn(
                         'mt-1 text-xs truncate',
-                        status?.hasContent ? 'text-gray-600' : 'text-gray-300'
+                        status?.hasContent ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300 dark:text-gray-600'
                       )}>
                         {getPreviewValue(section)}
                       </p>
@@ -324,7 +324,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                     {/* Arrow */}
                     <ChevronRight className={cn(
                       'h-4 w-4 flex-shrink-0 transition-transform',
-                      isActive ? 'text-[#5B50BD] dark:text-[#918AD3] rotate-90' : 'text-gray-300'
+                      isActive ? 'text-[#5B50BD] dark:text-[#918AD3] rotate-90' : 'text-gray-300 dark:text-gray-600'
                     )} />
                   </div>
                 )}
