@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { BoltLogo } from '@/components/ui';
 import { useAppStore } from '@/lib/store';
+import { useThemeStore } from '@/lib/theme';
 
 export function MobileLoginScreen() {
   const { setLoggedIn } = useAppStore();
+  const { isDarkMode } = useThemeStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -57,7 +59,7 @@ export function MobileLoginScreen() {
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
           <div className="flex h-20 w-20 items-center justify-center">
-            <BoltLogo className="h-20 w-auto" />
+            <BoltLogo className="h-20 w-auto" variant={isDarkMode ? 'dark' : 'light'} />
           </div>
           <h1 className="mt-6 text-2xl font-semibold text-gray-900">
             {step === 'email' ? 'Welcome back' : 'Enter your password'}

@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { BoltLogo } from '@/components/ui';
+import { useThemeStore } from '@/lib/theme';
 
 interface LoginScreenProps {
   onLogin: () => void;
 }
 
 export function LoginScreen({ onLogin }: LoginScreenProps) {
+  const { isDarkMode } = useThemeStore();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [email, setEmail] = useState('');
@@ -65,7 +67,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
           <div className="flex h-20 w-20 items-center justify-center">
-            <BoltLogo className="h-20 w-auto" />
+            <BoltLogo className="h-20 w-auto" variant={isDarkMode ? 'dark' : 'light'} />
           </div>
           <h1 className="mt-6 text-2xl font-semibold text-gray-900">
             {step === 'email' ? 'Welcome back' : 'Enter your password'}
