@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import { Logo } from '@/components/ui';
+import { BoltLogo } from '@/components/ui';
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -65,7 +65,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
           <div className="flex h-20 w-20 items-center justify-center">
-            <Logo size={80} />
+            <BoltLogo className="h-20 w-auto" />
           </div>
           <h1 className="mt-6 text-2xl font-semibold text-gray-900">
             {step === 'email' ? 'Welcome back' : 'Enter your password'}
