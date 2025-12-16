@@ -30,9 +30,10 @@ const mainNavItems: NavItem[] = [
 
 interface MobileNavigationProps {
   onOpenMenu: () => void;
+  hidden?: boolean;
 }
 
-export function MobileNavigation({ onOpenMenu }: MobileNavigationProps) {
+export function MobileNavigation({ onOpenMenu, hidden = false }: MobileNavigationProps) {
   const { activeSection, setActiveSection } = useAppStore();
 
   const handleNavClick = (id: string) => {
@@ -52,7 +53,12 @@ export function MobileNavigation({ onOpenMenu }: MobileNavigationProps) {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800 safe-area-bottom">
+    <nav
+      className={cn(
+        'fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800 safe-area-bottom transition-transform duration-300',
+        hidden ? 'translate-y-full' : 'translate-y-0'
+      )}
+    >
       <div className="flex items-center justify-around px-2 py-2">
         {mainNavItems.map((item) => (
           <button
@@ -61,7 +67,7 @@ export function MobileNavigation({ onOpenMenu }: MobileNavigationProps) {
             className={cn(
               'flex flex-col items-center justify-center min-w-[60px] py-1 px-2 rounded-lg transition-colors',
               isActive(item.id)
-                ? 'text-blue-600 dark:text-blue-400'
+                ? 'text-[#5B50BD] dark:text-[#918AD3]'
                 : 'text-gray-500 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800'
             )}
           >

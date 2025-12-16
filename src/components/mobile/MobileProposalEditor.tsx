@@ -153,7 +153,7 @@ export function MobileProposalEditor() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 pb-24">
         {SECTIONS.map((section) => {
           const Icon = section.icon;
           const isExpanded = expandedSections.includes(section.id);

@@ -9,11 +9,16 @@ import {
   FolderOpen,
   Filter,
   X,
+  MoreVertical,
+  Copy,
+  Trash2,
+  Building2,
+  FolderInput,
 } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Input, Button, Badge, Card, CardContent, Tabs, TabsList, TabsTrigger, TabsContent, Modal, Select } from '@/components/ui';
-import type { LibraryItem, Proposal } from '@/types';
+import { Input, Button, Badge, Card, CardContent, Tabs, TabsList, TabsTrigger, TabsContent, Modal, Select, Dropdown, DropdownItem, DropdownSeparator, toast, MoveToProjectModal } from '@/components/ui';
+import type { LibraryItem, Proposal, ProposalContent } from '@/types';
 
 export function MobileLibrary() {
   const {
@@ -23,12 +28,17 @@ export function MobileLibrary() {
     proposals,
     setCurrentProposal,
     setActiveSection,
+    deleteProposal,
+    addProposal,
+    currentUser,
   } = useAppStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [proposalStatusFilter, setProposalStatusFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
   const [newItem, setNewItem] = useState({
     name: '',
     description: '',
@@ -82,6 +92,64 @@ export function MobileLibrary() {
     setActiveSection('view-proposal');
   };
 
+  const handleCopyProposal = (proposal: Proposal) => {
+    addProposal({
+      ...proposal,
+      status: 'draft',
+      code: undefined,
+      content: {
+        ...proposal.content,
+        title: `${proposal.content.title} (Copy)`,
+      },
+      author: currentUser,
+      sentToClient: false,
+      approvalHistory: [],
+      comments: [],
+      collaborators: [],
+    });
+    toast.success('Proposal duplicated');
+  };
+
+  const handleDeleteProposal = (proposalId: string) => {
+    deleteProposal(proposalId);
+    toast.success('Proposal deleted');
+  };
+
+  const handleMoveProposal = (proposal: Proposal) => {
+    setSelectedProposal({ id: proposal.id, title: proposal.content.title || 'Untitled' });
+    setMoveModalOpen(true);
+  };
+
+  const handleUseTemplate = (template: LibraryItem) => {
+    // Create a new proposal from template
+    const newProposal = {
+      status: 'draft' as const,
+      content: {
+        title: template.name,
+        client: '',
+        contact: '',
+        background: template.description || '',
+        businessObjectives: [],
+        researchObjectives: [],
+        burningQuestions: [],
+        targetDefinition: '',
+        sampleSize: 0,
+        markets: [],
+        quotas: [],
+        advancedAnalysis: [],
+        referenceProjects: [],
+      } as ProposalContent,
+      author: currentUser,
+      sentToClient: false,
+      approvalHistory: [],
+      comments: [],
+      collaborators: [],
+    };
+    addProposal(newProposal);
+    toast.success('Template applied to new proposal');
+    setActiveSection('view-proposal');
+  };
+
   const statusColors: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
     pending_approval: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
@@ -111,7 +179,7 @@ export function MobileLibrary() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 pb-24">
         <Tabs defaultValue="proposals" className="h-full">
           <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 px-4 pt-3">
             <TabsList className="w-full">
@@ -156,10 +224,16 @@ export function MobileLibrary() {
                   <Card key={proposal.id} className="overflow-hidden">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">
+                        <button
+                          onClick={() => handleViewProposal(proposal)}
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400"
+                        >
                           <FileText className="h-5 w-5" />
-                        </div>
-                        <div className="flex-1 min-w-0">
+                        </button>
+                        <button
+                          onClick={() => handleViewProposal(proposal)}
+                          className="flex-1 min-w-0 text-left"
+                        >
                           <div className="flex items-center gap-2 mb-1">
                             {proposal.code && (
                               <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
@@ -174,23 +248,42 @@ export function MobileLibrary() {
                             {proposal.content.title || 'Untitled'}
                           </h3>
                           {proposal.content.client && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                              {proposal.content.client}
-                            </p>
+                            <div className="flex items-center gap-1 mt-1 text-sm text-gray-500 dark:text-gray-400">
+                              <Building2 className="h-3 w-3" />
+                              <span className="truncate">{proposal.content.client}</span>
+                            </div>
                           )}
-                          <div className="mt-2 flex items-center gap-3">
-                            <button
-                              onClick={() => handleViewProposal(proposal)}
-                              className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400"
-                            >
-                              <Eye className="h-3 w-3" />
-                              View
-                            </button>
-                            <span className="text-xs text-gray-400">
-                              {formatDate(proposal.updatedAt)}
-                            </span>
+                          <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+                            <span>{proposal.author.name}</span>
+                            <span>•</span>
+                            <span>{formatDate(proposal.updatedAt)}</span>
                           </div>
-                        </div>
+                        </button>
+                        <Dropdown
+                          trigger={
+                            <button className="flex-shrink-0 rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                              <MoreVertical className="h-5 w-5" />
+                            </button>
+                          }
+                          align="right"
+                        >
+                          <DropdownItem onClick={() => handleCopyProposal(proposal)}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            Duplicate
+                          </DropdownItem>
+                          <DropdownItem onClick={() => handleMoveProposal(proposal)}>
+                            <FolderInput className="mr-2 h-4 w-4" />
+                            Move
+                          </DropdownItem>
+                          <DropdownSeparator />
+                          <DropdownItem
+                            variant="destructive"
+                            onClick={() => handleDeleteProposal(proposal.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownItem>
+                        </Dropdown>
                       </div>
                     </CardContent>
                   </Card>
@@ -220,10 +313,16 @@ export function MobileLibrary() {
                   <Card key={template.id} className="overflow-hidden">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400">
+                        <button
+                          onClick={() => handleUseTemplate(template)}
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400"
+                        >
                           <FileText className="h-5 w-5" />
-                        </div>
-                        <div className="flex-1 min-w-0">
+                        </button>
+                        <button
+                          onClick={() => handleUseTemplate(template)}
+                          className="flex-1 min-w-0 text-left"
+                        >
                           <h3 className="font-medium text-gray-900 dark:text-white">
                             {template.name}
                           </h3>
@@ -241,16 +340,35 @@ export function MobileLibrary() {
                               ))}
                             </div>
                           )}
-                          <button
+                        </button>
+                        <Dropdown
+                          trigger={
+                            <button className="flex-shrink-0 rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                              <MoreVertical className="h-5 w-5" />
+                            </button>
+                          }
+                          align="right"
+                        >
+                          <DropdownItem onClick={() => handleUseTemplate(template)}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            Duplicate
+                          </DropdownItem>
+                          <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
+                            <FolderInput className="mr-2 h-4 w-4" />
+                            Move
+                          </DropdownItem>
+                          <DropdownSeparator />
+                          <DropdownItem
+                            variant="destructive"
                             onClick={() => {
-                              // Use template logic here
+                              deleteLibraryItem(template.id);
+                              toast.success('Template deleted');
                             }}
-                            className="mt-2 flex items-center gap-1 text-sm text-green-600 dark:text-green-400 font-medium"
                           >
-                            <Plus className="h-3 w-3" />
-                            Use Template
-                          </button>
-                        </div>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownItem>
+                        </Dropdown>
                       </div>
                     </CardContent>
                   </Card>
@@ -323,6 +441,19 @@ export function MobileLibrary() {
           </div>
         </div>
       </Modal>
+
+      {/* Move to Project Modal */}
+      {selectedProposal && (
+        <MoveToProjectModal
+          isOpen={moveModalOpen}
+          onClose={() => {
+            setMoveModalOpen(false);
+            setSelectedProposal(null);
+          }}
+          proposalId={selectedProposal.id}
+          proposalTitle={selectedProposal.title}
+        />
+      )}
     </div>
   );
 }

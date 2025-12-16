@@ -95,8 +95,8 @@ export function MainContent() {
                     className={cn(
                       'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                       proposalMode === 'chat'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? 'bg-[#5B50BD] text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
                     )}
                   >
                     Chat Mode
@@ -106,8 +106,8 @@ export function MainContent() {
                     className={cn(
                       'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                       proposalMode === 'editor'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? 'bg-[#5B50BD] text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
                     )}
                   >
                     Editor Mode
@@ -268,7 +268,7 @@ function ProjectView({ projectId }: { projectId: string }) {
               className="rounded-lg border border-gray-200 bg-white p-4 text-left transition-shadow hover:shadow-md"
             >
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-medium text-blue-600">
+                <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">
                   {proposal.code || 'Draft'}
                 </span>
                 <span

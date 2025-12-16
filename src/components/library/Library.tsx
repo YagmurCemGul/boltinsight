@@ -341,14 +341,14 @@ function ProposalCard({ proposal, onView }: { proposal: Proposal; onView: () => 
     <Card className="group relative transition-shadow hover:shadow-md">
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]">
             <FileText className="h-5 w-5" />
           </div>
 
           <div className="flex-1 overflow-hidden">
             <div className="flex items-center gap-2 mb-1">
               {proposal.code && (
-                <span className="text-xs font-medium text-blue-600">{proposal.code}</span>
+                <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">{proposal.code}</span>
               )}
               <Badge className={cn('text-xs', statusColors[proposal.status])}>
                 {proposal.status.replace('_', ' ')}
@@ -364,7 +364,7 @@ function ProposalCard({ proposal, onView }: { proposal: Proposal; onView: () => 
             <div className="mt-3 flex items-center gap-2">
               <button
                 onClick={onView}
-                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+                className="inline-flex items-center gap-1 text-sm text-[#5B50BD] hover:text-[#4A41A0] dark:text-[#918AD3] dark:hover:text-[#C8C4E9]"
               >
                 <Eye className="h-3 w-3" />
                 View

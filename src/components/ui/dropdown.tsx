@@ -31,7 +31,7 @@ export function Dropdown({ trigger, children, align = 'left', className }: Dropd
       {isOpen && (
         <div
           className={cn(
-            'absolute z-50 mt-2 min-w-[180px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg',
+            'absolute z-[100] mt-1 min-w-[160px] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-1 shadow-xl',
             align === 'right' ? 'right-0' : 'left-0',
             className
           )}
@@ -55,10 +55,10 @@ export function DropdownItem({ onClick, children, className, variant = 'default'
     <button
       onClick={onClick}
       className={cn(
-        'flex w-full items-center px-4 py-2 text-sm transition-colors',
+        'flex w-full items-center px-3 py-2 text-sm transition-colors',
         {
-          'text-gray-700 hover:bg-gray-100': variant === 'default',
-          'text-red-600 hover:bg-red-50': variant === 'destructive',
+          'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700': variant === 'default',
+          'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30': variant === 'destructive',
         },
         className
       )}
@@ -69,5 +69,5 @@ export function DropdownItem({ onClick, children, className, variant = 'default'
 }
 
 export function DropdownSeparator() {
-  return <div className="my-1 h-px bg-gray-200" />;
+  return <div className="my-1 h-px bg-gray-200 dark:bg-gray-700" />;
 }

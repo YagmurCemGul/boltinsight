@@ -26,7 +26,13 @@ import {
   Percent,
   Users,
   ClipboardCheck,
+  Check,
+  FileText,
+  MessageSquare,
+  UserCheck,
+  HelpCircle,
 } from 'lucide-react';
+import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { useThemeStore } from '@/lib/theme';
@@ -86,13 +92,35 @@ const menuItems = [
   },
 ];
 
+// Mock notifications data
+const mockNotifications = [
+  { id: '1', type: 'approval', message: 'Your proposal "Brand Tracking Q1" was approved', time: new Date(Date.now() - 1000 * 60 * 30), read: false },
+  { id: '2', type: 'comment', message: 'John added a comment on "Market Research"', time: new Date(Date.now() - 1000 * 60 * 60 * 2), read: false },
+  { id: '3', type: 'mention', message: 'You were mentioned in a proposal discussion', time: new Date(Date.now() - 1000 * 60 * 60 * 24), read: true },
+];
+
 export function Sidebar() {
   const { sidebarOpen, setSidebarOpen, activeSection, setActiveSection, currentUser, sidebarCollapsed, setSidebarCollapsed, setLoggedIn } = useAppStore();
   const { isDarkMode, toggleDarkMode } = useThemeStore();
   const [expandedItems, setExpandedItems] = useState<string[]>(['projects', 'history']);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [language, setLanguage] = useState('en');
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [notificationsList, setNotificationsList] = useState(mockNotifications);
+
+  const unreadCount = notificationsList.filter(n => !n.read).length;
+
+  const markAllRead = () => {
+    setNotificationsList(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'approval': return <UserCheck className="h-4 w-4 text-green-500" />;
+      case 'comment': return <MessageSquare className="h-4 w-4 text-blue-500" />;
+      default: return <FileText className="h-4 w-4 text-gray-500" />;
+    }
+  };
 
   const toggleExpand = (id: string) => {
     setExpandedItems((prev) =>
@@ -129,15 +157,29 @@ export function Sidebar() {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-            {!sidebarCollapsed && <h1 className="text-xl font-bold text-blue-600">BoltInsight</h1>}
-            {sidebarCollapsed && <span className="text-xl font-bold text-blue-600">BI</span>}
-            <button
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="hidden lg:flex items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-              title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            >
-              {sidebarCollapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-            </button>
+            {!sidebarCollapsed && <h1 className="text-xl font-bold text-[#5B50BD]">BoltInsight</h1>}
+            {sidebarCollapsed && <span className="text-xl font-bold text-[#5B50BD]">BI</span>}
+            <div className="flex items-center gap-1">
+              {!sidebarCollapsed && (
+                <button
+                  onClick={() => setNotificationsOpen(true)}
+                  className="relative flex items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                  title="Notifications"
+                >
+                  <Bell className="h-4 w-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0.5 right-0.5 h-2 w-2 rounded-full bg-red-500" />
+                  )}
+                </button>
+              )}
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="hidden lg:flex items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              >
+                {sidebarCollapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           {/* Main Navigation */}
@@ -146,9 +188,9 @@ export function Sidebar() {
             <button
               onClick={() => setActiveSection('new-proposal')}
               className={cn(
-                'mb-4 flex w-full items-center rounded-lg bg-blue-600 text-white transition-colors hover:bg-blue-700',
+                'mb-4 flex w-full items-center rounded-lg bg-[#5B50BD] text-white transition-colors hover:bg-[#4A41A0]',
                 sidebarCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3',
-                activeSection === 'new-proposal' && 'ring-2 ring-blue-300'
+                activeSection === 'new-proposal' && 'ring-2 ring-[#918AD3]'
               )}
               title={sidebarCollapsed ? 'New Proposal' : undefined}
             >
@@ -166,8 +208,8 @@ export function Sidebar() {
                       'flex w-full items-center rounded-lg text-sm transition-colors',
                       sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5',
                       activeSection === item.id
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]'
+                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                     )}
                     title={sidebarCollapsed ? item.label : undefined}
                   >
@@ -213,8 +255,8 @@ export function Sidebar() {
                   'flex w-full items-center rounded-lg text-sm transition-colors',
                   sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5',
                   activeSection === 'projects'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                 )}
                 title={sidebarCollapsed ? 'Projects' : undefined}
               >
@@ -248,8 +290,8 @@ export function Sidebar() {
                   'flex w-full items-center rounded-lg text-sm transition-colors',
                   sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5',
                   activeSection === 'history'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                 )}
                 title={sidebarCollapsed ? 'History' : undefined}
               >
@@ -278,7 +320,7 @@ export function Sidebar() {
             <div className={cn('flex items-center', sidebarCollapsed ? 'justify-center' : 'gap-3')}>
               <button
                 onClick={() => setSettingsOpen(true)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EDE9F9] text-[#5B50BD] hover:bg-[#C8C4E9] dark:bg-[#231E51] dark:text-[#918AD3] dark:hover:bg-[#1A163C]"
                 title={sidebarCollapsed ? 'Settings' : undefined}
               >
                 {sidebarCollapsed ? <Settings className="h-5 w-5" /> : <User className="h-5 w-5" />}
@@ -321,7 +363,7 @@ export function Sidebar() {
           {/* User Info */}
           <div className="rounded-lg bg-gray-50 p-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]">
                 <User className="h-6 w-6" />
               </div>
               <div>
@@ -347,7 +389,7 @@ export function Sidebar() {
                 }}
                 className={cn(
                   'relative h-6 w-11 rounded-full transition-colors',
-                  isDarkMode ? 'bg-blue-600' : 'bg-gray-200'
+                  isDarkMode ? 'bg-[#5B50BD]' : 'bg-gray-200'
                 )}
               >
                 <span
@@ -369,32 +411,31 @@ export function Sidebar() {
                 <span className="text-sm">Email Notifications</span>
               </div>
               <button
-                onClick={() => setNotifications(!notifications)}
+                onClick={() => setNotificationsEnabled(!notificationsEnabled)}
                 className={cn(
                   'relative h-6 w-11 rounded-full transition-colors',
-                  notifications ? 'bg-blue-600' : 'bg-gray-200'
+                  notificationsEnabled ? 'bg-[#5B50BD]' : 'bg-gray-200'
                 )}
               >
                 <span
                   className={cn(
                     'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform shadow',
-                    notifications ? 'left-5' : 'left-0.5'
+                    notificationsEnabled ? 'left-5' : 'left-0.5'
                   )}
                 />
               </button>
             </div>
           </div>
 
-          {/* Language */}
+          {/* Help */}
           <div>
-            <h3 className="mb-3 text-sm font-medium text-gray-900">Language</h3>
-            <Select
-              options={[
-                { value: 'en', label: 'English' },
-              ]}
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-            />
+            <button
+              onClick={() => toast.info('Help center coming soon')}
+              className="flex w-full items-center gap-3 rounded-lg border p-3 hover:bg-gray-50"
+            >
+              <HelpCircle className="h-4 w-4 text-gray-500" />
+              <span className="text-sm">Help & Support</span>
+            </button>
           </div>
 
           {/* Actions */}
@@ -411,7 +452,71 @@ export function Sidebar() {
               Sign Out
             </Button>
             <Button onClick={() => setSettingsOpen(false)}>
-              Save Changes
+              Done
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Notifications Modal */}
+      <Modal
+        isOpen={notificationsOpen}
+        onClose={() => setNotificationsOpen(false)}
+        title="Notifications"
+        size="md"
+      >
+        <div className="space-y-4">
+          {unreadCount > 0 && (
+            <div className="flex justify-end">
+              <Button variant="ghost" size="sm" onClick={markAllRead}>
+                <Check className="mr-1 h-4 w-4" />
+                Mark all read
+              </Button>
+            </div>
+          )}
+
+          {notificationsList.length === 0 ? (
+            <div className="py-8 text-center">
+              <Bell className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+              <p className="text-gray-500">No notifications</p>
+            </div>
+          ) : (
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {notificationsList.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={cn(
+                    'flex items-start gap-3 rounded-lg p-3 transition-colors',
+                    notification.read ? 'bg-gray-50 dark:bg-gray-800' : 'bg-[#EDE9F9] dark:bg-[#231E51]'
+                  )}
+                >
+                  <div className="mt-0.5">{getNotificationIcon(notification.type)}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className={cn(
+                      'text-sm',
+                      notification.read ? 'text-gray-600' : 'text-gray-900 font-medium'
+                    )}>
+                      {notification.message}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {formatDate(notification.time)}
+                    </p>
+                  </div>
+                  {!notification.read && (
+                    <span className="h-2 w-2 rounded-full bg-[#5B50BD] mt-2" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="pt-4 border-t">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setNotificationsOpen(false)}
+            >
+              Close
             </Button>
           </div>
         </div>

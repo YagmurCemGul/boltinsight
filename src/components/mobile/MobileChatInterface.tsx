@@ -112,13 +112,13 @@ export function MobileChatInterface({ onSwitchToEditor }: MobileChatInterfacePro
   return (
     <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 px-4 py-4">
         {/* Templates */}
         {showTemplates && chatMessages.length === 0 && (
           <div className="mb-6">
             <div className="text-center mb-6">
-              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-900/50">
-                <Sparkles className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EDE9F9] dark:bg-[#231E51]">
+                <Sparkles className="h-7 w-7 text-[#5B50BD] dark:text-[#918AD3]" />
               </div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Create a Proposal
@@ -167,8 +167,8 @@ export function MobileChatInterface({ onSwitchToEditor }: MobileChatInterfacePro
                 className={cn(
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
                   message.role === 'user'
-                    ? 'bg-blue-600'
-                    : 'bg-gradient-to-br from-purple-500 to-blue-500'
+                    ? 'bg-[#5B50BD]'
+                    : 'bg-gradient-to-br from-[#5B50BD] to-[#918AD3]'
                 )}
               >
                 {message.role === 'user' ? (
@@ -183,7 +183,7 @@ export function MobileChatInterface({ onSwitchToEditor }: MobileChatInterfacePro
                 className={cn(
                   'max-w-[80%] rounded-2xl px-4 py-2.5',
                   message.role === 'user'
-                    ? 'bg-blue-600 text-white rounded-br-md'
+                    ? 'bg-[#5B50BD] text-white rounded-br-md'
                     : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-bl-md'
                 )}
               >
@@ -215,7 +215,7 @@ export function MobileChatInterface({ onSwitchToEditor }: MobileChatInterfacePro
           {/* Typing Indicator */}
           {isAiTyping && (
             <div className="flex gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#5B50BD] to-[#918AD3]">
                 <Bot className="h-4 w-4 text-white" />
               </div>
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-bl-md px-4 py-3">
@@ -252,7 +252,7 @@ export function MobileChatInterface({ onSwitchToEditor }: MobileChatInterfacePro
               }}
               placeholder="Describe your research project..."
               rows={1}
-              className="w-full resize-none rounded-2xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              className="w-full resize-none rounded-2xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-[#5B50BD] focus:ring-2 focus:ring-[#5B50BD]/20"
             />
           </div>
 
@@ -262,7 +262,7 @@ export function MobileChatInterface({ onSwitchToEditor }: MobileChatInterfacePro
             className={cn(
               'shrink-0 rounded-full p-2.5 transition-colors',
               inputValue.trim() && !isAiTyping
-                ? 'bg-blue-600 text-white active:bg-blue-700'
+                ? 'bg-[#5B50BD] text-white active:bg-[#4A41A0]'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
             )}
           >

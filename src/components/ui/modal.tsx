@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './button';
@@ -33,15 +34,15 @@ export function Modal({ isOpen, onClose, title, children, className, size = 'md'
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center">
+  const modalContent = (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center">
       <div
         className="fixed inset-0 bg-black/50 transition-opacity"
         onClick={onClose}
       />
       <div
         className={cn(
-          'relative z-[80] w-full rounded-xl bg-white dark:bg-gray-800 shadow-xl mx-4',
+          'relative z-[200] w-full rounded-xl bg-white dark:bg-gray-800 shadow-xl mx-4',
           {
             'max-w-sm': size === 'sm',
             'max-w-md': size === 'md',
@@ -52,8 +53,8 @@ export function Modal({ isOpen, onClose, title, children, className, size = 'md'
         )}
       >
         {title && (
-          <div className="flex items-center justify-between border-b px-6 py-4">
-            <h2 className="text-lg font-semibold">{title}</h2>
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="h-4 w-4" />
             </Button>
@@ -63,4 +64,11 @@ export function Modal({ isOpen, onClose, title, children, className, size = 'md'
       </div>
     </div>
   );
+
+  // Use portal to render modal at document body level
+  if (typeof document !== 'undefined') {
+    return createPortal(modalContent, document.body);
+  }
+
+  return modalContent;
 }

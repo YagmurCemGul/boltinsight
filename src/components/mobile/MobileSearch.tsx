@@ -11,10 +11,14 @@ import {
   X,
   Calendar,
   Building2,
+  MoreVertical,
+  Copy,
+  Trash2,
+  FolderInput,
 } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Input, Select, Button, Badge, Card, CardContent, Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui';
+import { Input, Select, Button, Badge, Card, CardContent, Dropdown, DropdownItem, DropdownSeparator, toast, MoveToProjectModal } from '@/components/ui';
 import type { Proposal } from '@/types';
 
 interface MobileSearchProps {
@@ -22,10 +26,17 @@ interface MobileSearchProps {
 }
 
 export function MobileSearch({ mode }: MobileSearchProps) {
-  const { proposals, currentUser, setCurrentProposal, setActiveSection } = useAppStore();
+  const { proposals, currentUser, setCurrentProposal, setActiveSection, deleteProposal, addProposal } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
+
+  const handleMoveProposal = (proposal: Proposal) => {
+    setSelectedProposal({ id: proposal.id, title: proposal.content.title || 'Untitled' });
+    setMoveModalOpen(true);
+  };
 
   const filteredProposals = useMemo(() => {
     return proposals.filter((p) => {
@@ -55,6 +66,29 @@ export function MobileSearch({ mode }: MobileSearchProps) {
   const handleViewProposal = (proposal: Proposal) => {
     setCurrentProposal(proposal);
     setActiveSection('view-proposal');
+  };
+
+  const handleCopyProposal = (proposal: Proposal) => {
+    addProposal({
+      ...proposal,
+      status: 'draft',
+      code: undefined,
+      content: {
+        ...proposal.content,
+        title: `${proposal.content.title} (Copy)`,
+      },
+      author: currentUser,
+      sentToClient: false,
+      approvalHistory: [],
+      comments: [],
+      collaborators: [],
+    });
+    toast.success('Proposal duplicated');
+  };
+
+  const handleDeleteProposal = (proposalId: string) => {
+    deleteProposal(proposalId);
+    toast.success('Proposal deleted');
   };
 
   const statusColors: Record<string, string> = {
@@ -145,7 +179,7 @@ export function MobileSearch({ mode }: MobileSearchProps) {
       </div>
 
       {/* Results */}
-      <div className="flex-1 overflow-y-auto p-4 pb-24">
+      <div className="flex-1 p-4 pb-24">
         {/* Results Count */}
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           {filteredProposals.length} proposal{filteredProposals.length !== 1 ? 's' : ''} found
@@ -164,17 +198,19 @@ export function MobileSearch({ mode }: MobileSearchProps) {
         ) : (
           <div className="space-y-3">
             {filteredProposals.map((proposal) => (
-              <Card
-                key={proposal.id}
-                className="overflow-hidden cursor-pointer active:bg-gray-50 dark:active:bg-gray-800 transition-colors"
-                onClick={() => handleViewProposal(proposal)}
-              >
+              <Card key={proposal.id} className="overflow-hidden">
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">
+                    <button
+                      onClick={() => handleViewProposal(proposal)}
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400"
+                    >
                       <FileText className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
+                    </button>
+                    <button
+                      onClick={() => handleViewProposal(proposal)}
+                      className="flex-1 min-w-0 text-left"
+                    >
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         {proposal.code && (
                           <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
@@ -194,18 +230,37 @@ export function MobileSearch({ mode }: MobileSearchProps) {
                           <span className="truncate">{proposal.content.client}</span>
                         </div>
                       )}
-                      <div className="mt-2 flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-xs text-gray-400">
-                          <span>{proposal.author.name}</span>
-                          <span>•</span>
-                          <span>{formatDate(proposal.updatedAt)}</span>
-                        </div>
-                        <span className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 font-medium">
-                          <Eye className="h-3 w-3" />
-                          View
-                        </span>
+                      <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+                        <span>{proposal.author.name}</span>
+                        <span>•</span>
+                        <span>{formatDate(proposal.updatedAt)}</span>
                       </div>
-                    </div>
+                    </button>
+                    <Dropdown
+                      trigger={
+                        <button className="flex-shrink-0 rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                          <MoreVertical className="h-5 w-5" />
+                        </button>
+                      }
+                      align="right"
+                    >
+                      <DropdownItem onClick={() => handleCopyProposal(proposal)}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        Duplicate
+                      </DropdownItem>
+                      <DropdownItem onClick={() => handleMoveProposal(proposal)}>
+                        <FolderInput className="mr-2 h-4 w-4" />
+                        Move
+                      </DropdownItem>
+                      <DropdownSeparator />
+                      <DropdownItem
+                        variant="destructive"
+                        onClick={() => handleDeleteProposal(proposal.id)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownItem>
+                    </Dropdown>
                   </div>
                 </CardContent>
               </Card>
@@ -213,6 +268,19 @@ export function MobileSearch({ mode }: MobileSearchProps) {
           </div>
         )}
       </div>
+
+      {/* Move to Project Modal */}
+      {selectedProposal && (
+        <MoveToProjectModal
+          isOpen={moveModalOpen}
+          onClose={() => {
+            setMoveModalOpen(false);
+            setSelectedProposal(null);
+          }}
+          proposalId={selectedProposal.id}
+          proposalTitle={selectedProposal.title}
+        />
+      )}
     </div>
   );
 }

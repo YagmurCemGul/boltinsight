@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Menu, Bell, Zap, ArrowLeft, Search, MoreVertical, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Menu, Bell, Zap, ArrowLeft, Search, MoreVertical, X, Check, FileText, MessageSquare, UserCheck } from 'lucide-react';
+import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
+import { Modal, Button } from '@/components/ui';
 
 interface MobileHeaderProps {
   onOpenMenu: () => void;
@@ -12,6 +13,13 @@ interface MobileHeaderProps {
   onBack?: () => void;
   showSearch?: boolean;
 }
+
+// Mock notifications data
+const mockNotifications = [
+  { id: '1', type: 'approval', message: 'Your proposal "Brand Tracking Q1" was approved', time: new Date(Date.now() - 1000 * 60 * 30), read: false },
+  { id: '2', type: 'comment', message: 'John added a comment on "Market Research"', time: new Date(Date.now() - 1000 * 60 * 60 * 2), read: false },
+  { id: '3', type: 'mention', message: 'You were mentioned in a proposal discussion', time: new Date(Date.now() - 1000 * 60 * 60 * 24), read: true },
+];
 
 export function MobileHeader({
   onOpenMenu,
@@ -22,6 +30,22 @@ export function MobileHeader({
 }: MobileHeaderProps) {
   const { activeSection, setActiveSection, currentProposal } = useAppStore();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState(mockNotifications);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'approval': return <UserCheck className="h-4 w-4 text-green-500" />;
+      case 'comment': return <MessageSquare className="h-4 w-4 text-[#5B50BD]" />;
+      default: return <FileText className="h-4 w-4 text-gray-500" />;
+    }
+  };
 
   // Dynamic title based on activeSection
   const getTitle = () => {
@@ -76,7 +100,7 @@ export function MobileHeader({
             type="text"
             placeholder="Search proposals..."
             autoFocus
-            className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[#5B50BD]"
           />
         </div>
       </header>
@@ -106,10 +130,10 @@ export function MobileHeader({
 
           {!showBack && activeSection === 'new-proposal' && (
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#5B50BD]">
                 <Zap className="h-4 w-4 text-white" />
               </div>
-              <span className="font-bold text-blue-600">BoltInsight</span>
+              <span className="font-bold text-[#5B50BD]">BoltInsight</span>
             </div>
           )}
         </div>
@@ -131,12 +155,85 @@ export function MobileHeader({
               <Search className="h-5 w-5" />
             </button>
           )}
-          <button className="rounded-lg p-2 text-gray-500 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800 relative">
+          <button
+            onClick={() => setNotificationsOpen(true)}
+            className="rounded-lg p-2 text-gray-500 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800 relative"
+          >
             <Bell className="h-5 w-5" />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
+            )}
           </button>
         </div>
       </div>
+
+      {/* Notifications Modal */}
+      <Modal
+        isOpen={notificationsOpen}
+        onClose={() => setNotificationsOpen(false)}
+        title="Notifications"
+        size="md"
+      >
+        <div className="space-y-4">
+          {unreadCount > 0 && (
+            <div className="flex justify-end">
+              <Button variant="ghost" size="sm" onClick={markAllRead}>
+                <Check className="mr-1 h-4 w-4" />
+                Mark all read
+              </Button>
+            </div>
+          )}
+
+          {notifications.length === 0 ? (
+            <div className="py-8 text-center">
+              <Bell className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+              <p className="text-gray-500 dark:text-gray-400">No notifications</p>
+            </div>
+          ) : (
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={cn(
+                    'flex items-start gap-3 rounded-lg p-3 transition-colors',
+                    notification.read
+                      ? 'bg-gray-50 dark:bg-gray-800'
+                      : 'bg-[#EDE9F9] dark:bg-[#231E51]'
+                  )}
+                >
+                  <div className="mt-0.5">{getNotificationIcon(notification.type)}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className={cn(
+                      'text-sm',
+                      notification.read
+                        ? 'text-gray-600 dark:text-gray-400'
+                        : 'text-gray-900 dark:text-white font-medium'
+                    )}>
+                      {notification.message}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {formatDate(notification.time)}
+                    </p>
+                  </div>
+                  {!notification.read && (
+                    <span className="h-2 w-2 rounded-full bg-[#5B50BD] mt-2" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="pt-4 border-t dark:border-gray-700">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setNotificationsOpen(false)}
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </header>
   );
 }
