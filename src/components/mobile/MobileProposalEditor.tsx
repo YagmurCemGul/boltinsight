@@ -153,7 +153,7 @@ export function MobileProposalEditor() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-28">
+      <div className="flex-1 overflow-y-auto">
         {SECTIONS.map((section) => {
           const Icon = section.icon;
           const isExpanded = expandedSections.includes(section.id);
@@ -530,7 +530,7 @@ export function MobileProposalEditor() {
       </div>
 
       {/* Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex gap-3 z-40">
+      <div className="sticky bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-3 flex gap-3 z-40 mt-auto">
         <Button
           variant="outline"
           onClick={() => setDeleteModalOpen(true)}

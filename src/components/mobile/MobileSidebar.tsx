@@ -243,11 +243,11 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             </button>
 
             {showHistory && (
-              <div className="ml-4 mt-1 space-y-1 max-h-60 overflow-y-auto">
+              <div className="ml-4 mt-1 space-y-1">
                 {recentProposals.length === 0 ? (
                   <p className="py-4 text-center text-xs text-gray-400">No proposals yet</p>
                 ) : (
-                  recentProposals.map((proposal) => (
+                  recentProposals.slice(0, 5).map((proposal) => (
                     <div
                       key={proposal.id}
                       className="group flex items-start gap-2 rounded-lg px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -284,6 +284,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                           </button>
                         }
                         align="right"
+                        className="z-[200]"
                       >
                         <DropdownItem onClick={() => handleCopyProposal(proposal)}>
                           <Copy className="mr-2 h-4 w-4" />
