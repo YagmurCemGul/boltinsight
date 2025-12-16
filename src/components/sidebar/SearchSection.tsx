@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, Calendar, Tag, X, User, Users, UserCheck } from 'lucide-react';
-import { Input, Badge, Select } from '@/components/ui';
+import { Search, Filter, Calendar, Tag, X, User, Users, UserCheck, MoreVertical, Copy, Trash2, Eye, FileText } from 'lucide-react';
+import { Input, Badge, Select, Dropdown, DropdownItem, DropdownSeparator, toast } from '@/components/ui';
 import { useAppStore } from '@/lib/store';
 import { cn, formatDate, getStatusColor, getStatusLabel, truncateText } from '@/lib/utils';
-import type { ProposalStatus } from '@/types';
+import type { ProposalStatus, Proposal } from '@/types';
 
 interface SearchSectionProps {
   searchAll: boolean;
@@ -27,12 +27,35 @@ const ownershipOptions = [
 ];
 
 export function SearchSection({ searchAll }: SearchSectionProps) {
-  const { proposals, currentUser, setCurrentProposal, setActiveSection } = useAppStore();
+  const { proposals, currentUser, setCurrentProposal, setActiveSection, deleteProposal, addProposal } = useAppStore();
   const [query, setQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [ownershipFilter, setOwnershipFilter] = useState('');
+
+  const handleCopyProposal = (proposal: Proposal) => {
+    addProposal({
+      ...proposal,
+      status: 'draft',
+      code: undefined,
+      content: {
+        ...proposal.content,
+        title: `${proposal.content.title} (Copy)`,
+      },
+      author: currentUser,
+      sentToClient: false,
+      approvalHistory: [],
+      comments: [],
+      collaborators: [],
+    });
+    toast.success('Proposal duplicated');
+  };
+
+  const handleDeleteProposal = (proposalId: string) => {
+    deleteProposal(proposalId);
+    toast.success('Proposal deleted');
+  };
 
   // Filter proposals based on search criteria
   const results = useMemo(() => {
@@ -203,31 +226,61 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
         {results.length > 0 ? (
           <div className="max-h-60 space-y-1 overflow-y-auto">
             {results.map((proposal) => (
-              <button
+              <div
                 key={proposal.id}
-                onClick={() => handleResultClick(proposal)}
                 className={cn(
-                  'flex w-full flex-col items-start gap-1 rounded-lg p-2 text-left transition-colors',
+                  'group flex items-start gap-2 rounded-lg p-2 transition-colors',
                   'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
                 )}
               >
-                <div className="flex w-full items-center justify-between">
-                  <span className="text-xs font-medium text-gray-900 dark:text-white">
-                    {proposal.code || 'Draft'}
-                  </span>
-                  <span className={cn('rounded px-1.5 py-0.5 text-[10px]', getStatusColor(proposal.status))}>
-                    {getStatusLabel(proposal.status)}
-                  </span>
-                </div>
-                <span className="text-xs text-gray-600 dark:text-gray-300">
-                  {truncateText(proposal.content.title || 'Untitled', 35)}
-                </span>
-                <div className="flex w-full items-center justify-between">
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500">
-                    {proposal.content.client} - {formatDate(proposal.createdAt)}
-                  </span>
-                </div>
-              </button>
+                <button
+                  onClick={() => handleResultClick(proposal)}
+                  className="flex flex-1 items-start gap-2 text-left min-w-0"
+                >
+                  <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                        {proposal.code || 'Draft'}
+                      </span>
+                      <span className={cn('rounded px-1.5 py-0.5 text-[10px] whitespace-nowrap', getStatusColor(proposal.status))}>
+                        {getStatusLabel(proposal.status)}
+                      </span>
+                    </div>
+                    <p className="truncate text-sm text-gray-700 dark:text-gray-300 mt-0.5">
+                      {truncateText(proposal.content.title || 'Untitled', 25)}
+                    </p>
+                    <p className="text-[10px] text-gray-400 truncate">
+                      {proposal.content.client || 'No client'} - {formatDate(proposal.createdAt)}
+                    </p>
+                  </div>
+                </button>
+                <Dropdown
+                  trigger={
+                    <button className="flex-shrink-0 rounded p-1 text-gray-400 opacity-0 transition-opacity hover:bg-gray-200 dark:hover:bg-gray-600 group-hover:opacity-100">
+                      <MoreVertical className="h-4 w-4" />
+                    </button>
+                  }
+                  align="right"
+                >
+                  <DropdownItem onClick={() => handleResultClick(proposal)}>
+                    <Eye className="mr-2 h-4 w-4" />
+                    View
+                  </DropdownItem>
+                  <DropdownItem onClick={() => handleCopyProposal(proposal)}>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Duplicate
+                  </DropdownItem>
+                  <DropdownSeparator />
+                  <DropdownItem
+                    variant="destructive"
+                    onClick={() => handleDeleteProposal(proposal.id)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </DropdownItem>
+                </Dropdown>
+              </div>
             ))}
           </div>
         ) : (

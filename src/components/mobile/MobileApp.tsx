@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAppStore } from '@/lib/store';
 import { MobileNavigation } from './MobileNavigation';
 import { MobileSidebar } from './MobileSidebar';
@@ -17,6 +17,26 @@ export function MobileApp() {
   const { isLoggedIn, activeSection, setActiveSection, currentProposal } = useAppStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<'chat' | 'editor'>('chat');
+  const [navHidden, setNavHidden] = useState(false);
+  const lastScrollY = useRef(0);
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = useCallback(() => {
+    const currentScrollY = mainRef.current?.scrollTop || 0;
+    const scrollDiff = currentScrollY - lastScrollY.current;
+
+    // Only hide/show if scroll is significant (more than 10px)
+    if (Math.abs(scrollDiff) > 10) {
+      if (scrollDiff > 0 && currentScrollY > 50) {
+        // Scrolling down - hide nav
+        setNavHidden(true);
+      } else {
+        // Scrolling up - show nav
+        setNavHidden(false);
+      }
+      lastScrollY.current = currentScrollY;
+    }
+  }, []);
 
   // If not logged in, show login screen
   if (!isLoggedIn) {
@@ -96,12 +116,16 @@ export function MobileApp() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden pt-16 pb-16">
+      <main
+        ref={mainRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto pt-16 pb-16"
+      >
         {renderContent()}
       </main>
 
       {/* Bottom Navigation */}
-      <MobileNavigation onOpenMenu={() => setSidebarOpen(true)} />
+      <MobileNavigation onOpenMenu={() => setSidebarOpen(true)} hidden={navHidden} />
     </div>
   );
 }
