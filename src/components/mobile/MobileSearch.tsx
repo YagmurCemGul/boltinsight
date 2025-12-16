@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Input, Select, Button, Badge, Card, CardContent, Dropdown, DropdownItem, DropdownSeparator, toast } from '@/components/ui';
+import { Input, Select, Button, Badge, Card, CardContent, Dropdown, DropdownItem, DropdownSeparator, toast, MoveToProjectModal } from '@/components/ui';
 import type { Proposal } from '@/types';
 
 interface MobileSearchProps {
@@ -30,6 +30,13 @@ export function MobileSearch({ mode }: MobileSearchProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
+
+  const handleMoveProposal = (proposal: Proposal) => {
+    setSelectedProposal({ id: proposal.id, title: proposal.content.title || 'Untitled' });
+    setMoveModalOpen(true);
+  };
 
   const filteredProposals = useMemo(() => {
     return proposals.filter((p) => {
@@ -241,7 +248,7 @@ export function MobileSearch({ mode }: MobileSearchProps) {
                         <Copy className="mr-2 h-4 w-4" />
                         Duplicate
                       </DropdownItem>
-                      <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
+                      <DropdownItem onClick={() => handleMoveProposal(proposal)}>
                         <FolderInput className="mr-2 h-4 w-4" />
                         Move
                       </DropdownItem>
@@ -261,6 +268,19 @@ export function MobileSearch({ mode }: MobileSearchProps) {
           </div>
         )}
       </div>
+
+      {/* Move to Project Modal */}
+      {selectedProposal && (
+        <MoveToProjectModal
+          isOpen={moveModalOpen}
+          onClose={() => {
+            setMoveModalOpen(false);
+            setSelectedProposal(null);
+          }}
+          proposalId={selectedProposal.id}
+          proposalTitle={selectedProposal.title}
+        />
+      )}
     </div>
   );
 }

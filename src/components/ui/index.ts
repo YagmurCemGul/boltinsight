@@ -4,6 +4,7 @@ export { Textarea } from './textarea';
 export { Badge } from './badge';
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card';
 export { Modal } from './modal';
+export { MoveToProjectModal } from './MoveToProjectModal';
 export { Select } from './select';
 export { Dropdown, DropdownItem, DropdownSeparator } from './dropdown';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';

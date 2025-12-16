@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Input, Button, Badge, Card, CardContent, Tabs, TabsList, TabsTrigger, TabsContent, Modal, Select, Dropdown, DropdownItem, DropdownSeparator, toast } from '@/components/ui';
+import { Input, Button, Badge, Card, CardContent, Tabs, TabsList, TabsTrigger, TabsContent, Modal, Select, Dropdown, DropdownItem, DropdownSeparator, toast, MoveToProjectModal } from '@/components/ui';
 import type { LibraryItem, Proposal, ProposalContent } from '@/types';
 
 export function MobileLibrary() {
@@ -37,6 +37,8 @@ export function MobileLibrary() {
   const [proposalStatusFilter, setProposalStatusFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
   const [newItem, setNewItem] = useState({
     name: '',
     description: '',
@@ -111,6 +113,11 @@ export function MobileLibrary() {
   const handleDeleteProposal = (proposalId: string) => {
     deleteProposal(proposalId);
     toast.success('Proposal deleted');
+  };
+
+  const handleMoveProposal = (proposal: Proposal) => {
+    setSelectedProposal({ id: proposal.id, title: proposal.content.title || 'Untitled' });
+    setMoveModalOpen(true);
   };
 
   const handleUseTemplate = (template: LibraryItem) => {
@@ -264,7 +271,7 @@ export function MobileLibrary() {
                             <Copy className="mr-2 h-4 w-4" />
                             Duplicate
                           </DropdownItem>
-                          <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
+                          <DropdownItem onClick={() => handleMoveProposal(proposal)}>
                             <FolderInput className="mr-2 h-4 w-4" />
                             Move
                           </DropdownItem>
@@ -434,6 +441,19 @@ export function MobileLibrary() {
           </div>
         </div>
       </Modal>
+
+      {/* Move to Project Modal */}
+      {selectedProposal && (
+        <MoveToProjectModal
+          isOpen={moveModalOpen}
+          onClose={() => {
+            setMoveModalOpen(false);
+            setSelectedProposal(null);
+          }}
+          proposalId={selectedProposal.id}
+          proposalTitle={selectedProposal.title}
+        />
+      )}
     </div>
   );
 }

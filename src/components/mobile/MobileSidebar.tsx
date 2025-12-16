@@ -34,7 +34,7 @@ import { formatDate, truncateText, getStatusColor } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { useThemeStore } from '@/lib/theme';
-import { Modal, Button, Select, toast, Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui';
+import { Modal, Button, Select, toast, Dropdown, DropdownItem, DropdownSeparator, MoveToProjectModal, Input } from '@/components/ui';
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -55,12 +55,16 @@ const menuItems = [
 ];
 
 export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
-  const { activeSection, setActiveSection, currentUser, projects, proposals, setCurrentProposal, setLoggedIn, deleteProposal, addProposal } = useAppStore();
+  const { activeSection, setActiveSection, currentUser, projects, proposals, setCurrentProposal, setLoggedIn, deleteProposal, addProposal, addProject } = useAppStore();
   const { isDarkMode, toggleDarkMode } = useThemeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
+  const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
 
   // Get recent proposals for history
   const recentProposals = proposals
@@ -100,6 +104,22 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const handleDeleteProposal = (proposalId: string) => {
     deleteProposal(proposalId);
     toast.success('Proposal deleted');
+  };
+
+  const handleMoveProposal = (proposal: typeof proposals[0]) => {
+    setSelectedProposal({ id: proposal.id, title: proposal.content.title || 'Untitled' });
+    setMoveModalOpen(true);
+  };
+
+  const handleCreateProject = () => {
+    if (!newProjectName.trim()) return;
+    addProject({
+      name: newProjectName.trim(),
+      proposals: [],
+    });
+    toast.success(`Project "${newProjectName}" created`);
+    setNewProjectName('');
+    setNewProjectModalOpen(false);
   };
 
   return (
@@ -200,6 +220,14 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                     <span className="truncate">{project.name}</span>
                   </button>
                 ))}
+                {/* Create New Project Button */}
+                <button
+                  onClick={() => setNewProjectModalOpen(true)}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-left text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Create New Project</span>
+                </button>
               </div>
             )}
 
@@ -267,7 +295,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                           <Copy className="mr-2 h-4 w-4" />
                           Duplicate
                         </DropdownItem>
-                        <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
+                        <DropdownItem onClick={() => handleMoveProposal(proposal)}>
                           <FolderInput className="mr-2 h-4 w-4" />
                           Move
                         </DropdownItem>
@@ -443,6 +471,58 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             </Button>
             <Button onClick={() => setSettingsOpen(false)}>
               Done
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Move to Project Modal */}
+      {selectedProposal && (
+        <MoveToProjectModal
+          isOpen={moveModalOpen}
+          onClose={() => {
+            setMoveModalOpen(false);
+            setSelectedProposal(null);
+          }}
+          proposalId={selectedProposal.id}
+          proposalTitle={selectedProposal.title}
+        />
+      )}
+
+      {/* Create New Project Modal */}
+      <Modal
+        isOpen={newProjectModalOpen}
+        onClose={() => {
+          setNewProjectModalOpen(false);
+          setNewProjectName('');
+        }}
+        title="Create New Project"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <Input
+            placeholder="Project name"
+            value={newProjectName}
+            onChange={(e) => setNewProjectName(e.target.value)}
+            autoFocus
+          />
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => {
+                setNewProjectModalOpen(false);
+                setNewProjectName('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="flex-1"
+              onClick={handleCreateProject}
+              disabled={!newProjectName.trim()}
+            >
+              Create
             </Button>
           </div>
         </div>

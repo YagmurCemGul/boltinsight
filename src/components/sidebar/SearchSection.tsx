@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, Calendar, Tag, X, User, Users, UserCheck, MoreVertical, Copy, Trash2, Eye, FileText, FolderInput } from 'lucide-react';
-import { Input, Badge, Select, Dropdown, DropdownItem, DropdownSeparator, toast } from '@/components/ui';
+import { Input, Badge, Select, Dropdown, DropdownItem, DropdownSeparator, toast, MoveToProjectModal } from '@/components/ui';
 import { useAppStore } from '@/lib/store';
 import { cn, formatDate, getStatusColor, getStatusLabel, truncateText } from '@/lib/utils';
 import type { ProposalStatus, Proposal } from '@/types';
@@ -33,6 +33,13 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
   const [statusFilter, setStatusFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [ownershipFilter, setOwnershipFilter] = useState('');
+  const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
+
+  const handleMoveProposal = (proposal: Proposal) => {
+    setSelectedProposal({ id: proposal.id, title: proposal.content.title || 'Untitled' });
+    setMoveModalOpen(true);
+  };
 
   const handleCopyProposal = (proposal: Proposal) => {
     addProposal({
@@ -267,7 +274,7 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
                     <Copy className="mr-2 h-4 w-4" />
                     Duplicate
                   </DropdownItem>
-                  <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
+                  <DropdownItem onClick={() => handleMoveProposal(proposal)}>
                     <FolderInput className="mr-2 h-4 w-4" />
                     Move
                   </DropdownItem>
@@ -289,6 +296,19 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
           </p>
         )}
       </div>
+
+      {/* Move to Project Modal */}
+      {selectedProposal && (
+        <MoveToProjectModal
+          isOpen={moveModalOpen}
+          onClose={() => {
+            setMoveModalOpen(false);
+            setSelectedProposal(null);
+          }}
+          proposalId={selectedProposal.id}
+          proposalTitle={selectedProposal.title}
+        />
+      )}
     </div>
   );
 }
