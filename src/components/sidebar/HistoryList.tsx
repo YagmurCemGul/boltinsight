@@ -101,27 +101,27 @@ export function HistoryList() {
         visibleProposals.map((proposal) => (
           <div
             key={proposal.id}
-            className="group flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-gray-100"
+            className="group flex items-start gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-gray-100"
           >
             <button
               onClick={() => handleProposalClick(proposal)}
-              className="flex flex-1 items-start gap-2 text-left"
+              className="flex flex-1 items-start gap-2 text-left min-w-0"
             >
               <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
-              <div className="flex-1 overflow-hidden">
-                <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
                   {getStatusBadge(proposal)}
                   <span className={cn(
-                    'rounded px-1.5 py-0.5 text-[10px]',
+                    'rounded px-1.5 py-0.5 text-[10px] whitespace-nowrap',
                     getStatusColor(proposal.status)
                   )}>
                     {proposal.status.replace('_', ' ')}
                   </span>
                 </div>
-                <p className="truncate text-sm text-gray-700">
-                  {truncateText(proposal.content.title || 'Untitled Proposal', 30)}
+                <p className="truncate text-sm text-gray-700 mt-0.5">
+                  {truncateText(proposal.content.title || 'Untitled Proposal', 25)}
                 </p>
-                <p className="text-[10px] text-gray-400">
+                <p className="text-[10px] text-gray-400 truncate">
                   {proposal.content.client || 'No client'} - {formatDate(proposal.updatedAt)}
                 </p>
               </div>
@@ -129,7 +129,7 @@ export function HistoryList() {
 
             <Dropdown
               trigger={
-                <button className="rounded p-1 text-gray-400 opacity-0 transition-opacity hover:bg-gray-200 hover:text-gray-600 group-hover:opacity-100">
+                <button className="flex-shrink-0 rounded p-1 text-gray-400 opacity-0 transition-opacity hover:bg-gray-200 hover:text-gray-600 group-hover:opacity-100">
                   <MoreVertical className="h-4 w-4" />
                 </button>
               }
