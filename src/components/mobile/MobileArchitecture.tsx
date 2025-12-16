@@ -25,7 +25,7 @@ import { Card, CardContent, Tabs, TabsList, TabsTrigger, TabsContent, Badge } fr
 
 export function MobileArchitecture() {
   return (
-    <div className="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 pb-24">
+    <div className="h-full bg-gray-50 dark:bg-gray-900 pb-24">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-4">
         <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-1">

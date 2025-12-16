@@ -13,6 +13,7 @@ import {
   Copy,
   Trash2,
   Building2,
+  FolderInput,
 } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
@@ -171,7 +172,7 @@ export function MobileLibrary() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 pb-24">
         <Tabs defaultValue="proposals" className="h-full">
           <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 px-4 pt-3">
             <TabsList className="w-full">
@@ -259,13 +260,13 @@ export function MobileLibrary() {
                           }
                           align="right"
                         >
-                          <DropdownItem onClick={() => handleViewProposal(proposal)}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                          </DropdownItem>
                           <DropdownItem onClick={() => handleCopyProposal(proposal)}>
                             <Copy className="mr-2 h-4 w-4" />
                             Duplicate
+                          </DropdownItem>
+                          <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
+                            <FolderInput className="mr-2 h-4 w-4" />
+                            Move
                           </DropdownItem>
                           <DropdownSeparator />
                           <DropdownItem
@@ -305,10 +306,16 @@ export function MobileLibrary() {
                   <Card key={template.id} className="overflow-hidden">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400">
+                        <button
+                          onClick={() => handleUseTemplate(template)}
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400"
+                        >
                           <FileText className="h-5 w-5" />
-                        </div>
-                        <div className="flex-1 min-w-0">
+                        </button>
+                        <button
+                          onClick={() => handleUseTemplate(template)}
+                          className="flex-1 min-w-0 text-left"
+                        >
                           <h3 className="font-medium text-gray-900 dark:text-white">
                             {template.name}
                           </h3>
@@ -326,14 +333,35 @@ export function MobileLibrary() {
                               ))}
                             </div>
                           )}
-                          <button
-                            onClick={() => handleUseTemplate(template)}
-                            className="mt-2 flex items-center gap-1 text-sm text-green-600 dark:text-green-400 font-medium"
+                        </button>
+                        <Dropdown
+                          trigger={
+                            <button className="flex-shrink-0 rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                              <MoreVertical className="h-5 w-5" />
+                            </button>
+                          }
+                          align="right"
+                        >
+                          <DropdownItem onClick={() => handleUseTemplate(template)}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            Duplicate
+                          </DropdownItem>
+                          <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
+                            <FolderInput className="mr-2 h-4 w-4" />
+                            Move
+                          </DropdownItem>
+                          <DropdownSeparator />
+                          <DropdownItem
+                            variant="destructive"
+                            onClick={() => {
+                              deleteLibraryItem(template.id);
+                              toast.success('Template deleted');
+                            }}
                           >
-                            <Plus className="h-3 w-3" />
-                            Use Template
-                          </button>
-                        </div>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownItem>
+                        </Dropdown>
                       </div>
                     </CardContent>
                   </Card>

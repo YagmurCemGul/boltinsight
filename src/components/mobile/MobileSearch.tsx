@@ -14,6 +14,7 @@ import {
   MoreVertical,
   Copy,
   Trash2,
+  FolderInput,
 } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
@@ -171,7 +172,7 @@ export function MobileSearch({ mode }: MobileSearchProps) {
       </div>
 
       {/* Results */}
-      <div className="flex-1 overflow-y-auto p-4 pb-24">
+      <div className="flex-1 p-4 pb-24">
         {/* Results Count */}
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           {filteredProposals.length} proposal{filteredProposals.length !== 1 ? 's' : ''} found
@@ -236,13 +237,13 @@ export function MobileSearch({ mode }: MobileSearchProps) {
                       }
                       align="right"
                     >
-                      <DropdownItem onClick={() => handleViewProposal(proposal)}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        View
-                      </DropdownItem>
                       <DropdownItem onClick={() => handleCopyProposal(proposal)}>
                         <Copy className="mr-2 h-4 w-4" />
                         Duplicate
+                      </DropdownItem>
+                      <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
+                        <FolderInput className="mr-2 h-4 w-4" />
+                        Move
                       </DropdownItem>
                       <DropdownSeparator />
                       <DropdownItem

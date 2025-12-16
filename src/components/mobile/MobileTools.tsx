@@ -53,7 +53,7 @@ export function MobileMOECalculator() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 pb-24">
+    <div className="h-full bg-gray-50 dark:bg-gray-900 p-4 pb-24">
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-4">
@@ -232,7 +232,7 @@ export function MobileDemographics() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 pb-24">
+    <div className="h-full bg-gray-50 dark:bg-gray-900 p-4 pb-24">
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-4">
@@ -415,7 +415,7 @@ export function MobileFeasibility() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 pb-24">
+    <div className="h-full bg-gray-50 dark:bg-gray-900 p-4 pb-24">
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-4">

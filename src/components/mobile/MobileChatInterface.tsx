@@ -112,7 +112,7 @@ export function MobileChatInterface({ onSwitchToEditor }: MobileChatInterfacePro
   return (
     <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 px-4 py-4">
         {/* Templates */}
         {showTemplates && chatMessages.length === 0 && (
           <div className="mb-6">

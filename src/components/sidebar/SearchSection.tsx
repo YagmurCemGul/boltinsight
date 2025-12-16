@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, Calendar, Tag, X, User, Users, UserCheck, MoreVertical, Copy, Trash2, Eye, FileText } from 'lucide-react';
+import { Search, Filter, Calendar, Tag, X, User, Users, UserCheck, MoreVertical, Copy, Trash2, Eye, FileText, FolderInput } from 'lucide-react';
 import { Input, Badge, Select, Dropdown, DropdownItem, DropdownSeparator, toast } from '@/components/ui';
 import { useAppStore } from '@/lib/store';
 import { cn, formatDate, getStatusColor, getStatusLabel, truncateText } from '@/lib/utils';
@@ -263,13 +263,13 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
                   }
                   align="right"
                 >
-                  <DropdownItem onClick={() => handleResultClick(proposal)}>
-                    <Eye className="mr-2 h-4 w-4" />
-                    View
-                  </DropdownItem>
                   <DropdownItem onClick={() => handleCopyProposal(proposal)}>
                     <Copy className="mr-2 h-4 w-4" />
                     Duplicate
+                  </DropdownItem>
+                  <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
+                    <FolderInput className="mr-2 h-4 w-4" />
+                    Move
                   </DropdownItem>
                   <DropdownSeparator />
                   <DropdownItem

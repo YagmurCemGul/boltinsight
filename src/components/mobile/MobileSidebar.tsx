@@ -267,6 +267,10 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                           <Copy className="mr-2 h-4 w-4" />
                           Duplicate
                         </DropdownItem>
+                        <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
+                          <FolderInput className="mr-2 h-4 w-4" />
+                          Move
+                        </DropdownItem>
                         <DropdownSeparator />
                         <DropdownItem
                           variant="destructive"
