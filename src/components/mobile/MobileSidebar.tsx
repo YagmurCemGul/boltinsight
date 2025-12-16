@@ -20,7 +20,6 @@ import {
   Users,
   Percent,
   ClipboardCheck,
-  Layers,
   ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -44,7 +43,6 @@ const menuItems = [
   { id: 'feasibility', label: 'Feasibility Check', icon: ClipboardCheck },
   { id: 'divider-2', type: 'divider' },
   { id: 'library', label: 'Library', icon: Library },
-  { id: 'architecture', label: 'Architecture', icon: Layers },
 ];
 
 export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
@@ -64,7 +62,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 transition-opacity"
+          className="fixed inset-0 z-[60] bg-black/50 transition-opacity"
           onClick={onClose}
         />
       )}
@@ -72,7 +70,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-0 z-50 h-full w-[85%] max-w-[320px] transform bg-white dark:bg-gray-900 transition-transform duration-300 ease-out shadow-xl',
+          'fixed left-0 top-0 z-[70] h-full w-[85%] max-w-[320px] transform bg-white dark:bg-gray-900 transition-transform duration-300 ease-out shadow-xl',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
