@@ -421,21 +421,21 @@ You can share these in any order, or click **Editor Mode** above to fill in the 
   return (
     <div className="flex h-full flex-col">
       {/* Template Selection */}
-      <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-2">
+        <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
           Start with a template (optional)
         </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {templateOptions.map((template) => (
             <button
               key={template.id}
               onClick={() => handleTemplateSelect(template.id)}
               disabled={isAiTyping}
               className={cn(
-                'rounded-lg px-3 py-2 text-sm font-medium transition-colors text-center',
+                'rounded-full px-3 py-1 text-xs font-medium transition-colors whitespace-nowrap',
                 selectedTemplate === template.id
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700',
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700',
                 isAiTyping && 'opacity-50 cursor-not-allowed'
               )}
             >
