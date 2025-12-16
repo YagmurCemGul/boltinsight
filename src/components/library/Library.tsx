@@ -10,7 +10,7 @@ import {
   FolderOpen,
   Eye,
 } from 'lucide-react';
-import { cn, formatDate } from '@/lib/utils';
+import { cn, formatDate, getStatusColor } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import {
   Button,
@@ -329,14 +329,6 @@ function EmptyState({ onAdd, category }: { onAdd: () => void; category?: string 
 }
 
 function ProposalCard({ proposal, onView }: { proposal: Proposal; onView: () => void }) {
-  const statusColors: Record<string, string> = {
-    draft: 'bg-gray-100 text-gray-700',
-    pending_approval: 'bg-yellow-100 text-yellow-700',
-    approved: 'bg-green-100 text-green-700',
-    rejected: 'bg-red-100 text-red-700',
-    on_hold: 'bg-orange-100 text-orange-700',
-  };
-
   return (
     <Card className="group relative transition-shadow hover:shadow-md">
       <CardContent className="p-4">
@@ -350,7 +342,7 @@ function ProposalCard({ proposal, onView }: { proposal: Proposal; onView: () => 
               {proposal.code && (
                 <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">{proposal.code}</span>
               )}
-              <Badge className={cn('text-xs', statusColors[proposal.status])}>
+              <Badge className={cn('text-xs', getStatusColor(proposal.status))}>
                 {proposal.status.replace('_', ' ')}
               </Badge>
             </div>

@@ -199,7 +199,10 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
             {showProjects && (
               <div className="ml-4 mt-1 space-y-1">
-                {projects.slice(0, 5).map((project) => (
+                {[...projects]
+                  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                  .slice(0, 5)
+                  .map((project) => (
                   <div
                     key={project.id}
                     className="group flex items-center gap-2"
