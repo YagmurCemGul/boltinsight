@@ -130,8 +130,8 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
       <div className={cn(
         'flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium',
         searchAll
-          ? 'bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
-          : 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+          ? 'bg-[#1ED6BB]/10 dark:bg-[#1ED6BB]/20 text-[#0E6B5D] dark:text-[#1ED6BB] border border-[#1ED6BB]/30 dark:border-[#1ED6BB]/40'
+          : 'bg-[#EDE9F9] dark:bg-[#231E51] text-[#5B50BD] dark:text-[#918AD3] border border-[#C8C4E9] dark:border-[#5B50BD]'
       )}>
         {searchAll ? (
           <>
@@ -159,7 +159,7 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
           onClick={() => setShowFilters(!showFilters)}
           className={cn(
             'absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 transition-colors',
-            showFilters ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+            showFilters ? 'bg-[#EDE9F9] dark:bg-[#231E51] text-[#5B50BD] dark:text-[#918AD3]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
           )}
         >
           <Filter className="h-4 w-4" />
@@ -174,7 +174,7 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
             {(statusFilter || dateFilter || ownershipFilter) && (
               <button
                 onClick={clearFilters}
-                className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                className="flex items-center gap-1 text-xs text-[#5B50BD] dark:text-[#918AD3] hover:text-[#4A41A0] dark:hover:text-[#C8C4E9]"
               >
                 <X className="h-3 w-3" />
                 Clear
@@ -247,7 +247,7 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
                   <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                      <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">
                         {proposal.code || 'Draft'}
                       </span>
                       <span className={cn('rounded px-1.5 py-0.5 text-[10px] whitespace-nowrap', getStatusColor(proposal.status))}>

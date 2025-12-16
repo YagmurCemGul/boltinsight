@@ -66,13 +66,13 @@ export function MoveToProjectModal({ isOpen, onClose, proposalId, proposalTitle 
                 className={cn(
                   'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors',
                   isCurrentProject
-                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 cursor-default'
+                    ? 'bg-[#EDE9F9] dark:bg-[#231E51] text-[#5B50BD] dark:text-[#918AD3] cursor-default'
                     : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
                 )}
               >
                 <FolderKanban className="h-5 w-5 flex-shrink-0" />
                 <span className="flex-1 truncate font-medium">{project.name}</span>
-                {isCurrentProject && <Check className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
+                {isCurrentProject && <Check className="h-4 w-4 text-[#5B50BD] dark:text-[#918AD3]" />}
                 <span className="text-xs text-gray-400">{project.proposals.length} proposals</span>
               </button>
             );
@@ -117,7 +117,7 @@ export function MoveToProjectModal({ isOpen, onClose, proposalId, proposalTitle 
         ) : (
           <button
             onClick={() => setShowNewProject(true)}
-            className="flex w-full items-center gap-3 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 px-3 py-2.5 text-gray-500 dark:text-gray-400 hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 transition-colors"
+            className="flex w-full items-center gap-3 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 px-3 py-2.5 text-gray-500 dark:text-gray-400 hover:border-[#5B50BD] hover:text-[#5B50BD] dark:hover:border-[#918AD3] dark:hover:text-[#918AD3] transition-colors"
           >
             <Plus className="h-5 w-5" />
             <span className="font-medium">Create New Project</span>

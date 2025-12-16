@@ -1,41 +1,91 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
+/* Bolt Brand Colors */
 :root {
+  /* Brand Primary - Purple */
+  --bolt-purple-900: #100E28;
+  --bolt-purple-800: #1A163C;
+  --bolt-purple-700: #231E51;
+  --bolt-purple-600: #5B50BD;
+  --bolt-purple-500: #918AD3;
+  --bolt-purple-400: #C8C4E9;
+
+  /* Brand Teal */
+  --bolt-teal-900: #0E6B5D;
+  --bolt-teal-800: #14A08C;
+  --bolt-teal-600: #1ED6BB;
+  --bolt-teal-400: #73EBD9;
+  --bolt-teal-200: #A1F1E6;
+  --bolt-teal-100: #D0F8F2;
+
+  /* Brand Red */
+  --bolt-red-900: #860E24;
+  --bolt-red-800: #CA1636;
+  --bolt-red-600: #EB3F5F;
+  --bolt-red-400: #F38B9F;
+  --bolt-red-200: #F7B2BF;
+  --bolt-red-100: #FBD8DF;
+
+  /* Neutral Grays */
+  --bolt-gray-900: #232323;
+  --bolt-gray-700: #393939;
+  --bolt-gray-600: #5A5A5A;
+  --bolt-gray-500: #919191;
+  --bolt-gray-300: #C8C8C8;
+  --bolt-gray-100: #E9E9E9;
+
+  /* Slate */
+  --bolt-slate-900: #252A31;
+  --bolt-slate-800: #383F4A;
+  --bolt-slate-600: #4B5563;
+  --bolt-slate-500: #8C97A8;
+  --bolt-slate-300: #B1BAC5;
+  --bolt-slate-100: #D8DCE2;
+
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #231E51;
   --card: #ffffff;
-  --card-foreground: #171717;
-  --border: #e5e7eb;
-  --input: #e5e7eb;
-  --primary: #2563eb;
+  --card-foreground: #231E51;
+  --border: #C8C4E9;
+  --input: #C8C4E9;
+  --primary: #5B50BD;
   --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #1f2937;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --sidebar: #f9fafb;
+  --secondary: #F6F8F8;
+  --secondary-foreground: #231E51;
+  --muted: #F6F8F8;
+  --muted-foreground: #5A5A5A;
+  --sidebar: #F6F8F8;
+  --success: #1ED6BB;
+  --success-foreground: #0E6B5D;
+  --danger: #EB3F5F;
+  --danger-foreground: #860E24;
 }
 
 .dark {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
-  --card: #1e293b;
-  --card-foreground: #f1f5f9;
-  --border: #334155;
-  --input: #334155;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --secondary: #1e293b;
-  --secondary-foreground: #f1f5f9;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --sidebar: #1e293b;
+  --background: #100E28;
+  --foreground: #E9E9E9;
+  --card: #1A163C;
+  --card-foreground: #E9E9E9;
+  --border: #231E51;
+  --input: #231E51;
+  --primary: #918AD3;
+  --primary-foreground: #100E28;
+  --secondary: #1A163C;
+  --secondary-foreground: #E9E9E9;
+  --muted: #1A163C;
+  --muted-foreground: #918AD3;
+  --sidebar: #1A163C;
+  --success: #1ED6BB;
+  --success-foreground: #D0F8F2;
+  --danger: #EB3F5F;
+  --danger-foreground: #FBD8DF;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
 * {
@@ -325,7 +375,7 @@ body {
 
 /* Focus styles */
 :focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #5B50BD;
   outline-offset: 2px;
 }
 

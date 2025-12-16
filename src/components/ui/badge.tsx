@@ -17,7 +17,7 @@ export function Badge({ className, variant = 'default', ...props }: BadgeProps) 
           'bg-green-100 text-green-800': variant === 'success',
           'bg-yellow-100 text-yellow-800': variant === 'warning',
           'bg-red-100 text-red-800': variant === 'error',
-          'bg-blue-100 text-blue-800': variant === 'info',
+          'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]': variant === 'info',
         },
         className
       )}

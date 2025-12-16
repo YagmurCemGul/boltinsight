@@ -67,7 +67,7 @@ export function MobileNavigation({ onOpenMenu, hidden = false }: MobileNavigatio
             className={cn(
               'flex flex-col items-center justify-center min-w-[60px] py-1 px-2 rounded-lg transition-colors',
               isActive(item.id)
-                ? 'text-blue-600 dark:text-blue-400'
+                ? 'text-[#5B50BD] dark:text-[#918AD3]'
                 : 'text-gray-500 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800'
             )}
           >

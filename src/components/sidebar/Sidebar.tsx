@@ -157,8 +157,8 @@ export function Sidebar() {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-            {!sidebarCollapsed && <h1 className="text-xl font-bold text-blue-600">BoltInsight</h1>}
-            {sidebarCollapsed && <span className="text-xl font-bold text-blue-600">BI</span>}
+            {!sidebarCollapsed && <h1 className="text-xl font-bold text-[#5B50BD]">BoltInsight</h1>}
+            {sidebarCollapsed && <span className="text-xl font-bold text-[#5B50BD]">BI</span>}
             <div className="flex items-center gap-1">
               {!sidebarCollapsed && (
                 <button
@@ -188,9 +188,9 @@ export function Sidebar() {
             <button
               onClick={() => setActiveSection('new-proposal')}
               className={cn(
-                'mb-4 flex w-full items-center rounded-lg bg-blue-600 text-white transition-colors hover:bg-blue-700',
+                'mb-4 flex w-full items-center rounded-lg bg-[#5B50BD] text-white transition-colors hover:bg-[#4A41A0]',
                 sidebarCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3',
-                activeSection === 'new-proposal' && 'ring-2 ring-blue-300'
+                activeSection === 'new-proposal' && 'ring-2 ring-[#918AD3]'
               )}
               title={sidebarCollapsed ? 'New Proposal' : undefined}
             >
@@ -208,8 +208,8 @@ export function Sidebar() {
                       'flex w-full items-center rounded-lg text-sm transition-colors',
                       sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5',
                       activeSection === item.id
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]'
+                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                     )}
                     title={sidebarCollapsed ? item.label : undefined}
                   >
@@ -255,8 +255,8 @@ export function Sidebar() {
                   'flex w-full items-center rounded-lg text-sm transition-colors',
                   sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5',
                   activeSection === 'projects'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                 )}
                 title={sidebarCollapsed ? 'Projects' : undefined}
               >
@@ -290,8 +290,8 @@ export function Sidebar() {
                   'flex w-full items-center rounded-lg text-sm transition-colors',
                   sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5',
                   activeSection === 'history'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                 )}
                 title={sidebarCollapsed ? 'History' : undefined}
               >
@@ -320,7 +320,7 @@ export function Sidebar() {
             <div className={cn('flex items-center', sidebarCollapsed ? 'justify-center' : 'gap-3')}>
               <button
                 onClick={() => setSettingsOpen(true)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EDE9F9] text-[#5B50BD] hover:bg-[#C8C4E9] dark:bg-[#231E51] dark:text-[#918AD3] dark:hover:bg-[#1A163C]"
                 title={sidebarCollapsed ? 'Settings' : undefined}
               >
                 {sidebarCollapsed ? <Settings className="h-5 w-5" /> : <User className="h-5 w-5" />}
@@ -363,7 +363,7 @@ export function Sidebar() {
           {/* User Info */}
           <div className="rounded-lg bg-gray-50 p-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]">
                 <User className="h-6 w-6" />
               </div>
               <div>
@@ -389,7 +389,7 @@ export function Sidebar() {
                 }}
                 className={cn(
                   'relative h-6 w-11 rounded-full transition-colors',
-                  isDarkMode ? 'bg-blue-600' : 'bg-gray-200'
+                  isDarkMode ? 'bg-[#5B50BD]' : 'bg-gray-200'
                 )}
               >
                 <span
@@ -414,7 +414,7 @@ export function Sidebar() {
                 onClick={() => setNotificationsEnabled(!notificationsEnabled)}
                 className={cn(
                   'relative h-6 w-11 rounded-full transition-colors',
-                  notificationsEnabled ? 'bg-blue-600' : 'bg-gray-200'
+                  notificationsEnabled ? 'bg-[#5B50BD]' : 'bg-gray-200'
                 )}
               >
                 <span
@@ -487,7 +487,7 @@ export function Sidebar() {
                   key={notification.id}
                   className={cn(
                     'flex items-start gap-3 rounded-lg p-3 transition-colors',
-                    notification.read ? 'bg-gray-50' : 'bg-blue-50'
+                    notification.read ? 'bg-gray-50 dark:bg-gray-800' : 'bg-[#EDE9F9] dark:bg-[#231E51]'
                   )}
                 >
                   <div className="mt-0.5">{getNotificationIcon(notification.type)}</div>
@@ -503,7 +503,7 @@ export function Sidebar() {
                     </p>
                   </div>
                   {!notification.read && (
-                    <span className="h-2 w-2 rounded-full bg-blue-500 mt-2" />
+                    <span className="h-2 w-2 rounded-full bg-[#5B50BD] mt-2" />
                   )}
                 </div>
               ))}

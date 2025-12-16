@@ -434,7 +434,7 @@ You can share these in any order, or click **Editor Mode** above to fill in the 
               className={cn(
                 'rounded-full px-3 py-1 text-xs font-medium transition-colors whitespace-nowrap',
                 selectedTemplate === template.id
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-[#5B50BD] text-white'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700',
                 isAiTyping && 'opacity-50 cursor-not-allowed'
               )}
@@ -454,8 +454,8 @@ You can share these in any order, or click **Editor Mode** above to fill in the 
 
           {isAiTyping && (
             <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-                <Bot className="h-5 w-5 text-blue-600" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EDE9F9] dark:bg-[#231E51]">
+                <Bot className="h-5 w-5 text-[#5B50BD] dark:text-[#918AD3]" />
               </div>
               <div className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-3">
                 <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
@@ -555,13 +555,13 @@ function ChatMessageItem({ message }: { message: ChatMessage }) {
       <div
         className={cn(
           'flex h-8 w-8 items-center justify-center rounded-full',
-          isUser ? 'bg-gray-200' : 'bg-blue-100'
+          isUser ? 'bg-gray-200 dark:bg-gray-700' : 'bg-[#EDE9F9] dark:bg-[#231E51]'
         )}
       >
         {isUser ? (
           <User className="h-5 w-5 text-gray-600" />
         ) : (
-          <Bot className="h-5 w-5 text-blue-600" />
+          <Bot className="h-5 w-5 text-[#5B50BD] dark:text-[#918AD3]" />
         )}
       </div>
 
@@ -569,7 +569,7 @@ function ChatMessageItem({ message }: { message: ChatMessage }) {
         <div
           className={cn(
             'rounded-lg px-4 py-3',
-            isUser ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'
+            isUser ? 'bg-[#5B50BD] text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
           )}
         >
           <div className="whitespace-pre-wrap text-sm">{message.content}</div>
@@ -581,7 +581,7 @@ function ChatMessageItem({ message }: { message: ChatMessage }) {
                   key={attachment.id}
                   className={cn(
                     'flex items-center gap-2 rounded px-2 py-1',
-                    isUser ? 'bg-blue-500' : 'bg-gray-200'
+                    isUser ? 'bg-[#4A41A0]' : 'bg-gray-200 dark:bg-gray-600'
                   )}
                 >
                   <FileText className="h-4 w-4" />

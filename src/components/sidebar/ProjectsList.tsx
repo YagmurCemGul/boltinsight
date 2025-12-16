@@ -110,7 +110,7 @@ export function ProjectsList() {
       {/* Create Project Button */}
       <button
         onClick={() => setIsCreateModalOpen(true)}
-        className="flex w-full items-center gap-2 rounded-lg border border-dashed border-gray-300 px-3 py-2 text-sm text-gray-500 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600"
+        className="flex w-full items-center gap-2 rounded-lg border border-dashed border-gray-300 px-3 py-2 text-sm text-gray-500 transition-colors hover:border-[#5B50BD] hover:bg-[#EDE9F9] hover:text-[#5B50BD] dark:hover:border-[#918AD3] dark:hover:bg-[#231E51] dark:hover:text-[#918AD3]"
       >
         <Plus className="h-4 w-4" />
         <span>Create Project</span>

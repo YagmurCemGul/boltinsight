@@ -55,7 +55,7 @@ export function MobileLoginScreen() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-lg">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#5B50BD] shadow-lg">
             <Zap className="h-9 w-9 text-white" />
           </div>
           <h1 className="mt-6 text-2xl font-semibold text-gray-900">
@@ -139,14 +139,14 @@ export function MobileLoginScreen() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email address"
-                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3.5 text-base text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3.5 text-base text-gray-900 placeholder-gray-400 outline-none focus:border-[#5B50BD] focus:ring-1 focus:ring-[#5B50BD]"
               />
 
               {/* Continue Button */}
               <button
                 onClick={handleEmailContinue}
                 disabled={isLoading || !email}
-                className="flex w-full items-center justify-center rounded-lg bg-blue-500 px-4 py-3.5 text-base font-medium text-white transition-colors active:bg-blue-600 disabled:opacity-50"
+                className="flex w-full items-center justify-center rounded-lg bg-[#5B50BD] px-4 py-3.5 text-base font-medium text-white transition-colors active:bg-[#4A41A0] disabled:opacity-50"
               >
                 {loadingProvider === 'email' ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -176,7 +176,7 @@ export function MobileLoginScreen() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
                   autoFocus
-                  className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3.5 pr-12 text-base text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3.5 pr-12 text-base text-gray-900 placeholder-gray-400 outline-none focus:border-[#5B50BD] focus:ring-1 focus:ring-[#5B50BD]"
                 />
                 <button
                   type="button"
@@ -191,7 +191,7 @@ export function MobileLoginScreen() {
               <button
                 onClick={handlePasswordSubmit}
                 disabled={isLoading || !password}
-                className="flex w-full items-center justify-center rounded-lg bg-blue-500 px-4 py-3.5 text-base font-medium text-white transition-colors active:bg-blue-600 disabled:opacity-50"
+                className="flex w-full items-center justify-center rounded-lg bg-[#5B50BD] px-4 py-3.5 text-base font-medium text-white transition-colors active:bg-[#4A41A0] disabled:opacity-50"
               >
                 {loadingProvider === 'password' ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -202,7 +202,7 @@ export function MobileLoginScreen() {
 
               {/* Forgot Password */}
               <div className="text-center">
-                <button className="text-sm text-blue-500 active:text-blue-600">
+                <button className="text-sm text-[#5B50BD] active:text-[#4A41A0]">
                   Forgot password?
                 </button>
               </div>

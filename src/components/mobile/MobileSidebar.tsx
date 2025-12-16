@@ -42,7 +42,7 @@ interface MobileSidebarProps {
 }
 
 const menuItems = [
-  { id: 'new-proposal', label: 'New Proposal', icon: Plus, color: 'text-blue-600' },
+  { id: 'new-proposal', label: 'New Proposal', icon: Plus, color: 'text-[#5B50BD]' },
   { id: 'search-my', label: 'Search My Proposals', icon: User },
   { id: 'search-all', label: 'Search All Proposals', icon: Users },
   { id: 'meta-learnings', label: 'Meta Learnings', icon: Brain },
@@ -143,10 +143,10 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-4">
             <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#5B50BD]">
                 <Zap className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-blue-600">BoltInsight</span>
+              <span className="text-xl font-bold text-[#5B50BD]">BoltInsight</span>
             </div>
             <button
               onClick={onClose}
@@ -171,7 +171,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   className={cn(
                     'flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-colors mb-1',
                     activeSection === item.id
-                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                      ? 'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]'
                       : 'text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-800'
                   )}
                 >
@@ -212,7 +212,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                     className={cn(
                       'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-left',
                       activeSection === `project-${project.id}`
-                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30'
+                        ? 'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]'
                         : 'text-gray-600 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800'
                     )}
                   >
@@ -223,7 +223,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 {/* Create New Project Button */}
                 <button
                   onClick={() => setNewProjectModalOpen(true)}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-left text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-left text-[#5B50BD] dark:text-[#918AD3] hover:bg-[#EDE9F9] dark:hover:bg-[#231E51]"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Create New Project</span>
@@ -265,7 +265,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                         <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                            <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">
                               {proposal.code || 'Draft'}
                             </span>
                             <span className={cn(
@@ -332,7 +332,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               <div
                 className={cn(
                   'relative h-6 w-11 rounded-full transition-colors',
-                  isDarkMode ? 'bg-blue-600' : 'bg-gray-300'
+                  isDarkMode ? 'bg-[#5B50BD]' : 'bg-gray-300'
                 )}
               >
                 <span
@@ -351,7 +351,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               }}
               className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left active:bg-gray-100 dark:active:bg-gray-800"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EDE9F9] dark:bg-[#231E51] text-[#5B50BD] dark:text-[#918AD3]">
                 <User className="h-5 w-5" />
               </div>
               <div className="flex-1">
@@ -375,7 +375,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           {/* User Info */}
           <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EDE9F9] dark:bg-[#231E51] text-[#5B50BD] dark:text-[#918AD3]">
                 <User className="h-6 w-6" />
               </div>
               <div>
@@ -402,7 +402,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               <div
                 className={cn(
                   'relative h-6 w-11 rounded-full transition-colors',
-                  notificationsEnabled ? 'bg-blue-600' : 'bg-gray-300'
+                  notificationsEnabled ? 'bg-[#5B50BD]' : 'bg-gray-300'
                 )}
               >
                 <span
@@ -431,7 +431,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               <div
                 className={cn(
                   'relative h-6 w-11 rounded-full transition-colors',
-                  isDarkMode ? 'bg-blue-600' : 'bg-gray-300'
+                  isDarkMode ? 'bg-[#5B50BD]' : 'bg-gray-300'
                 )}
               >
                 <span

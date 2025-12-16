@@ -42,7 +42,7 @@ export function MobileHeader({
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'approval': return <UserCheck className="h-4 w-4 text-green-500" />;
-      case 'comment': return <MessageSquare className="h-4 w-4 text-blue-500" />;
+      case 'comment': return <MessageSquare className="h-4 w-4 text-[#5B50BD]" />;
       default: return <FileText className="h-4 w-4 text-gray-500" />;
     }
   };
@@ -100,7 +100,7 @@ export function MobileHeader({
             type="text"
             placeholder="Search proposals..."
             autoFocus
-            className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[#5B50BD]"
           />
         </div>
       </header>
@@ -130,10 +130,10 @@ export function MobileHeader({
 
           {!showBack && activeSection === 'new-proposal' && (
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#5B50BD]">
                 <Zap className="h-4 w-4 text-white" />
               </div>
-              <span className="font-bold text-blue-600">BoltInsight</span>
+              <span className="font-bold text-[#5B50BD]">BoltInsight</span>
             </div>
           )}
         </div>
@@ -198,7 +198,7 @@ export function MobileHeader({
                     'flex items-start gap-3 rounded-lg p-3 transition-colors',
                     notification.read
                       ? 'bg-gray-50 dark:bg-gray-800'
-                      : 'bg-blue-50 dark:bg-blue-900/30'
+                      : 'bg-[#EDE9F9] dark:bg-[#231E51]'
                   )}
                 >
                   <div className="mt-0.5">{getNotificationIcon(notification.type)}</div>
@@ -216,7 +216,7 @@ export function MobileHeader({
                     </p>
                   </div>
                   {!notification.read && (
-                    <span className="h-2 w-2 rounded-full bg-blue-500 mt-2" />
+                    <span className="h-2 w-2 rounded-full bg-[#5B50BD] mt-2" />
                   )}
                 </div>
               ))}

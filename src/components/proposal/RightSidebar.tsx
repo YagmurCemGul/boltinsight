@@ -226,7 +226,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
             {/* Progress Bar */}
             <div className="mt-3 h-2 rounded-full bg-gray-100">
               <div
-                className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                className="h-full rounded-full bg-[#5B50BD] transition-all duration-300"
                 style={{
                   width: `${(completionStats.requiredCompleted / completionStats.requiredTotal) * 100}%`,
                 }}
@@ -254,7 +254,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                   'w-full rounded-lg text-left transition-all',
                   collapsed ? 'p-2 flex items-center justify-center' : 'p-3',
                   isActive
-                    ? 'bg-blue-50 ring-1 ring-blue-200'
+                    ? 'bg-[#EDE9F9] ring-1 ring-[#C8C4E9] dark:bg-[#231E51] dark:ring-[#5B50BD]'
                     : isIncompleteRequired
                     ? 'border border-red-300 dark:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
                     : 'hover:bg-gray-50'
@@ -266,7 +266,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                   <div className="relative">
                     <section.icon className={cn(
                       'h-5 w-5',
-                      isActive ? 'text-blue-600' : isIncompleteRequired ? 'text-red-400' : 'text-gray-400'
+                      isActive ? 'text-[#5B50BD] dark:text-[#918AD3]' : isIncompleteRequired ? 'text-red-400' : 'text-gray-400'
                     )} />
                     {status?.complete ? (
                       <CheckCircle className="absolute -top-1 -right-1 h-3 w-3 text-green-500 bg-white rounded-full" />
@@ -293,7 +293,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                       <div className="flex items-center gap-2">
                         <section.icon className={cn(
                           'h-4 w-4 flex-shrink-0',
-                          isActive ? 'text-blue-600' : 'text-gray-400'
+                          isActive ? 'text-[#5B50BD] dark:text-[#918AD3]' : 'text-gray-400'
                         )} />
                         <span className={cn(
                           'text-sm font-medium truncate',
@@ -324,7 +324,7 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
                     {/* Arrow */}
                     <ChevronRight className={cn(
                       'h-4 w-4 flex-shrink-0 transition-transform',
-                      isActive ? 'text-blue-600 rotate-90' : 'text-gray-300'
+                      isActive ? 'text-[#5B50BD] dark:text-[#918AD3] rotate-90' : 'text-gray-300'
                     )} />
                   </div>
                 )}

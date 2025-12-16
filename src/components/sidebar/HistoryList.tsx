@@ -85,7 +85,7 @@ export function HistoryList() {
   const getStatusBadge = (proposal: typeof proposals[0]) => {
     if (proposal.sentToClient && proposal.code) {
       return (
-        <span className="text-xs font-medium text-blue-600">{proposal.code}</span>
+        <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">{proposal.code}</span>
       );
     }
     return (

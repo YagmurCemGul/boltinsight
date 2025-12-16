@@ -592,9 +592,9 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
                   onChange={(items) => updateContent('advancedAnalysis', items)}
                   placeholder="Add an analysis type..."
                 />
-                <div className="mt-3 rounded-lg bg-blue-50 p-4">
-                  <p className="mb-2 text-sm font-medium text-blue-700">AI Recommendations:</p>
-                  <ul className="space-y-1 text-sm text-blue-600">
+                <div className="mt-3 rounded-lg bg-[#EDE9F9] dark:bg-[#231E51] p-4">
+                  <p className="mb-2 text-sm font-medium text-[#5B50BD] dark:text-[#918AD3]">AI Recommendations:</p>
+                  <ul className="space-y-1 text-sm text-[#5B50BD] dark:text-[#918AD3]">
                     <li>- MaxDiff Analysis for attribute importance</li>
                     <li>- Conjoint Analysis for price optimization</li>
                     <li>- Key Driver Analysis for satisfaction drivers</li>
@@ -845,7 +845,7 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
               }}
               className="flex w-full items-center gap-3 rounded-lg border p-4 text-left hover:bg-gray-50 transition-colors"
             >
-              <FileText className="h-8 w-8 text-blue-600" />
+              <FileText className="h-8 w-8 text-[#5B50BD] dark:text-[#918AD3]" />
               <div>
                 <p className="font-medium">Word Document</p>
                 <p className="text-sm text-gray-500">Export as .docx file</p>
