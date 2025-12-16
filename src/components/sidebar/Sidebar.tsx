@@ -494,11 +494,11 @@ export function Sidebar() {
                   <div className="flex-1 min-w-0">
                     <p className={cn(
                       'text-sm',
-                      notification.read ? 'text-gray-600' : 'text-gray-900 font-medium'
+                      notification.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-white font-medium'
                     )}>
                       {notification.message}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                       {formatDate(notification.time)}
                     </p>
                   </div>

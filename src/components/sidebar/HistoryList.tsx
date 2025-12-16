@@ -89,7 +89,7 @@ export function HistoryList() {
       );
     }
     return (
-      <span className="text-xs font-medium text-gray-400">Draft</span>
+      <span className="text-xs font-medium text-gray-400 dark:text-gray-500">Draft</span>
     );
   };
 
@@ -101,7 +101,7 @@ export function HistoryList() {
         visibleProposals.map((proposal) => (
           <div
             key={proposal.id}
-            className="group flex items-start gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-gray-100"
+            className="group flex items-start gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <button
               onClick={() => handleProposalClick(proposal)}
@@ -118,10 +118,10 @@ export function HistoryList() {
                     {proposal.status.replace('_', ' ')}
                   </span>
                 </div>
-                <p className="truncate text-sm text-gray-700 mt-0.5">
+                <p className="truncate text-sm text-gray-700 dark:text-gray-300 mt-0.5">
                   {truncateText(proposal.content.title || 'Untitled Proposal', 25)}
                 </p>
-                <p className="text-[10px] text-gray-400 truncate">
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">
                   {proposal.content.client || 'No client'} - {formatDate(proposal.updatedAt)}
                 </p>
               </div>
@@ -129,7 +129,7 @@ export function HistoryList() {
 
             <Dropdown
               trigger={
-                <button className="flex-shrink-0 rounded p-1 text-gray-400 opacity-0 transition-opacity hover:bg-gray-200 hover:text-gray-600 group-hover:opacity-100">
+                <button className="flex-shrink-0 rounded p-1 text-gray-400 opacity-0 transition-opacity hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300 group-hover:opacity-100">
                   <MoreVertical className="h-4 w-4" />
                 </button>
               }
@@ -194,13 +194,13 @@ export function HistoryList() {
         size="sm"
       >
         <div className="space-y-4">
-          <div className="flex items-start gap-3 rounded-lg bg-red-50 p-4">
-            <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+          <div className="flex items-start gap-3 rounded-lg bg-red-50 dark:bg-red-900/30 p-4">
+            <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-red-800">
+              <p className="text-sm font-medium text-red-800 dark:text-red-200">
                 Are you sure you want to delete this proposal?
               </p>
-              <p className="mt-1 text-xs text-red-600">
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
                 This action cannot be undone.
               </p>
             </div>
