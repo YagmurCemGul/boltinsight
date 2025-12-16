@@ -42,8 +42,6 @@ export function MobileHeader({
         return 'Feasibility Check';
       case 'library':
         return 'Library';
-      case 'architecture':
-        return 'Architecture';
       case 'search-my':
         return 'My Proposals';
       case 'search-all':
@@ -66,8 +64,8 @@ export function MobileHeader({
 
   if (searchOpen) {
     return (
-      <header className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top">
-        <div className="flex items-center gap-2 px-3 py-3">
+      <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top">
+        <div className="flex items-center gap-2 px-3 h-full">
           <button
             onClick={() => setSearchOpen(false)}
             className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -86,8 +84,8 @@ export function MobileHeader({
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top">
-      <div className="flex items-center justify-between px-4 py-3">
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top">
+      <div className="flex items-center justify-between px-4 h-full">
         {/* Left Side */}
         <div className="flex items-center gap-2">
           {showBack ? (

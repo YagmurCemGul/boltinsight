@@ -96,7 +96,7 @@ export function MobileApp() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden pt-14 pb-16">
+      <main className="flex-1 overflow-hidden pt-16 pb-16">
         {renderContent()}
       </main>
 
