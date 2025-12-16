@@ -1,0 +1,14 @@
+<svg width="120" height="48" viewBox="0 0 120 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bolt Logo -->
+  <text x="0" y="38" font-family="Arial Black, Arial, sans-serif" font-size="42" font-weight="900" fill="#231E51">
+    <tspan>b</tspan>
+  </text>
+  <!-- Custom "o" with notch -->
+  <circle cx="42" cy="28" r="14" fill="#231E51"/>
+  <circle cx="42" cy="28" r="7" fill="white"/>
+  <rect x="49" y="28" width="14" height="14" fill="white"/>
+  <!-- l and t -->
+  <text x="56" y="38" font-family="Arial Black, Arial, sans-serif" font-size="42" font-weight="900" fill="#231E51">
+    <tspan>lt</tspan>
+  </text>
+</svg>

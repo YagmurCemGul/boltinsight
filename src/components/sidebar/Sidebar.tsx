@@ -39,7 +39,7 @@ import { useThemeStore } from '@/lib/theme';
 import { SearchSection } from './SearchSection';
 import { ProjectsList } from './ProjectsList';
 import { HistoryList } from './HistoryList';
-import { Modal, Button, Input, Select, toast } from '@/components/ui';
+import { Modal, Button, Input, Select, toast, BoltLogo } from '@/components/ui';
 
 const menuItems = [
   {
@@ -157,8 +157,8 @@ export function Sidebar() {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-            {!sidebarCollapsed && <h1 className="text-xl font-bold text-[#5B50BD]">BoltInsight</h1>}
-            {sidebarCollapsed && <span className="text-xl font-bold text-[#5B50BD]">BI</span>}
+            {!sidebarCollapsed && <BoltLogo size="sm" />}
+            {sidebarCollapsed && <BoltLogo size="sm" iconOnly />}
             <div className="flex items-center gap-1">
               {!sidebarCollapsed && (
                 <button

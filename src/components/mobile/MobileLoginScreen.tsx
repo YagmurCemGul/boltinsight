@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Zap, Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
+import { BoltLogo } from '@/components/ui';
 
 export function MobileLoginScreen() {
   const { setLoggedIn } = useAppStore();
@@ -55,9 +56,7 @@ export function MobileLoginScreen() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#5B50BD] shadow-lg">
-            <Zap className="h-9 w-9 text-white" />
-          </div>
+          <BoltLogo size="lg" />
           <h1 className="mt-6 text-2xl font-semibold text-gray-900">
             {step === 'email' ? 'Welcome back' : 'Enter your password'}
           </h1>
