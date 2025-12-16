@@ -22,7 +22,7 @@ import {
   Building2,
   MessageSquare,
 } from 'lucide-react';
-import { cn, getStatusColor } from '@/lib/utils';
+import { cn, getStatusLabel } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { Button, Input, Textarea, Select, Badge, Modal, toast } from '@/components/ui';
 import type { Proposal, Market, Quota } from '@/types';
@@ -135,8 +135,8 @@ export function MobileProposalEditor() {
           {currentProposal.code && (
             <span className="text-sm font-medium text-blue-600">{currentProposal.code}</span>
           )}
-          <Badge className={cn('text-xs', getStatusColor(currentProposal.status))}>
-            {currentProposal.status.replace('_', ' ')}
+          <Badge status={currentProposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'} className="text-xs">
+            {getStatusLabel(currentProposal.status)}
           </Badge>
         </div>
         <h1 className="text-lg font-semibold text-gray-900 dark:text-white truncate">

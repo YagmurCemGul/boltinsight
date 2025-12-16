@@ -1,31 +1,91 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import type { HTMLAttributes } from 'react';
+import { statusColors, borderRadius } from '@/lib/design-tokens';
+import type { HTMLAttributes, CSSProperties } from 'react';
+import { useState, useEffect } from 'react';
+
+type StatusType = 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted';
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'success' | 'warning' | 'error' | 'info' | 'custom';
+  status?: StatusType;
 }
 
-export function Badge({ className, variant = 'custom', ...props }: BadgeProps) {
-  // If className contains bg- or text- classes, don't apply variant colors
-  const hasCustomColors = className && (className.includes('bg-') || className.includes('text-'));
-  const effectiveVariant = hasCustomColors ? 'custom' : variant;
+export function Badge({ className, variant = 'custom', status, style, ...props }: BadgeProps) {
+  const [isDark, setIsDark] = useState(false);
+
+  // Check for dark mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    checkDarkMode();
+
+    // Watch for dark mode changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const mode = isDark ? 'dark' : 'light';
+
+  // Build dynamic styles based on status or variant
+  let dynamicStyles: CSSProperties = {
+    borderRadius: borderRadius.full,
+    ...style,
+  };
+
+  // If status is provided, use statusColors from design tokens
+  if (status && statusColors[mode][status]) {
+    const colors = statusColors[mode][status];
+    dynamicStyles = {
+      ...dynamicStyles,
+      backgroundColor: colors.background,
+      color: colors.text,
+    };
+  } else if (variant !== 'custom') {
+    // Use variant-based colors
+    const variantColors: Record<string, { light: { bg: string; text: string }; dark: { bg: string; text: string } }> = {
+      default: {
+        light: { bg: '#e5e7eb', text: '#374151' },
+        dark: { bg: '#374151', text: '#e5e7eb' },
+      },
+      success: {
+        light: { bg: '#d1fae5', text: '#065f46' },
+        dark: { bg: 'rgba(5, 150, 105, 0.5)', text: '#6ee7b7' },
+      },
+      warning: {
+        light: { bg: '#fef3c7', text: '#92400e' },
+        dark: { bg: 'rgba(217, 119, 6, 0.5)', text: '#fcd34d' },
+      },
+      error: {
+        light: { bg: '#fee2e2', text: '#991b1b' },
+        dark: { bg: 'rgba(220, 38, 38, 0.5)', text: '#fca5a5' },
+      },
+      info: {
+        light: { bg: '#EDE9F9', text: '#5B50BD' },
+        dark: { bg: '#231E51', text: '#918AD3' },
+      },
+    };
+
+    if (variantColors[variant]) {
+      dynamicStyles = {
+        ...dynamicStyles,
+        backgroundColor: variantColors[variant][mode].bg,
+        color: variantColors[variant][mode].text,
+      };
+    }
+  }
 
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-        {
-          'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': effectiveVariant === 'default',
-          'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300': effectiveVariant === 'success',
-          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300': effectiveVariant === 'warning',
-          'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300': effectiveVariant === 'error',
-          'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]': effectiveVariant === 'info',
-          // 'custom' variant applies no colors - uses className
-        },
+        'inline-flex items-center px-2.5 py-0.5 text-xs font-medium',
         className
       )}
+      style={dynamicStyles}
       {...props}
     />
   );

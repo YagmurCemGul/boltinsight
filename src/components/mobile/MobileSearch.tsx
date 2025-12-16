@@ -16,7 +16,7 @@ import {
   Trash2,
   FolderInput,
 } from 'lucide-react';
-import { cn, formatDate, getStatusColor } from '@/lib/utils';
+import { cn, formatDate, getStatusLabel } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { Input, Select, Button, Badge, Card, CardContent, Dropdown, DropdownItem, DropdownSeparator, toast, MoveToProjectModal } from '@/components/ui';
 import type { Proposal } from '@/types';
@@ -209,8 +209,8 @@ export function MobileSearch({ mode }: MobileSearchProps) {
                             {proposal.code}
                           </span>
                         )}
-                        <Badge className={cn('text-xs', getStatusColor(proposal.status))}>
-                          {proposal.status.replace('_', ' ')}
+                        <Badge status={proposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'} className="text-xs">
+                          {getStatusLabel(proposal.status)}
                         </Badge>
                       </div>
                       <h3 className="font-medium text-gray-900 dark:text-white line-clamp-1">

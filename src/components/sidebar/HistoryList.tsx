@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { FileText, MoreVertical, Copy, Trash2, FolderInput, AlertTriangle } from 'lucide-react';
-import { cn, formatDate, getStatusColor, truncateText } from '@/lib/utils';
+import { cn, formatDate, getStatusLabel, truncateText } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { Badge, Dropdown, DropdownItem, DropdownSeparator, Modal, Select, Button, toast } from '@/components/ui';
 
@@ -111,12 +111,9 @@ export function HistoryList() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   {getStatusBadge(proposal)}
-                  <span className={cn(
-                    'rounded px-1.5 py-0.5 text-[10px] whitespace-nowrap',
-                    getStatusColor(proposal.status)
-                  )}>
-                    {proposal.status.replace('_', ' ')}
-                  </span>
+                  <Badge status={proposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'} className="text-[10px] px-1.5 py-0.5 whitespace-nowrap">
+                    {getStatusLabel(proposal.status)}
+                  </Badge>
                 </div>
                 <p className="truncate text-sm text-gray-700 dark:text-gray-300 mt-0.5">
                   {truncateText(proposal.content.title || 'Untitled Proposal', 25)}
