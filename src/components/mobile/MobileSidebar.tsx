@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import {
   X,
   Plus,
@@ -34,7 +33,7 @@ import { formatDate, truncateText, getStatusColor } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { useThemeStore } from '@/lib/theme';
-import { Modal, Button, Select, toast, Dropdown, DropdownItem, DropdownSeparator, MoveToProjectModal, Input } from '@/components/ui';
+import { Modal, Button, Select, toast, Dropdown, DropdownItem, DropdownSeparator, MoveToProjectModal, Input, BoltLogo } from '@/components/ui';
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -142,7 +141,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-4">
-            <Image src="/Logo.svg" alt="BoltInsight" width={140} height={36} className="h-9 w-auto" />
+            <BoltLogo className="h-9 w-auto" variant={isDarkMode ? 'dark' : 'light'} />
             <button
               onClick={onClose}
               className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"

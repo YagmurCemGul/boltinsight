@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import {
   Plus,
   Search,
@@ -40,7 +39,7 @@ import { useThemeStore } from '@/lib/theme';
 import { SearchSection } from './SearchSection';
 import { ProjectsList } from './ProjectsList';
 import { HistoryList } from './HistoryList';
-import { Modal, Button, Input, Select, toast } from '@/components/ui';
+import { Modal, Button, Input, Select, toast, BoltLogo } from '@/components/ui';
 
 const menuItems = [
   {
@@ -158,8 +157,8 @@ export function Sidebar() {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-            {!sidebarCollapsed && <Image src="/Logo.svg" alt="BoltInsight" width={140} height={36} className="h-9 w-auto" />}
-            {sidebarCollapsed && <Image src="/Logo.svg" alt="BoltInsight" width={32} height={32} className="h-8 w-8 object-contain" />}
+            {!sidebarCollapsed && <BoltLogo className="h-9 w-auto" variant={isDarkMode ? 'dark' : 'light'} />}
+            {sidebarCollapsed && <BoltLogo className="h-8 w-8" variant={isDarkMode ? 'dark' : 'light'} />}
             <div className="flex items-center gap-1">
               {!sidebarCollapsed && (
                 <button

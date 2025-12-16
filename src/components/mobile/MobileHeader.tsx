@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { Menu, Bell, ArrowLeft, Search, X, Check, FileText, MessageSquare, UserCheck } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Modal, Button } from '@/components/ui';
+import { useThemeStore } from '@/lib/theme';
+import { Modal, Button, BoltLogo } from '@/components/ui';
 
 interface MobileHeaderProps {
   onOpenMenu: () => void;
@@ -30,6 +30,7 @@ export function MobileHeader({
   showSearch = false
 }: MobileHeaderProps) {
   const { activeSection, setActiveSection, currentProposal } = useAppStore();
+  const { isDarkMode } = useThemeStore();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
@@ -130,7 +131,7 @@ export function MobileHeader({
           )}
 
           {!showBack && activeSection === 'new-proposal' && (
-            <Image src="/Logo.svg" alt="BoltInsight" width={120} height={32} className="h-8 w-auto" />
+            <BoltLogo className="h-8 w-auto" variant={isDarkMode ? 'dark' : 'light'} />
           )}
         </div>
 
