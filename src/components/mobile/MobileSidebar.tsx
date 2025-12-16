@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import {
   X,
   Plus,
@@ -16,7 +17,6 @@ import {
   Sun,
   Bell,
   LogOut,
-  Zap,
   Users,
   Percent,
   ClipboardCheck,
@@ -142,12 +142,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-4">
-            <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#5B50BD]">
-                <Zap className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-xl font-bold text-[#5B50BD]">BoltInsight</span>
-            </div>
+            <Image src="/Logo.svg" alt="BoltInsight" width={140} height={36} className="h-9 w-auto" />
             <button
               onClick={onClose}
               className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"

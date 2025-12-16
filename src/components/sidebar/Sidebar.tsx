@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import {
   Plus,
   Search,
@@ -157,8 +158,8 @@ export function Sidebar() {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-            {!sidebarCollapsed && <h1 className="text-xl font-bold text-[#5B50BD]">BoltInsight</h1>}
-            {sidebarCollapsed && <span className="text-xl font-bold text-[#5B50BD]">BI</span>}
+            {!sidebarCollapsed && <Image src="/Logo.svg" alt="BoltInsight" width={140} height={36} className="h-9 w-auto" />}
+            {sidebarCollapsed && <Image src="/Logo.svg" alt="BoltInsight" width={32} height={32} className="h-8 w-8 object-contain" />}
             <div className="flex items-center gap-1">
               {!sidebarCollapsed && (
                 <button
