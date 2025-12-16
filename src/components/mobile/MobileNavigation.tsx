@@ -74,7 +74,7 @@ export function MobileNavigation({ onOpenMenu, hidden = false }: MobileNavigatio
             <item.icon
               className={cn(
                 'h-6 w-6 mb-0.5',
-                isActive(item.id) && item.id === 'new-proposal' && 'text-blue-600'
+                isActive(item.id) && item.id === 'new-proposal' && 'text-[#5B50BD]'
               )}
             />
             <span className="text-xs font-medium">{item.label}</span>
