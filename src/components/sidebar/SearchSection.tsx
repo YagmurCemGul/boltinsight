@@ -208,8 +208,7 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
                 onClick={() => handleResultClick(proposal)}
                 className={cn(
                   'flex w-full flex-col items-start gap-1 rounded-lg p-2 text-left transition-colors',
-                  'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700',
-                  searchAll && proposal.author.id === currentUser.id && 'ring-1 ring-blue-200 dark:ring-blue-800'
+                  'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
                 )}
               >
                 <div className="flex w-full items-center justify-between">
@@ -227,16 +226,6 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
                   <span className="text-[10px] text-gray-400 dark:text-gray-500">
                     {proposal.content.client} - {formatDate(proposal.createdAt)}
                   </span>
-                  {searchAll && (
-                    <span className={cn(
-                      'text-[10px] px-1.5 py-0.5 rounded',
-                      proposal.author.id === currentUser.id
-                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                    )}>
-                      {proposal.author.id === currentUser.id ? 'Mine' : proposal.author.name}
-                    </span>
-                  )}
                 </div>
               </button>
             ))}
