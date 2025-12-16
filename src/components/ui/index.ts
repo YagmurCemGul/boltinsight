@@ -10,3 +10,4 @@ export { Dropdown, DropdownItem, DropdownSeparator } from './dropdown';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
 export { ToastContainer, toast, useToastStore } from './toast';
 export { Logo } from './Logo';
+export { BoltLogo, BoltLogoIcon } from './BoltLogo';

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
 interface DropdownProps {
@@ -8,15 +9,22 @@ interface DropdownProps {
   children: ReactNode;
   align?: 'left' | 'right';
   className?: string;
+  usePortal?: boolean;
 }
 
-export function Dropdown({ trigger, children, align = 'left', className }: DropdownProps) {
+export function Dropdown({ trigger, children, align = 'left', className, usePortal = true }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const triggerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        triggerRef.current && !triggerRef.current.contains(target) &&
+        dropdownRef.current && !dropdownRef.current.contains(target)
+      ) {
         setIsOpen(false);
       }
     };
@@ -25,19 +33,39 @@ export function Dropdown({ trigger, children, align = 'left', className }: Dropd
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (isOpen && triggerRef.current && usePortal) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: align === 'right' ? rect.right + window.scrollX - 160 : rect.left + window.scrollX,
+      });
+    }
+  }, [isOpen, align, usePortal]);
+
+  const dropdownContent = (
+    <div
+      ref={dropdownRef}
+      className={cn(
+        'min-w-[160px] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-1 shadow-xl',
+        usePortal ? 'fixed z-[9999]' : 'absolute z-[100] mt-1',
+        !usePortal && (align === 'right' ? 'right-0' : 'left-0'),
+        className
+      )}
+      style={usePortal ? { top: position.top, left: position.left } : undefined}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {children}
+    </div>
+  );
+
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={triggerRef}>
       <div onClick={() => setIsOpen(!isOpen)}>{trigger}</div>
       {isOpen && (
-        <div
-          className={cn(
-            'absolute z-[100] mt-1 min-w-[160px] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-1 shadow-xl',
-            align === 'right' ? 'right-0' : 'left-0',
-            className
-          )}
-        >
-          {children}
-        </div>
+        usePortal && typeof document !== 'undefined'
+          ? createPortal(dropdownContent, document.body)
+          : dropdownContent
       )}
     </div>
   );

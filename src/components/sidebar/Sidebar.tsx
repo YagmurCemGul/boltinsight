@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import {
   Plus,
   Search,
@@ -40,7 +39,7 @@ import { useThemeStore } from '@/lib/theme';
 import { SearchSection } from './SearchSection';
 import { ProjectsList } from './ProjectsList';
 import { HistoryList } from './HistoryList';
-import { Modal, Button, Input, Select, toast } from '@/components/ui';
+import { Modal, Button, Input, Select, toast, BoltLogo } from '@/components/ui';
 
 const menuItems = [
   {
@@ -158,29 +157,30 @@ export function Sidebar() {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-            {!sidebarCollapsed && <Image src="/Logo.svg" alt="BoltInsight" width={140} height={36} className="h-9 w-auto" />}
-            {sidebarCollapsed && <Image src="/Logo.svg" alt="BoltInsight" width={32} height={32} className="h-8 w-8 object-contain" />}
-            <div className="flex items-center gap-1">
-              {!sidebarCollapsed && (
-                <button
-                  onClick={() => setNotificationsOpen(true)}
-                  className="relative flex items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                  title="Notifications"
-                >
-                  <Bell className="h-4 w-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-0.5 right-0.5 h-2 w-2 rounded-full bg-red-500" />
-                  )}
-                </button>
-              )}
-              <button
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="hidden lg:flex items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              >
-                {sidebarCollapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-              </button>
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="hidden lg:block cursor-pointer"
+              title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {!sidebarCollapsed && <BoltLogo className="h-9 w-auto" variant={isDarkMode ? 'dark' : 'light'} />}
+              {sidebarCollapsed && <BoltLogo className="h-8 w-8" variant={isDarkMode ? 'dark' : 'light'} />}
+            </button>
+            <div className="lg:hidden">
+              {!sidebarCollapsed && <BoltLogo className="h-9 w-auto" variant={isDarkMode ? 'dark' : 'light'} />}
+              {sidebarCollapsed && <BoltLogo className="h-8 w-8" variant={isDarkMode ? 'dark' : 'light'} />}
             </div>
+            {!sidebarCollapsed && (
+              <button
+                onClick={() => setNotificationsOpen(true)}
+                className="relative flex items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                title="Notifications"
+              >
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-0.5 right-0.5 h-2 w-2 rounded-full bg-red-500" />
+                )}
+              </button>
+            )}
           </div>
 
           {/* Main Navigation */}
@@ -487,24 +487,28 @@ export function Sidebar() {
                 <div
                   key={notification.id}
                   className={cn(
-                    'flex items-start gap-3 rounded-lg p-3 transition-colors',
-                    notification.read ? 'bg-gray-50 dark:bg-gray-800' : 'bg-[#EDE9F9] dark:bg-[#231E51]'
+                    'flex items-start gap-3 rounded-lg p-3 transition-colors border',
+                    notification.read
+                      ? 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700'
+                      : 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700/50'
                   )}
                 >
                   <div className="mt-0.5">{getNotificationIcon(notification.type)}</div>
                   <div className="flex-1 min-w-0">
                     <p className={cn(
-                      'text-sm',
-                      notification.read ? 'text-gray-600' : 'text-gray-900 font-medium'
+                      'text-sm leading-relaxed',
+                      notification.read
+                        ? 'text-gray-600 dark:text-gray-300'
+                        : 'text-gray-900 dark:text-gray-100 font-medium'
                     )}>
                       {notification.message}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {formatDate(notification.time)}
                     </p>
                   </div>
                   {!notification.read && (
-                    <span className="h-2 w-2 rounded-full bg-[#5B50BD] mt-2" />
+                    <span className="h-2 w-2 rounded-full bg-purple-500 dark:bg-purple-400 mt-2 flex-shrink-0" />
                   )}
                 </div>
               ))}

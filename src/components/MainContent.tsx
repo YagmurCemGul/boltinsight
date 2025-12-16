@@ -9,7 +9,7 @@ import { MetaLearnings } from '@/components/meta-learnings';
 import { MarginOfErrorCalculator, DemographicDistribution, FeasibilityCheck } from '@/components/tools';
 import { Library } from '@/components/library';
 import { Architecture } from '@/components/architecture';
-import { cn } from '@/lib/utils';
+import { cn, getStatusColor } from '@/lib/utils';
 import type { Proposal, ProposalContent } from '@/types';
 
 export function MainContent() {
@@ -273,12 +273,8 @@ function ProjectView({ projectId }: { projectId: string }) {
                 </span>
                 <span
                   className={cn(
-                    'rounded px-2 py-0.5 text-xs',
-                    proposal.status === 'approved'
-                      ? 'bg-green-100 text-green-800'
-                      : proposal.status === 'rejected'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-gray-100 text-gray-800'
+                    'rounded px-2 py-0.5 text-xs font-medium',
+                    getStatusColor(proposal.status)
                   )}
                 >
                   {proposal.status.replace('_', ' ')}

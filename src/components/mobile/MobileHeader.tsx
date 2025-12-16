@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { Menu, Bell, ArrowLeft, Search, X, Check, FileText, MessageSquare, UserCheck } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Modal, Button } from '@/components/ui';
+import { useThemeStore } from '@/lib/theme';
+import { Modal, Button, BoltLogo } from '@/components/ui';
 
 interface MobileHeaderProps {
   onOpenMenu: () => void;
@@ -30,6 +30,7 @@ export function MobileHeader({
   showSearch = false
 }: MobileHeaderProps) {
   const { activeSection, setActiveSection, currentProposal } = useAppStore();
+  const { isDarkMode } = useThemeStore();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
@@ -123,14 +124,10 @@ export function MobileHeader({
           ) : (
             <button
               onClick={onOpenMenu}
-              className="rounded-lg p-2 -ml-2 text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-800"
+              className="-ml-1 active:opacity-70"
             >
-              <Menu className="h-5 w-5" />
+              <BoltLogo className="h-8 w-auto" variant={isDarkMode ? 'dark' : 'light'} />
             </button>
-          )}
-
-          {!showBack && activeSection === 'new-proposal' && (
-            <Image src="/Logo.svg" alt="BoltInsight" width={120} height={32} className="h-8 w-auto" />
           )}
         </div>
 
@@ -191,28 +188,28 @@ export function MobileHeader({
                 <div
                   key={notification.id}
                   className={cn(
-                    'flex items-start gap-3 rounded-lg p-3 transition-colors',
+                    'flex items-start gap-3 rounded-lg p-3 transition-colors border',
                     notification.read
-                      ? 'bg-gray-50 dark:bg-gray-800'
-                      : 'bg-[#EDE9F9] dark:bg-[#231E51]'
+                      ? 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700'
+                      : 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700/50'
                   )}
                 >
                   <div className="mt-0.5">{getNotificationIcon(notification.type)}</div>
                   <div className="flex-1 min-w-0">
                     <p className={cn(
-                      'text-sm',
+                      'text-sm leading-relaxed',
                       notification.read
-                        ? 'text-gray-600 dark:text-gray-400'
-                        : 'text-gray-900 dark:text-white font-medium'
+                        ? 'text-gray-600 dark:text-gray-300'
+                        : 'text-gray-900 dark:text-gray-100 font-medium'
                     )}>
                       {notification.message}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {formatDate(notification.time)}
                     </p>
                   </div>
                   {!notification.read && (
-                    <span className="h-2 w-2 rounded-full bg-[#5B50BD] mt-2" />
+                    <span className="h-2 w-2 rounded-full bg-purple-500 dark:bg-purple-400 mt-2 flex-shrink-0" />
                   )}
                 </div>
               ))}

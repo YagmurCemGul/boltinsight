@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import {
   X,
   Plus,
@@ -34,7 +33,7 @@ import { formatDate, truncateText, getStatusColor } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { useThemeStore } from '@/lib/theme';
-import { Modal, Button, Select, toast, Dropdown, DropdownItem, DropdownSeparator, MoveToProjectModal, Input } from '@/components/ui';
+import { Modal, Button, Select, toast, Dropdown, DropdownItem, DropdownSeparator, MoveToProjectModal, Input, BoltLogo } from '@/components/ui';
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -65,6 +64,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
   const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectDescription, setNewProjectDescription] = useState('');
 
   // Get recent proposals for history
   const recentProposals = proposals
@@ -115,10 +115,12 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
     if (!newProjectName.trim()) return;
     addProject({
       name: newProjectName.trim(),
+      description: newProjectDescription.trim() || undefined,
       proposals: [],
     });
     toast.success(`Project "${newProjectName}" created`);
     setNewProjectName('');
+    setNewProjectDescription('');
     setNewProjectModalOpen(false);
   };
 
@@ -142,7 +144,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-4">
-            <Image src="/Logo.svg" alt="BoltInsight" width={140} height={36} className="h-9 w-auto" />
+            <BoltLogo className="h-9 w-auto" variant={isDarkMode ? 'dark' : 'light'} />
             <button
               onClick={onClose}
               className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -197,23 +199,51 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
             {showProjects && (
               <div className="ml-4 mt-1 space-y-1">
-                {projects.slice(0, 5).map((project) => (
-                  <button
+                {[...projects]
+                  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                  .slice(0, 5)
+                  .map((project) => (
+                  <div
                     key={project.id}
-                    onClick={() => {
-                      setActiveSection(`project-${project.id}`);
-                      onClose();
-                    }}
-                    className={cn(
-                      'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-left',
-                      activeSection === `project-${project.id}`
-                        ? 'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]'
-                        : 'text-gray-600 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800'
-                    )}
+                    className="group flex items-center gap-2"
                   >
-                    <FolderKanban className="h-4 w-4" />
-                    <span className="truncate">{project.name}</span>
-                  </button>
+                    <button
+                      onClick={() => {
+                        setActiveSection(`project-${project.id}`);
+                        onClose();
+                      }}
+                      className={cn(
+                        'flex flex-1 items-center gap-2 rounded-lg px-3 py-2 text-sm text-left',
+                        activeSection === `project-${project.id}`
+                          ? 'bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]'
+                          : 'text-gray-600 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800'
+                      )}
+                    >
+                      <FolderKanban className="h-4 w-4" />
+                      <span className="truncate">{project.name}</span>
+                    </button>
+                    <Dropdown
+                      trigger={
+                        <button className="flex-shrink-0 rounded p-1 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700">
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      }
+                      align="right"
+                    >
+                      <DropdownItem onClick={() => {
+                        setActiveSection(`project-${project.id}`);
+                        onClose();
+                      }}>
+                        <FolderKanban className="mr-2 h-4 w-4" />
+                        Open
+                      </DropdownItem>
+                      <DropdownSeparator />
+                      <DropdownItem variant="destructive" onClick={() => {}}>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownItem>
+                    </Dropdown>
+                  </div>
                 ))}
                 {/* Create New Project Button */}
                 <button
@@ -244,7 +274,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             </button>
 
             {showHistory && (
-              <div className="ml-4 mt-1 space-y-1 max-h-60 overflow-y-auto">
+              <div className="ml-4 mt-1 space-y-1 max-h-64 overflow-y-auto">
                 {recentProposals.length === 0 ? (
                   <p className="py-4 text-center text-xs text-gray-400">No proposals yet</p>
                 ) : (
@@ -312,33 +342,6 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
           {/* Footer - User Profile */}
           <div className="border-t border-gray-200 dark:border-gray-800 p-4">
-            {/* Theme Toggle */}
-            <button
-              onClick={() => {
-                toggleDarkMode();
-                toast.success(isDarkMode ? 'Light mode enabled' : 'Dark mode enabled');
-              }}
-              className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-gray-700 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-800 mb-2"
-            >
-              <div className="flex items-center gap-3">
-                {isDarkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-                <span className="font-medium">{isDarkMode ? 'Dark Mode' : 'Light Mode'}</span>
-              </div>
-              <div
-                className={cn(
-                  'relative h-6 w-11 rounded-full transition-colors',
-                  isDarkMode ? 'bg-[#5B50BD]' : 'bg-gray-300'
-                )}
-              >
-                <span
-                  className={cn(
-                    'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform shadow',
-                    isDarkMode ? 'left-5' : 'left-0.5'
-                  )}
-                />
-              </div>
-            </button>
-
             {/* User Info */}
             <button
               onClick={() => {
@@ -490,6 +493,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         onClose={() => {
           setNewProjectModalOpen(false);
           setNewProjectName('');
+          setNewProjectDescription('');
         }}
         title="Create New Project"
         size="sm"
@@ -501,6 +505,13 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             onChange={(e) => setNewProjectName(e.target.value)}
             autoFocus
           />
+          <textarea
+            placeholder="Project description (optional)"
+            value={newProjectDescription}
+            onChange={(e) => setNewProjectDescription(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-[#5B50BD] focus:ring-2 focus:ring-[#5B50BD]/20 resize-none"
+            rows={3}
+          />
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -508,6 +519,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               onClick={() => {
                 setNewProjectModalOpen(false);
                 setNewProjectName('');
+                setNewProjectDescription('');
               }}
             >
               Cancel

@@ -153,7 +153,7 @@ export function MobileProposalEditor() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 pb-24">
+      <div className="flex-1 overflow-y-auto">
         {SECTIONS.map((section) => {
           const Icon = section.icon;
           const isExpanded = expandedSections.includes(section.id);
@@ -530,11 +530,11 @@ export function MobileProposalEditor() {
       </div>
 
       {/* Bottom Actions */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-3 flex gap-3">
+      <div className="sticky bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-3 flex gap-3 z-40 mt-auto">
         <Button
           variant="outline"
           onClick={() => setDeleteModalOpen(true)}
-          className="text-red-600 border-red-200 hover:bg-red-50"
+          className="text-red-600 border-red-200 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-900/30"
         >
           <Trash2 className="h-4 w-4" />
         </Button>
