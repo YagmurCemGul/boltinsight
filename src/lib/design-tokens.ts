@@ -758,6 +758,237 @@ export const darkTheme = {
 };
 
 // ==========================================
+// CARD VARIANTS - Kart Stilleri
+// ==========================================
+
+export const cardVariants = {
+  default: {
+    light: {
+      background: '#ffffff',
+      border: '#e5e7eb',
+      text: '#374151',
+      shadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+      hoverShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+    },
+    dark: {
+      background: '#1e293b',
+      border: '#334155',
+      text: '#f1f5f9',
+      shadow: '0 1px 3px 0 rgb(0 0 0 / 0.3)',
+      hoverShadow: '0 4px 6px -1px rgb(0 0 0 / 0.3)',
+    },
+  },
+};
+
+// ==========================================
+// MODAL VARIANTS - Modal Stilleri
+// ==========================================
+
+export const modalVariants = {
+  default: {
+    light: {
+      background: '#ffffff',
+      border: '#e5e7eb',
+      text: '#374151',
+      titleText: '#111827',
+      overlay: 'rgba(0, 0, 0, 0.5)',
+      shadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    },
+    dark: {
+      background: '#1e293b',
+      border: '#334155',
+      text: '#e5e7eb',
+      titleText: '#f9fafb',
+      overlay: 'rgba(0, 0, 0, 0.7)',
+      shadow: '0 25px 50px -12px rgb(0 0 0 / 0.5)',
+    },
+  },
+};
+
+// ==========================================
+// SELECT VARIANTS - Select Stilleri
+// ==========================================
+
+export const selectVariants = {
+  default: {
+    light: {
+      background: '#ffffff',
+      border: '#d1d5db',
+      text: '#374151',
+      placeholder: '#9ca3af',
+      focusBorder: '#5B50BD',
+      focusRing: 'rgba(91, 80, 189, 0.2)',
+      optionBackground: '#ffffff',
+      optionHover: '#f3f4f6',
+      optionSelected: '#EDE9F9',
+    },
+    dark: {
+      background: '#1e293b',
+      border: '#475569',
+      text: '#f1f5f9',
+      placeholder: '#64748b',
+      focusBorder: '#5B50BD',
+      focusRing: 'rgba(91, 80, 189, 0.2)',
+      optionBackground: '#1e293b',
+      optionHover: '#334155',
+      optionSelected: '#231E51',
+    },
+  },
+};
+
+// ==========================================
+// TEXTAREA VARIANTS - Textarea Stilleri
+// ==========================================
+
+export const textareaVariants = {
+  default: {
+    light: {
+      background: '#ffffff',
+      border: '#d1d5db',
+      text: '#374151',
+      placeholder: '#9ca3af',
+      focusBorder: '#5B50BD',
+      focusRing: 'rgba(91, 80, 189, 0.2)',
+    },
+    dark: {
+      background: '#1e293b',
+      border: '#475569',
+      text: '#f1f5f9',
+      placeholder: '#64748b',
+      focusBorder: '#5B50BD',
+      focusRing: 'rgba(91, 80, 189, 0.2)',
+    },
+  },
+};
+
+// ==========================================
+// TABS VARIANTS - Tab Stilleri
+// ==========================================
+
+export const tabsVariants = {
+  default: {
+    light: {
+      listBackground: '#f3f4f6',
+      triggerText: '#6b7280',
+      triggerHover: '#374151',
+      triggerActive: '#5B50BD',
+      triggerActiveBackground: '#ffffff',
+      contentBackground: 'transparent',
+    },
+    dark: {
+      listBackground: '#1e293b',
+      triggerText: '#9ca3af',
+      triggerHover: '#e5e7eb',
+      triggerActive: '#918AD3',
+      triggerActiveBackground: '#334155',
+      contentBackground: 'transparent',
+    },
+  },
+};
+
+// ==========================================
+// TOAST VARIANTS - Toast Stilleri
+// ==========================================
+
+export const toastVariants = {
+  success: {
+    light: {
+      background: '#ffffff',
+      border: '#d1fae5',
+      iconColor: '#059669',
+      titleColor: '#065f46',
+      messageColor: '#047857',
+    },
+    dark: {
+      background: '#1e293b',
+      border: '#064e3b',
+      iconColor: '#34d399',
+      titleColor: '#6ee7b7',
+      messageColor: '#a7f3d0',
+    },
+  },
+  error: {
+    light: {
+      background: '#ffffff',
+      border: '#fee2e2',
+      iconColor: '#dc2626',
+      titleColor: '#991b1b',
+      messageColor: '#b91c1c',
+    },
+    dark: {
+      background: '#1e293b',
+      border: '#7f1d1d',
+      iconColor: '#f87171',
+      titleColor: '#fca5a5',
+      messageColor: '#fecaca',
+    },
+  },
+  warning: {
+    light: {
+      background: '#ffffff',
+      border: '#fef3c7',
+      iconColor: '#d97706',
+      titleColor: '#92400e',
+      messageColor: '#b45309',
+    },
+    dark: {
+      background: '#1e293b',
+      border: '#78350f',
+      iconColor: '#fbbf24',
+      titleColor: '#fcd34d',
+      messageColor: '#fde68a',
+    },
+  },
+  info: {
+    light: {
+      background: '#ffffff',
+      border: '#dbeafe',
+      iconColor: '#2563eb',
+      titleColor: '#1e40af',
+      messageColor: '#1d4ed8',
+    },
+    dark: {
+      background: '#1e293b',
+      border: '#1e3a8a',
+      iconColor: '#60a5fa',
+      titleColor: '#93c5fd',
+      messageColor: '#bfdbfe',
+    },
+  },
+};
+
+// ==========================================
+// DROPDOWN VARIANTS - Dropdown Stilleri
+// ==========================================
+
+export const dropdownVariants = {
+  default: {
+    light: {
+      background: '#ffffff',
+      border: '#e5e7eb',
+      shadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+      itemText: '#374151',
+      itemHover: '#f3f4f6',
+      itemActive: '#EDE9F9',
+      separator: '#e5e7eb',
+      dangerText: '#dc2626',
+      dangerHover: '#fee2e2',
+    },
+    dark: {
+      background: '#1e293b',
+      border: '#334155',
+      shadow: '0 10px 15px -3px rgb(0 0 0 / 0.3)',
+      itemText: '#e5e7eb',
+      itemHover: '#334155',
+      itemActive: '#231E51',
+      separator: '#334155',
+      dangerText: '#f87171',
+      dangerHover: '#7f1d1d',
+    },
+  },
+};
+
+// ==========================================
 // EXPORTS - Tüm Değerlerin Birleşimi
 // ==========================================
 
@@ -779,6 +1010,13 @@ export const designTokens = {
   breakpoints,
   sidebar,
   darkTheme,
+  cardVariants,
+  modalVariants,
+  selectVariants,
+  textareaVariants,
+  tabsVariants,
+  toastVariants,
+  dropdownVariants,
 };
 
 export default designTokens;

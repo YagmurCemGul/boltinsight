@@ -1,7 +1,9 @@
 'use client';
 
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode, type CSSProperties } from 'react';
 import { cn } from '@/lib/utils';
+import { tabsVariants, spacing, typography, motion } from '@/lib/design-tokens';
+import { useThemeMode } from '@/hooks';
 
 interface TabsContextValue {
   activeTab: string;
@@ -29,11 +31,21 @@ export function Tabs({ defaultValue, children, className }: TabsProps) {
 interface TabsListProps {
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }
 
-export function TabsList({ children, className }: TabsListProps) {
+export function TabsList({ children, className, style }: TabsListProps) {
+  const mode = useThemeMode();
+  const colors = tabsVariants.default[mode];
+
+  const listStyles: CSSProperties = {
+    display: 'flex',
+    borderBottom: `1px solid ${mode === 'dark' ? '#334155' : '#e5e7eb'}`,
+    ...style,
+  };
+
   return (
-    <div className={cn('flex border-b border-gray-200', className)}>
+    <div className={className} style={listStyles}>
       {children}
     </div>
   );
@@ -43,25 +55,35 @@ interface TabsTriggerProps {
   value: string;
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }
 
-export function TabsTrigger({ value, children, className }: TabsTriggerProps) {
+export function TabsTrigger({ value, children, className, style }: TabsTriggerProps) {
   const context = useContext(TabsContext);
   if (!context) throw new Error('TabsTrigger must be used within Tabs');
+
+  const mode = useThemeMode();
+  const colors = tabsVariants.default[mode];
 
   const { activeTab, setActiveTab } = context;
   const isActive = activeTab === value;
 
+  const triggerStyles: CSSProperties = {
+    padding: `${spacing[2]} ${spacing[4]}`,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.medium,
+    transition: motion.transition.colors,
+    borderBottom: isActive ? `2px solid ${colors.triggerActive}` : '2px solid transparent',
+    color: isActive ? colors.triggerActive : colors.triggerText,
+    marginBottom: '-1px',
+    ...style,
+  };
+
   return (
     <button
       onClick={() => setActiveTab(value)}
-      className={cn(
-        'px-4 py-2 text-sm font-medium transition-colors',
-        isActive
-          ? 'border-b-2 border-[#5B50BD] text-[#5B50BD] dark:border-[#918AD3] dark:text-[#918AD3]'
-          : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
-        className
-      )}
+      className={cn('hover:opacity-80', className)}
+      style={triggerStyles}
     >
       {children}
     </button>

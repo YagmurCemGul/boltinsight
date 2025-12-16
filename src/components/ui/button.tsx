@@ -1,8 +1,9 @@
 'use client';
 
-import { forwardRef, type ButtonHTMLAttributes, type CSSProperties, useState, useEffect } from 'react';
+import { forwardRef, type ButtonHTMLAttributes, type CSSProperties, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { buttonSizes, buttonVariants, borderRadius, motion } from '@/lib/design-tokens';
+import { useThemeMode } from '@/hooks';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';
@@ -12,26 +13,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'default', size = 'md', style, onMouseEnter, onMouseLeave, ...props }, ref) => {
     const [isHovered, setIsHovered] = useState(false);
-    const [isDark, setIsDark] = useState(false);
-
-    // Check for dark mode
-    useEffect(() => {
-      const checkDarkMode = () => {
-        setIsDark(document.documentElement.classList.contains('dark'));
-      };
-      checkDarkMode();
-
-      // Watch for dark mode changes
-      const observer = new MutationObserver(checkDarkMode);
-      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-      return () => observer.disconnect();
-    }, []);
+    const mode = useThemeMode();
 
     // Get variant colors (default and primary use the same)
     const variantKey = variant === 'default' ? 'primary' : variant;
     const variantColors = buttonVariants[variantKey as keyof typeof buttonVariants];
-    const mode = isDark ? 'dark' : 'light';
 
     // Get size values
     const sizeKey = size === 'icon' ? 'md' : size;

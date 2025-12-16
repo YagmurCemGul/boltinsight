@@ -2,8 +2,8 @@
 
 import { cn } from '@/lib/utils';
 import { statusColors, borderRadius } from '@/lib/design-tokens';
+import { useThemeMode } from '@/hooks';
 import type { HTMLAttributes, CSSProperties } from 'react';
-import { useState, useEffect } from 'react';
 
 type StatusType = 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted';
 
@@ -13,23 +13,7 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 export function Badge({ className, variant = 'custom', status, style, ...props }: BadgeProps) {
-  const [isDark, setIsDark] = useState(false);
-
-  // Check for dark mode
-  useEffect(() => {
-    const checkDarkMode = () => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    };
-    checkDarkMode();
-
-    // Watch for dark mode changes
-    const observer = new MutationObserver(checkDarkMode);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-    return () => observer.disconnect();
-  }, []);
-
-  const mode = isDark ? 'dark' : 'light';
+  const mode = useThemeMode();
 
   // Build dynamic styles based on status or variant
   let dynamicStyles: CSSProperties = {

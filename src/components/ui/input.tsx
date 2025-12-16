@@ -1,8 +1,9 @@
 'use client';
 
-import { forwardRef, type InputHTMLAttributes, type CSSProperties, useState, useEffect } from 'react';
+import { forwardRef, type InputHTMLAttributes, type CSSProperties, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { inputSizes, inputVariants, borderRadius, motion, glowEffects } from '@/lib/design-tokens';
+import { useThemeMode } from '@/hooks';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   inputSize?: 'sm' | 'md' | 'lg';
@@ -12,23 +13,8 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, inputSize = 'md', error = false, style, onFocus, onBlur, ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [isDark, setIsDark] = useState(false);
+    const mode = useThemeMode();
 
-    // Check for dark mode
-    useEffect(() => {
-      const checkDarkMode = () => {
-        setIsDark(document.documentElement.classList.contains('dark'));
-      };
-      checkDarkMode();
-
-      // Watch for dark mode changes
-      const observer = new MutationObserver(checkDarkMode);
-      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-      return () => observer.disconnect();
-    }, []);
-
-    const mode = isDark ? 'dark' : 'light';
     const variant = error ? 'error' : 'default';
     const sizeValues = inputSizes[inputSize];
     const variantColors = inputVariants[variant][mode];

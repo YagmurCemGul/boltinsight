@@ -1,57 +1,120 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import type { HTMLAttributes } from 'react';
+import { cardVariants, borderRadius, spacing, typography } from '@/lib/design-tokens';
+import { useThemeMode } from '@/hooks';
+import type { HTMLAttributes, CSSProperties } from 'react';
 
-export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+export function Card({ className, style, ...props }: HTMLAttributes<HTMLDivElement>) {
+  const mode = useThemeMode();
+  const colors = cardVariants.default[mode];
+
+  const cardStyles: CSSProperties = {
+    backgroundColor: colors.background,
+    borderColor: colors.border,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderRadius: borderRadius.xl,
+    boxShadow: colors.shadow,
+    ...style,
+  };
+
   return (
     <div
-      className={cn(
-        'rounded-xl border border-gray-200 bg-white shadow-sm',
-        className
-      )}
+      className={cn('transition-shadow', className)}
+      style={cardStyles}
       {...props}
     />
   );
 }
 
-export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+export function CardHeader({ className, style, ...props }: HTMLAttributes<HTMLDivElement>) {
+  const headerStyles: CSSProperties = {
+    padding: spacing[6],
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing[1.5],
+    ...style,
+  };
+
   return (
     <div
-      className={cn('flex flex-col space-y-1.5 p-6', className)}
+      className={className}
+      style={headerStyles}
       {...props}
     />
   );
 }
 
-export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
+export function CardTitle({ className, style, ...props }: HTMLAttributes<HTMLHeadingElement>) {
+  const mode = useThemeMode();
+  const colors = cardVariants.default[mode];
+
+  const titleStyles: CSSProperties = {
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.semibold,
+    lineHeight: typography.lineHeight.none,
+    letterSpacing: typography.letterSpacing.tight,
+    color: colors.text,
+    ...style,
+  };
+
   return (
     <h3
-      className={cn('text-lg font-semibold leading-none tracking-tight', className)}
+      className={className}
+      style={titleStyles}
       {...props}
     />
   );
 }
 
-export function CardDescription({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) {
+export function CardDescription({ className, style, ...props }: HTMLAttributes<HTMLParagraphElement>) {
+  const mode = useThemeMode();
+
+  const descStyles: CSSProperties = {
+    fontSize: typography.fontSize.sm,
+    color: mode === 'dark' ? '#94a3b8' : '#6b7280',
+    ...style,
+  };
+
   return (
     <p
-      className={cn('text-sm text-gray-500', className)}
+      className={className}
+      style={descStyles}
       {...props}
     />
   );
 }
 
-export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+export function CardContent({ className, style, ...props }: HTMLAttributes<HTMLDivElement>) {
+  const contentStyles: CSSProperties = {
+    padding: spacing[6],
+    paddingTop: '0',
+    ...style,
+  };
+
   return (
-    <div className={cn('p-6 pt-0', className)} {...props} />
+    <div
+      className={className}
+      style={contentStyles}
+      {...props}
+    />
   );
 }
 
-export function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+export function CardFooter({ className, style, ...props }: HTMLAttributes<HTMLDivElement>) {
+  const footerStyles: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    padding: spacing[6],
+    paddingTop: '0',
+    ...style,
+  };
+
   return (
     <div
-      className={cn('flex items-center p-6 pt-0', className)}
+      className={className}
+      style={footerStyles}
       {...props}
     />
   );
