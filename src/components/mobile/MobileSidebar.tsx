@@ -16,7 +16,6 @@ import {
   Sun,
   Bell,
   LogOut,
-  Zap,
   Users,
   Percent,
   ClipboardCheck,
@@ -34,7 +33,7 @@ import { formatDate, truncateText, getStatusColor } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { useThemeStore } from '@/lib/theme';
-import { Modal, Button, Select, toast, Dropdown, DropdownItem, DropdownSeparator, MoveToProjectModal, Input } from '@/components/ui';
+import { Modal, Button, Select, toast, Dropdown, DropdownItem, DropdownSeparator, MoveToProjectModal, Input, BoltLogoIcon } from '@/components/ui';
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -143,8 +142,8 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-4">
             <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#5B50BD]">
-                <Zap className="h-6 w-6 text-white" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#5B50BD] p-1.5">
+                <BoltLogoIcon color="white" />
               </div>
               <span className="text-xl font-bold text-[#5B50BD]">BoltInsight</span>
             </div>

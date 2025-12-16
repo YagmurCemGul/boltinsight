@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Menu, Bell, Zap, ArrowLeft, Search, MoreVertical, X, Check, FileText, MessageSquare, UserCheck } from 'lucide-react';
+import { Menu, Bell, ArrowLeft, Search, MoreVertical, X, Check, FileText, MessageSquare, UserCheck } from 'lucide-react';
+import { BoltLogoIcon } from '@/components/ui';
 import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { Modal, Button } from '@/components/ui';
@@ -130,8 +131,8 @@ export function MobileHeader({
 
           {!showBack && activeSection === 'new-proposal' && (
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#5B50BD]">
-                <Zap className="h-4 w-4 text-white" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#5B50BD] p-1">
+                <BoltLogoIcon color="white" />
               </div>
               <span className="font-bold text-[#5B50BD]">BoltInsight</span>
             </div>
