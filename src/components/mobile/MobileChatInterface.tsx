@@ -15,12 +15,12 @@ import { useAppStore } from '@/lib/store';
 import type { ChatMessage, Proposal } from '@/types';
 
 const TEMPLATES = [
-  { id: 'concept', name: 'Concept Test', emoji: '💡' },
-  { id: 'brand', name: 'Brand Tracking', emoji: '📊' },
-  { id: 'segmentation', name: 'Segmentation', emoji: '👥' },
-  { id: 'ua', name: 'U&A Study', emoji: '🔍' },
-  { id: 'ad', name: 'Ad Testing', emoji: '📺' },
-  { id: 'pricing', name: 'Pricing Research', emoji: '💰' },
+  { id: 'concept', name: 'Concept Test' },
+  { id: 'brand', name: 'Brand Tracking' },
+  { id: 'segmentation', name: 'Segmentation' },
+  { id: 'ua', name: 'U&A Study' },
+  { id: 'ad', name: 'Ad Testing' },
+  { id: 'pricing', name: 'Pricing Research' },
 ];
 
 interface MobileChatInterfaceProps {
@@ -133,9 +133,8 @@ export function MobileChatInterface({ onSwitchToEditor }: MobileChatInterfacePro
                 <button
                   key={template.id}
                   onClick={() => handleTemplateSelect(template)}
-                  className="flex items-center gap-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 text-left transition-colors active:bg-gray-50 dark:active:bg-gray-700"
+                  className="flex items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 text-center transition-colors active:bg-gray-50 dark:active:bg-gray-700"
                 >
-                  <span className="text-xl">{template.emoji}</span>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {template.name}
                   </span>
@@ -234,7 +233,7 @@ export function MobileChatInterface({ onSwitchToEditor }: MobileChatInterfacePro
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 pb-20">
+      <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3">
         <div className="flex items-end gap-2">
           <button className="shrink-0 rounded-full p-2 text-gray-500 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800">
             <Paperclip className="h-5 w-5" />

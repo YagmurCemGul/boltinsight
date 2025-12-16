@@ -66,7 +66,7 @@ const SECTIONS: Section[] = [
   {
     id: 'businessObjectives',
     label: '2. Business Objectives',
-    icon: Target,
+    icon: TrendingUp,
     description: 'Short bullet list (marketing goals)',
     fields: [{ key: 'businessObjectives', label: 'Business Objectives', required: false, isArray: true }],
   },

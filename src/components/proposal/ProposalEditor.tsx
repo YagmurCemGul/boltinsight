@@ -366,52 +366,6 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
 
   return (
     <div className="flex h-full min-w-0 overflow-hidden">
-      {/* Left Panel - Content Sections Navigation */}
-      <div className="w-48 flex-shrink-0 border-r border-gray-200 bg-gray-50 overflow-y-auto hidden md:block">
-        <div className="p-4">
-          <h3 className="mb-2 text-sm font-medium text-gray-700">Proposal Sections</h3>
-          <div className="mb-4 h-2 rounded-full bg-gray-200">
-            <div
-              className="h-full rounded-full bg-blue-600 transition-all"
-              style={{ width: `${getSectionCompletion()}%` }}
-            />
-          </div>
-          <p className="mb-4 text-xs text-gray-500">{getSectionCompletion()}% complete</p>
-        </div>
-
-        <nav className="space-y-1 px-2">
-          {SECTION_CONFIG.map((section) => {
-            const value = content[section.id as keyof ProposalContent];
-            const isComplete = Array.isArray(value) ? value.length > 0 : !!value;
-
-            return (
-              <button
-                key={section.id}
-                onClick={() => setActiveSection(section.id)}
-                className={cn(
-                  'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors',
-                  activeSection === section.id
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-100'
-                )}
-              >
-                <section.icon className="h-4 w-4" />
-                <span className="flex-1 text-left">{section.label}</span>
-                {section.required && (
-                  <span
-                    className={cn(
-                      'h-2 w-2 rounded-full',
-                      isComplete ? 'bg-green-500' : 'bg-red-400'
-                    )}
-                  />
-                )}
-                <ChevronRight className="h-4 w-4 opacity-50" />
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         {/* Header Actions */}
