@@ -164,7 +164,11 @@ export function MobileSearch({ mode }: MobileSearchProps) {
         ) : (
           <div className="space-y-3">
             {filteredProposals.map((proposal) => (
-              <Card key={proposal.id} className="overflow-hidden">
+              <Card
+                key={proposal.id}
+                className="overflow-hidden cursor-pointer active:bg-gray-50 dark:active:bg-gray-800 transition-colors"
+                onClick={() => handleViewProposal(proposal)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">
@@ -196,13 +200,10 @@ export function MobileSearch({ mode }: MobileSearchProps) {
                           <span>•</span>
                           <span>{formatDate(proposal.updatedAt)}</span>
                         </div>
-                        <button
-                          onClick={() => handleViewProposal(proposal)}
-                          className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 font-medium"
-                        >
+                        <span className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 font-medium">
                           <Eye className="h-3 w-3" />
                           View
-                        </button>
+                        </span>
                       </div>
                     </div>
                   </div>

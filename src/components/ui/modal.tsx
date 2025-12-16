@@ -34,14 +34,14 @@ export function Modal({ isOpen, onClose, title, children, className, size = 'md'
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center">
       <div
         className="fixed inset-0 bg-black/50 transition-opacity"
         onClick={onClose}
       />
       <div
         className={cn(
-          'relative z-50 w-full rounded-xl bg-white shadow-xl',
+          'relative z-[80] w-full rounded-xl bg-white dark:bg-gray-800 shadow-xl mx-4',
           {
             'max-w-sm': size === 'sm',
             'max-w-md': size === 'md',

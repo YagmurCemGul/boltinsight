@@ -20,9 +20,11 @@ import {
   Users,
   Percent,
   ClipboardCheck,
-  Layers,
   ChevronRight,
+  FileText,
+  ChevronDown,
 } from 'lucide-react';
+import { formatDate, truncateText, getStatusColor } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { useThemeStore } from '@/lib/theme';
@@ -44,18 +46,29 @@ const menuItems = [
   { id: 'feasibility', label: 'Feasibility Check', icon: ClipboardCheck },
   { id: 'divider-2', type: 'divider' },
   { id: 'library', label: 'Library', icon: Library },
-  { id: 'architecture', label: 'Architecture', icon: Layers },
 ];
 
 export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
-  const { activeSection, setActiveSection, currentUser, projects, setLoggedIn } = useAppStore();
+  const { activeSection, setActiveSection, currentUser, projects, proposals, setCurrentProposal, setLoggedIn } = useAppStore();
   const { isDarkMode, toggleDarkMode } = useThemeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
+  // Get recent proposals for history
+  const recentProposals = proposals
+    .filter((p) => p.status !== 'deleted')
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, 10);
+
   const handleItemClick = (id: string) => {
     setActiveSection(id);
+    onClose();
+  };
+
+  const handleProposalClick = (proposal: typeof proposals[0]) => {
+    setCurrentProposal(proposal);
+    setActiveSection('view-proposal');
     onClose();
   };
 
@@ -64,7 +77,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 transition-opacity"
+          className="fixed inset-0 z-[60] bg-black/50 transition-opacity"
           onClick={onClose}
         />
       )}
@@ -72,7 +85,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-0 z-50 h-full w-[85%] max-w-[320px] transform bg-white dark:bg-gray-900 transition-transform duration-300 ease-out shadow-xl',
+          'fixed left-0 top-0 z-[70] h-full w-[85%] max-w-[320px] transform bg-white dark:bg-gray-900 transition-transform duration-300 ease-out shadow-xl',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -129,10 +142,10 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <FolderKanban className="h-5 w-5" />
                 <span className="font-medium">Projects</span>
               </div>
-              <ChevronRight
+              <ChevronDown
                 className={cn(
                   'h-5 w-5 transition-transform',
-                  showProjects && 'rotate-90'
+                  !showProjects && '-rotate-90'
                 )}
               />
             </button>
@@ -169,13 +182,50 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <History className="h-5 w-5" />
                 <span className="font-medium">History</span>
               </div>
-              <ChevronRight
+              <ChevronDown
                 className={cn(
                   'h-5 w-5 transition-transform',
-                  showHistory && 'rotate-90'
+                  !showHistory && '-rotate-90'
                 )}
               />
             </button>
+
+            {showHistory && (
+              <div className="ml-4 mt-1 space-y-1 max-h-60 overflow-y-auto">
+                {recentProposals.length === 0 ? (
+                  <p className="py-4 text-center text-xs text-gray-400">No proposals yet</p>
+                ) : (
+                  recentProposals.map((proposal) => (
+                    <button
+                      key={proposal.id}
+                      onClick={() => handleProposalClick(proposal)}
+                      className="flex w-full items-start gap-2 rounded-lg px-3 py-2 text-left text-gray-600 dark:text-gray-400 active:bg-gray-100 dark:active:bg-gray-800"
+                    >
+                      <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                            {proposal.code || 'Draft'}
+                          </span>
+                          <span className={cn(
+                            'rounded px-1.5 py-0.5 text-[10px]',
+                            getStatusColor(proposal.status)
+                          )}>
+                            {proposal.status.replace('_', ' ')}
+                          </span>
+                        </div>
+                        <p className="truncate text-sm text-gray-700 dark:text-gray-300">
+                          {truncateText(proposal.content.title || 'Untitled', 25)}
+                        </p>
+                        <p className="text-[10px] text-gray-400">
+                          {formatDate(proposal.updatedAt)}
+                        </p>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </nav>
 
           {/* Footer - User Profile */}

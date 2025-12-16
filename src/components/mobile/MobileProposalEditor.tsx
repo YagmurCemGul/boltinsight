@@ -360,8 +360,92 @@ export function MobileProposalEditor() {
                   )}
 
                   {section.id === 'markets' && (
-                    <div className="text-sm text-gray-500 dark:text-gray-400 py-4 text-center">
-                      Markets and quotas management available in desktop view
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Markets
+                        </label>
+                        <div className="space-y-3">
+                          {(currentProposal.content.markets || []).map((market, i) => (
+                            <div key={i} className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {market.country || 'New Market'}
+                                </span>
+                                <button
+                                  onClick={() => {
+                                    const markets = [...(currentProposal.content.markets || [])];
+                                    markets.splice(i, 1);
+                                    updateContent('markets', markets);
+                                  }}
+                                  className="p-1 text-red-500"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <Input
+                                  value={market.country || ''}
+                                  onChange={(e) => {
+                                    const markets = [...(currentProposal.content.markets || [])];
+                                    markets[i] = { ...markets[i], country: e.target.value };
+                                    updateContent('markets', markets);
+                                  }}
+                                  placeholder="Country"
+                                  className="text-sm"
+                                />
+                                <Input
+                                  value={market.language || ''}
+                                  onChange={(e) => {
+                                    const markets = [...(currentProposal.content.markets || [])];
+                                    markets[i] = { ...markets[i], language: e.target.value };
+                                    updateContent('markets', markets);
+                                  }}
+                                  placeholder="Language"
+                                  className="text-sm"
+                                />
+                              </div>
+                              <div className="mt-2">
+                                <Input
+                                  type="number"
+                                  value={market.sampleSize || ''}
+                                  onChange={(e) => {
+                                    const markets = [...(currentProposal.content.markets || [])];
+                                    markets[i] = { ...markets[i], sampleSize: parseInt(e.target.value) || 0 };
+                                    updateContent('markets', markets);
+                                  }}
+                                  placeholder="Sample Size"
+                                  className="text-sm"
+                                />
+                              </div>
+                            </div>
+                          ))}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const markets = [...(currentProposal.content.markets || [])];
+                              markets.push({ country: '', language: '', sampleSize: 0 });
+                              updateContent('markets', markets);
+                            }}
+                            className="w-full"
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Market
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Quotas
+                        </label>
+                        <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-3">
+                          <p className="text-sm text-blue-700 dark:text-blue-300">
+                            Quota recommendations will be generated based on your target definition and markets.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )}
 
