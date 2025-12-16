@@ -95,15 +95,12 @@ export function calculateRequiredSampleSize(
 }
 
 export function getStatusColor(status: string): string {
-  const colors: Record<string, string> = {
-    draft: 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-white',
-    pending_approval: 'bg-amber-100 text-amber-800 dark:bg-amber-600 dark:text-white',
-    approved: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-600 dark:text-white',
-    rejected: 'bg-red-100 text-red-800 dark:bg-red-600 dark:text-white',
-    on_hold: 'bg-slate-200 text-slate-800 dark:bg-slate-600 dark:text-white',
-    deleted: 'bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-white',
-  };
-  return colors[status] || 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-white';
+  // CSS classes defined in globals.css for proper dark mode support
+  const validStatuses = ['draft', 'pending_approval', 'approved', 'rejected', 'on_hold', 'deleted'];
+  if (validStatuses.includes(status)) {
+    return `status-${status}`;
+  }
+  return 'status-draft';
 }
 
 export function getStatusLabel(status: string): string {

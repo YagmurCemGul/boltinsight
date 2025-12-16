@@ -1,6 +1,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 
+/* ========== STATUS BADGE COLORS ========== */
+/* Light Mode */
+.status-draft {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+.status-pending_approval {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+.status-approved {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+.status-on_hold {
+  background-color: #e2e8f0;
+  color: #334155;
+}
+.status-deleted {
+  background-color: #e5e7eb;
+  color: #6b7280;
+}
+
+/* Dark Mode */
+.dark .status-draft {
+  background-color: #4b5563;
+  color: #ffffff;
+}
+.dark .status-pending_approval {
+  background-color: #d97706;
+  color: #ffffff;
+}
+.dark .status-approved {
+  background-color: #059669;
+  color: #ffffff;
+}
+.dark .status-rejected {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+.dark .status-on_hold {
+  background-color: #475569;
+  color: #ffffff;
+}
+.dark .status-deleted {
+  background-color: #4b5563;
+  color: #ffffff;
+}
+
 /* Bolt Brand Colors */
 :root {
   /* Brand Primary - Purple */
