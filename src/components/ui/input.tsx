@@ -1,23 +1,63 @@
 'use client';
 
-import { forwardRef, type InputHTMLAttributes } from 'react';
+import { forwardRef, type InputHTMLAttributes, type CSSProperties, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { inputSizes, inputVariants, borderRadius, motion, glowEffects } from '@/lib/design-tokens';
+import { useThemeMode } from '@/hooks';
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {}
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  inputSize?: 'sm' | 'md' | 'lg';
+  error?: boolean;
+}
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, inputSize = 'md', error = false, style, onFocus, onBlur, ...props }, ref) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const mode = useThemeMode();
+
+    const variant = error ? 'error' : 'default';
+    const sizeValues = inputSizes[inputSize];
+    const variantColors = inputVariants[variant][mode];
+
+    // Build dynamic styles
+    const dynamicStyles: CSSProperties = {
+      height: sizeValues.height,
+      paddingLeft: sizeValues.paddingX,
+      paddingRight: sizeValues.paddingX,
+      fontSize: sizeValues.fontSize,
+      backgroundColor: variantColors.background,
+      color: variantColors.text,
+      borderWidth: '1px',
+      borderStyle: 'solid',
+      borderColor: isFocused ? variantColors.borderFocus : variantColors.border,
+      borderRadius: borderRadius.lg,
+      transition: motion.transition.colors,
+      boxShadow: isFocused ? (error ? glowEffects.focusError : glowEffects.focusPrimary) : 'none',
+      ...style,
+    };
+
+    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(true);
+      onFocus?.(e);
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(false);
+      onBlur?.(e);
+    };
+
     return (
       <input
         type={type}
         className={cn(
-          'flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm',
-          'placeholder:text-gray-400',
-          'focus:outline-none focus:ring-2 focus:ring-[#5B50BD] focus:border-transparent',
+          'flex w-full',
           'disabled:cursor-not-allowed disabled:opacity-50',
           className
         )}
+        style={dynamicStyles}
         ref={ref}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         {...props}
       />
     );

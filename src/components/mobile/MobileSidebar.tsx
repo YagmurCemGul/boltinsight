@@ -29,11 +29,11 @@ import {
   BellRing,
   HelpCircle,
 } from 'lucide-react';
-import { formatDate, truncateText, getStatusColor } from '@/lib/utils';
+import { formatDate, truncateText, getStatusLabel } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { useThemeStore } from '@/lib/theme';
-import { Modal, Button, Select, toast, Dropdown, DropdownItem, DropdownSeparator, MoveToProjectModal, Input, BoltLogo } from '@/components/ui';
+import { Modal, Button, Select, toast, Dropdown, DropdownItem, DropdownSeparator, MoveToProjectModal, Input, BoltLogo, Badge } from '@/components/ui';
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -293,12 +293,9 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                             <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">
                               {proposal.code || 'Draft'}
                             </span>
-                            <span className={cn(
-                              'rounded px-1.5 py-0.5 text-[10px]',
-                              getStatusColor(proposal.status)
-                            )}>
-                              {proposal.status.replace('_', ' ')}
-                            </span>
+                            <Badge status={proposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'} className="text-[10px] px-1.5 py-0.5">
+                              {getStatusLabel(proposal.status)}
+                            </Badge>
                           </div>
                           <p className="truncate text-sm text-gray-700 dark:text-gray-300">
                             {truncateText(proposal.content.title || 'Untitled', 20)}

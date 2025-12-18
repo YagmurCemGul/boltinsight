@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { create } from 'zustand';
+import { toastVariants, borderRadius, typography, zIndex, motion } from '@/lib/design-tokens';
+import { useThemeMode } from '@/hooks';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -67,22 +69,10 @@ const icons = {
   info: Info,
 };
 
-const styles = {
-  success: 'bg-green-50 border-green-200 text-green-800',
-  error: 'bg-red-50 border-red-200 text-red-800',
-  warning: 'bg-amber-50 border-amber-200 text-amber-800',
-  info: 'bg-[#EDE9F9] border-[#C8C4E9] text-[#5B50BD] dark:bg-[#231E51] dark:border-[#5B50BD] dark:text-[#918AD3]',
-};
-
-const iconStyles = {
-  success: 'text-green-500',
-  error: 'text-red-500',
-  warning: 'text-amber-500',
-  info: 'text-[#5B50BD] dark:text-[#918AD3]',
-};
-
 function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   const [isExiting, setIsExiting] = useState(false);
+  const mode = useThemeMode();
+  const colors = toastVariants[toast.type][mode];
   const Icon = icons[toast.type];
 
   const handleClose = () => {
@@ -90,26 +80,64 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
     setTimeout(onClose, 200);
   };
 
+  const toastStyles: CSSProperties = {
+    display: 'flex',
+    width: '100%',
+    maxWidth: '24rem',
+    alignItems: 'flex-start',
+    gap: '0.75rem',
+    borderRadius: borderRadius.lg,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+    padding: '1rem',
+    boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    transition: motion.transition.all,
+    transform: isExiting ? 'translateX(100%)' : 'translateX(0)',
+    opacity: isExiting ? 0 : 1,
+    pointerEvents: 'auto' as const,
+  };
+
+  const titleStyles: CSSProperties = {
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.medium,
+    color: colors.titleColor,
+  };
+
+  const messageStyles: CSSProperties = {
+    marginTop: '0.25rem',
+    fontSize: typography.fontSize.xs,
+    color: colors.messageColor,
+    opacity: 0.8,
+  };
+
   return (
-    <div
-      className={cn(
-        'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-lg border p-4 shadow-lg transition-all duration-200',
-        styles[toast.type],
-        isExiting ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100'
-      )}
-    >
-      <Icon className={cn('h-5 w-5 flex-shrink-0', iconStyles[toast.type])} />
-      <div className="flex-1">
-        <p className="text-sm font-medium">{toast.title}</p>
-        {toast.message && (
-          <p className="mt-1 text-xs opacity-80">{toast.message}</p>
-        )}
+    <div style={toastStyles}>
+      <Icon
+        style={{
+          width: '1.25rem',
+          height: '1.25rem',
+          flexShrink: 0,
+          color: colors.iconColor,
+        }}
+      />
+      <div style={{ flex: 1 }}>
+        <p style={titleStyles}>{toast.title}</p>
+        {toast.message && <p style={messageStyles}>{toast.message}</p>}
       </div>
       <button
         onClick={handleClose}
-        className="flex-shrink-0 rounded p-1 opacity-60 hover:opacity-100 transition-opacity"
+        style={{
+          flexShrink: 0,
+          padding: '0.25rem',
+          borderRadius: borderRadius.default,
+          opacity: 0.6,
+          color: colors.titleColor,
+        }}
+        className="hover:opacity-100 transition-opacity"
       >
-        <X className="h-4 w-4" />
+        <X style={{ width: '1rem', height: '1rem' }} />
       </button>
     </div>
   );
@@ -120,8 +148,19 @@ export function ToastContainer() {
 
   if (toasts.length === 0) return null;
 
+  const containerStyles: CSSProperties = {
+    position: 'fixed',
+    bottom: '1rem',
+    right: '1rem',
+    zIndex: zIndex.toast,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.5rem',
+    pointerEvents: 'none',
+  };
+
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+    <div style={containerStyles}>
       {toasts.map((t) => (
         <ToastItem key={t.id} toast={t} onClose={() => removeToast(t.id)} />
       ))}

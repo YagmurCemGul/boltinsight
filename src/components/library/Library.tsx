@@ -13,7 +13,7 @@ import {
   Globe,
   Tag,
 } from 'lucide-react';
-import { cn, formatDate, getStatusColor } from '@/lib/utils';
+import { cn, formatDate, getStatusLabel } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import {
   Button,
@@ -626,8 +626,8 @@ function ProposalCard({ proposal, onView }: { proposal: Proposal; onView: () => 
               {proposal.code && (
                 <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">{proposal.code}</span>
               )}
-              <Badge className={cn('text-xs', getStatusColor(proposal.status))}>
-                {proposal.status.replace('_', ' ')}
+              <Badge status={proposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'} className="text-xs">
+                {getStatusLabel(proposal.status)}
               </Badge>
             </div>
             <h3 className="font-medium text-gray-900 truncate">

@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, Calendar, Tag, X, User, Users, UserCheck, MoreVertical, Copy, Trash2, Eye, FileText, FolderInput } from 'lucide-react';
 import { Input, Badge, Select, Dropdown, DropdownItem, DropdownSeparator, toast, MoveToProjectModal } from '@/components/ui';
 import { useAppStore } from '@/lib/store';
-import { cn, formatDate, getStatusColor, getStatusLabel, truncateText } from '@/lib/utils';
+import { cn, formatDate, getStatusLabel, truncateText } from '@/lib/utils';
 import type { ProposalStatus, Proposal } from '@/types';
 
 interface SearchSectionProps {
@@ -262,9 +262,9 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
                       <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">
                         {proposal.code || 'Draft'}
                       </span>
-                      <span className={cn('rounded px-1.5 py-0.5 text-[10px] whitespace-nowrap', getStatusColor(proposal.status))}>
+                      <Badge status={proposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'} className="text-[10px] px-1.5 py-0.5 whitespace-nowrap">
                         {getStatusLabel(proposal.status)}
-                      </span>
+                      </Badge>
                     </div>
                     <p className="truncate text-sm text-gray-700 dark:text-gray-300 mt-0.5">
                       {truncateText(proposal.content.title || 'Untitled', 25)}

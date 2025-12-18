@@ -22,7 +22,7 @@ import {
   Building2,
   MessageSquare,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, getStatusLabel } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { Button, Input, Textarea, Select, Badge, Modal, toast } from '@/components/ui';
 import type { Proposal, Market, Quota } from '@/types';
@@ -127,14 +127,6 @@ export function MobileProposalEditor() {
     updateContent(field, current.map((item, i) => (i === index ? value : item)));
   };
 
-  const statusColor: Record<string, string> = {
-    draft: 'bg-gray-100 text-gray-700',
-    pending_approval: 'bg-yellow-100 text-yellow-700',
-    approved: 'bg-green-100 text-green-700',
-    rejected: 'bg-red-100 text-red-700',
-    on_hold: 'bg-orange-100 text-orange-700',
-  };
-
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
       {/* Header */}
@@ -143,8 +135,8 @@ export function MobileProposalEditor() {
           {currentProposal.code && (
             <span className="text-sm font-medium text-blue-600">{currentProposal.code}</span>
           )}
-          <Badge className={cn('text-xs', statusColor[currentProposal.status])}>
-            {currentProposal.status.replace('_', ' ')}
+          <Badge status={currentProposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'} className="text-xs">
+            {getStatusLabel(currentProposal.status)}
           </Badge>
         </div>
         <h1 className="text-lg font-semibold text-gray-900 dark:text-white truncate">

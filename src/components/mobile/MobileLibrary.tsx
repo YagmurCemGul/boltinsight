@@ -15,7 +15,7 @@ import {
   Building2,
   FolderInput,
 } from 'lucide-react';
-import { cn, formatDate } from '@/lib/utils';
+import { cn, formatDate, getStatusLabel } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { Input, Button, Badge, Card, CardContent, Tabs, TabsList, TabsTrigger, TabsContent, Modal, Select, Dropdown, DropdownItem, DropdownSeparator, toast, MoveToProjectModal } from '@/components/ui';
 import type { LibraryItem, Proposal, ProposalContent } from '@/types';
@@ -150,14 +150,6 @@ export function MobileLibrary() {
     setActiveSection('view-proposal');
   };
 
-  const statusColors: Record<string, string> = {
-    draft: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
-    pending_approval: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
-    approved: 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300',
-    rejected: 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300',
-    on_hold: 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
-  };
-
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
       {/* Search Bar */}
@@ -240,8 +232,8 @@ export function MobileLibrary() {
                                 {proposal.code}
                               </span>
                             )}
-                            <Badge className={cn('text-xs', statusColors[proposal.status])}>
-                              {proposal.status.replace('_', ' ')}
+                            <Badge status={proposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'} className="text-xs">
+                              {getStatusLabel(proposal.status)}
                             </Badge>
                           </div>
                           <h3 className="font-medium text-gray-900 dark:text-white truncate">

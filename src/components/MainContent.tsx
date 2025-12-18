@@ -9,7 +9,8 @@ import { MetaLearnings } from '@/components/meta-learnings';
 import { Calculators, DemographicDistribution, FeasibilityCheck } from '@/components/tools';
 import { Library } from '@/components/library';
 import { Architecture } from '@/components/architecture';
-import { cn, getStatusColor } from '@/lib/utils';
+import { cn, getStatusLabel } from '@/lib/utils';
+import { Badge } from '@/components/ui';
 import type { Proposal, ProposalContent } from '@/types';
 
 export function MainContent() {
@@ -271,14 +272,12 @@ function ProjectView({ projectId }: { projectId: string }) {
                 <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">
                   {proposal.code || 'Draft'}
                 </span>
-                <span
-                  className={cn(
-                    'rounded px-2 py-0.5 text-xs font-medium',
-                    getStatusColor(proposal.status)
-                  )}
+                <Badge
+                  status={proposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'}
+                  className="text-xs"
                 >
-                  {proposal.status.replace('_', ' ')}
-                </span>
+                  {getStatusLabel(proposal.status)}
+                </Badge>
               </div>
               <h3 className="font-medium text-gray-900">
                 {proposal.content.title || 'Untitled Proposal'}

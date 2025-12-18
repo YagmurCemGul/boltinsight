@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, type ReactNode, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './button';
+import { modalVariants, borderRadius, spacing, typography, zIndex } from '@/lib/design-tokens';
+import { useThemeMode } from '@/hooks';
 
 interface ModalProps {
   isOpen: boolean;
@@ -15,7 +17,17 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
+const sizeMap = {
+  sm: '24rem',   // max-w-sm
+  md: '28rem',   // max-w-md
+  lg: '32rem',   // max-w-lg
+  xl: '42rem',   // max-w-2xl
+};
+
 export function Modal({ isOpen, onClose, title, children, className, size = 'md' }: ModalProps) {
+  const mode = useThemeMode();
+  const colors = modalVariants.default[mode];
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -34,33 +46,64 @@ export function Modal({ isOpen, onClose, title, children, className, size = 'md'
 
   if (!isOpen) return null;
 
+  const overlayStyles: CSSProperties = {
+    position: 'fixed',
+    inset: 0,
+    backgroundColor: colors.overlay,
+    transition: 'opacity 0.2s',
+  };
+
+  const modalStyles: CSSProperties = {
+    position: 'relative',
+    zIndex: zIndex.modal,
+    width: '100%',
+    maxWidth: sizeMap[size],
+    margin: '0 1rem',
+    backgroundColor: colors.background,
+    borderRadius: borderRadius.xl,
+    boxShadow: colors.shadow,
+  };
+
+  const headerStyles: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottom: `1px solid ${colors.border}`,
+    padding: `${spacing[4]} ${spacing[6]}`,
+  };
+
+  const titleStyles: CSSProperties = {
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.titleText,
+  };
+
+  const contentStyles: CSSProperties = {
+    padding: spacing[6],
+  };
+
   const modalContent = (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center">
+    <div
+      className="fixed inset-0 flex items-center justify-center"
+      style={{ zIndex: zIndex.modal }}
+    >
       <div
-        className="fixed inset-0 bg-black/50 transition-opacity"
+        style={overlayStyles}
         onClick={onClose}
       />
       <div
-        className={cn(
-          'relative z-[200] w-full rounded-xl bg-white dark:bg-gray-800 shadow-xl mx-4',
-          {
-            'max-w-sm': size === 'sm',
-            'max-w-md': size === 'md',
-            'max-w-lg': size === 'lg',
-            'max-w-2xl': size === 'xl',
-          },
-          className
-        )}
+        className={cn(className)}
+        style={modalStyles}
       >
         {title && (
-          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
+          <div style={headerStyles}>
+            <h2 style={titleStyles}>{title}</h2>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="h-4 w-4" />
             </Button>
           </div>
         )}
-        <div className="p-6">{children}</div>
+        <div style={contentStyles}>{children}</div>
       </div>
     </div>
   );
