@@ -5,65 +5,49 @@ import {
   Search,
   Plus,
   FileText,
-  Eye,
-  FolderOpen,
-  Filter,
-  X,
+  ExternalLink,
+  Link2,
   MoreVertical,
-  Copy,
   Trash2,
-  Building2,
-  FolderInput,
 } from 'lucide-react';
-import { cn, formatDate, getStatusLabel } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Input, Button, Badge, Card, CardContent, Tabs, TabsList, TabsTrigger, TabsContent, Modal, Select, Dropdown, DropdownItem, DropdownSeparator, toast, MoveToProjectModal } from '@/components/ui';
-import type { LibraryItem, Proposal, ProposalContent } from '@/types';
+import { Input, Button, Badge, Card, CardContent, Modal, Select, Dropdown, DropdownItem, DropdownSeparator, toast } from '@/components/ui';
+import type { LibraryItem } from '@/types';
+
+const CATEGORY_OPTIONS = [
+  { value: 'external_link', label: 'External Link' },
+  { value: 'document', label: 'Document' },
+  { value: 'resource', label: 'Resource' },
+];
+
+const CATEGORY_ICONS: Record<string, React.ElementType> = {
+  external_link: ExternalLink,
+  document: FileText,
+  resource: Link2,
+};
 
 export function MobileLibrary() {
   const {
     libraryItems,
     addLibraryItem,
     deleteLibraryItem,
-    proposals,
-    setCurrentProposal,
-    setActiveSection,
-    deleteProposal,
-    addProposal,
-    currentUser,
   } = useAppStore();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [proposalStatusFilter, setProposalStatusFilter] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('');
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [moveModalOpen, setMoveModalOpen] = useState(false);
-  const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
   const [newItem, setNewItem] = useState({
     name: '',
     description: '',
     url: '',
-    category: 'template',
+    category: 'external_link',
     tags: '',
   });
 
-  // Filter proposals
-  const filteredProposals = proposals.filter((p) => {
-    if (p.status === 'deleted') return false;
-    if (proposalStatusFilter && p.status !== proposalStatusFilter) return false;
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        p.content.title?.toLowerCase().includes(query) ||
-        p.content.client?.toLowerCase().includes(query)
-      );
-    }
-    return true;
-  });
-
-  // Filter templates
-  const templates = libraryItems.filter((item) => {
-    if (item.category !== 'template') return false;
+  // Filter resources
+  const filteredItems = libraryItems.filter((item) => {
+    if (categoryFilter && item.category !== categoryFilter) return false;
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       return (
@@ -83,71 +67,9 @@ export function MobileLibrary() {
       category: newItem.category as LibraryItem['category'],
       tags: newItem.tags.split(',').map((t) => t.trim()).filter(Boolean),
     });
-    setNewItem({ name: '', description: '', url: '', category: 'template', tags: '' });
+    setNewItem({ name: '', description: '', url: '', category: 'external_link', tags: '' });
     setAddModalOpen(false);
-  };
-
-  const handleViewProposal = (proposal: Proposal) => {
-    setCurrentProposal(proposal);
-    setActiveSection('view-proposal');
-  };
-
-  const handleCopyProposal = (proposal: Proposal) => {
-    addProposal({
-      ...proposal,
-      status: 'draft',
-      code: undefined,
-      content: {
-        ...proposal.content,
-        title: `${proposal.content.title} (Copy)`,
-      },
-      author: currentUser,
-      sentToClient: false,
-      approvalHistory: [],
-      comments: [],
-      collaborators: [],
-    });
-    toast.success('Proposal duplicated');
-  };
-
-  const handleDeleteProposal = (proposalId: string) => {
-    deleteProposal(proposalId);
-    toast.success('Proposal deleted');
-  };
-
-  const handleMoveProposal = (proposal: Proposal) => {
-    setSelectedProposal({ id: proposal.id, title: proposal.content.title || 'Untitled' });
-    setMoveModalOpen(true);
-  };
-
-  const handleUseTemplate = (template: LibraryItem) => {
-    // Create a new proposal from template
-    const newProposal = {
-      status: 'draft' as const,
-      content: {
-        title: template.name,
-        client: '',
-        contact: '',
-        background: template.description || '',
-        businessObjectives: [],
-        researchObjectives: [],
-        burningQuestions: [],
-        targetDefinition: '',
-        sampleSize: 0,
-        markets: [],
-        quotas: [],
-        advancedAnalysis: [],
-        referenceProjects: [],
-      } as ProposalContent,
-      author: currentUser,
-      sentToClient: false,
-      approvalHistory: [],
-      comments: [],
-      collaborators: [],
-    };
-    addProposal(newProposal);
-    toast.success('Template applied to new proposal');
-    setActiveSection('view-proposal');
+    toast.success('Resource added');
   };
 
   return (
@@ -170,205 +92,100 @@ export function MobileLibrary() {
         </div>
       </div>
 
+      {/* Category Filter */}
+      <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+        <Select
+          options={[{ value: '', label: 'All Categories' }, ...CATEGORY_OPTIONS]}
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+        />
+      </div>
+
       {/* Content */}
-      <div className="flex-1 pb-24">
-        <Tabs defaultValue="proposals" className="h-full">
-          <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 px-4 pt-3">
-            <TabsList className="w-full">
-              <TabsTrigger value="proposals" className="flex-1">Proposals</TabsTrigger>
-              <TabsTrigger value="templates" className="flex-1">Templates</TabsTrigger>
-            </TabsList>
+      <div className="flex-1 overflow-y-auto px-4 py-4 pb-24">
+        {filteredItems.length === 0 ? (
+          <div className="text-center py-12">
+            <Link2 className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              No resources
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Add your first resource
+            </p>
+            <Button onClick={() => setAddModalOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Resource
+            </Button>
           </div>
-
-          <TabsContent value="proposals" className="px-4 py-4">
-            {/* Filter for Proposals */}
-            <div className="mb-4">
-              <Select
-                options={[
-                  { value: '', label: 'All Statuses' },
-                  { value: 'draft', label: 'Draft' },
-                  { value: 'pending_approval', label: 'Pending' },
-                  { value: 'approved', label: 'Approved' },
-                  { value: 'rejected', label: 'Rejected' },
-                ]}
-                value={proposalStatusFilter}
-                onChange={(e) => setProposalStatusFilter(e.target.value)}
-              />
-            </div>
-
-            {filteredProposals.length === 0 ? (
-              <div className="text-center py-12">
-                <FolderOpen className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  No proposals found
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  Create your first proposal
-                </p>
-                <Button onClick={() => setActiveSection('new-proposal')}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Proposal
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredProposals.map((proposal) => (
-                  <Card key={proposal.id} className="overflow-hidden">
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <button
-                          onClick={() => handleViewProposal(proposal)}
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400"
-                        >
-                          <FileText className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleViewProposal(proposal)}
-                          className="flex-1 min-w-0 text-left"
-                        >
-                          <div className="flex items-center gap-2 mb-1">
-                            {proposal.code && (
-                              <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                                {proposal.code}
-                              </span>
-                            )}
-                            <Badge status={proposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'} className="text-xs">
-                              {getStatusLabel(proposal.status)}
-                            </Badge>
+        ) : (
+          <div className="space-y-3">
+            {filteredItems.map((item) => {
+              const Icon = CATEGORY_ICONS[item.category] || FileText;
+              return (
+                <Card key={item.id} className="overflow-hidden">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EDE9F9] dark:bg-[#231E51] text-[#5B50BD] dark:text-[#918AD3]"
+                      >
+                        <Icon className="h-5 w-5" />
+                      </a>
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 min-w-0"
+                      >
+                        <h3 className="font-medium text-gray-900 dark:text-white">
+                          {item.name}
+                        </h3>
+                        {item.description && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">
+                            {item.description}
+                          </p>
+                        )}
+                        {item.tags && item.tags.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {item.tags.slice(0, 3).map((tag) => (
+                              <Badge key={tag} variant="default" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
                           </div>
-                          <h3 className="font-medium text-gray-900 dark:text-white truncate">
-                            {proposal.content.title || 'Untitled'}
-                          </h3>
-                          {proposal.content.client && (
-                            <div className="flex items-center gap-1 mt-1 text-sm text-gray-500 dark:text-gray-400">
-                              <Building2 className="h-3 w-3" />
-                              <span className="truncate">{proposal.content.client}</span>
-                            </div>
-                          )}
-                          <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
-                            <span>{proposal.author.name}</span>
-                            <span>•</span>
-                            <span>{formatDate(proposal.updatedAt)}</span>
-                          </div>
-                        </button>
-                        <Dropdown
-                          trigger={
-                            <button className="flex-shrink-0 rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
-                              <MoreVertical className="h-5 w-5" />
-                            </button>
-                          }
-                          align="right"
+                        )}
+                        <p className="text-xs text-gray-400 mt-2">
+                          Added {formatDate(item.createdAt)}
+                        </p>
+                      </a>
+                      <Dropdown
+                        trigger={
+                          <button className="flex-shrink-0 rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <MoreVertical className="h-5 w-5" />
+                          </button>
+                        }
+                        align="right"
+                      >
+                        <DropdownItem
+                          variant="destructive"
+                          onClick={() => {
+                            deleteLibraryItem(item.id);
+                            toast.success('Resource deleted');
+                          }}
                         >
-                          <DropdownItem onClick={() => handleCopyProposal(proposal)}>
-                            <Copy className="mr-2 h-4 w-4" />
-                            Duplicate
-                          </DropdownItem>
-                          <DropdownItem onClick={() => handleMoveProposal(proposal)}>
-                            <FolderInput className="mr-2 h-4 w-4" />
-                            Move
-                          </DropdownItem>
-                          <DropdownSeparator />
-                          <DropdownItem
-                            variant="destructive"
-                            onClick={() => handleDeleteProposal(proposal.id)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownItem>
-                        </Dropdown>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="templates" className="px-4 py-4">
-            {templates.length === 0 ? (
-              <div className="text-center py-12">
-                <FileText className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  No templates
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  Add templates to reuse
-                </p>
-                <Button onClick={() => setAddModalOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Template
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {templates.map((template) => (
-                  <Card key={template.id} className="overflow-hidden">
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <button
-                          onClick={() => handleUseTemplate(template)}
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400"
-                        >
-                          <FileText className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleUseTemplate(template)}
-                          className="flex-1 min-w-0 text-left"
-                        >
-                          <h3 className="font-medium text-gray-900 dark:text-white">
-                            {template.name}
-                          </h3>
-                          {template.description && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">
-                              {template.description}
-                            </p>
-                          )}
-                          {template.tags && template.tags.length > 0 && (
-                            <div className="mt-2 flex flex-wrap gap-1">
-                              {template.tags.slice(0, 3).map((tag) => (
-                                <Badge key={tag} variant="default" className="text-xs">
-                                  {tag}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
-                        </button>
-                        <Dropdown
-                          trigger={
-                            <button className="flex-shrink-0 rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
-                              <MoreVertical className="h-5 w-5" />
-                            </button>
-                          }
-                          align="right"
-                        >
-                          <DropdownItem onClick={() => handleUseTemplate(template)}>
-                            <Copy className="mr-2 h-4 w-4" />
-                            Duplicate
-                          </DropdownItem>
-                          <DropdownItem onClick={() => toast.info('Move to folder coming soon')}>
-                            <FolderInput className="mr-2 h-4 w-4" />
-                            Move
-                          </DropdownItem>
-                          <DropdownSeparator />
-                          <DropdownItem
-                            variant="destructive"
-                            onClick={() => {
-                              deleteLibraryItem(template.id);
-                              toast.success('Template deleted');
-                            }}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownItem>
-                        </Dropdown>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownItem>
+                      </Dropdown>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Add Modal */}
@@ -386,7 +203,7 @@ export function MobileLibrary() {
             <Input
               value={newItem.name}
               onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-              placeholder="Template name"
+              placeholder="Resource name"
             />
           </div>
 
@@ -414,6 +231,17 @@ export function MobileLibrary() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Category
+            </label>
+            <Select
+              options={CATEGORY_OPTIONS}
+              value={newItem.category}
+              onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Tags
             </label>
             <Input
@@ -433,19 +261,6 @@ export function MobileLibrary() {
           </div>
         </div>
       </Modal>
-
-      {/* Move to Project Modal */}
-      {selectedProposal && (
-        <MoveToProjectModal
-          isOpen={moveModalOpen}
-          onClose={() => {
-            setMoveModalOpen(false);
-            setSelectedProposal(null);
-          }}
-          proposalId={selectedProposal.id}
-          proposalTitle={selectedProposal.title}
-        />
-      )}
     </div>
   );
 }

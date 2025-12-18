@@ -7,10 +7,10 @@ import {
   FileText,
   Search,
   Trash2,
-  FolderOpen,
-  Eye,
+  ExternalLink,
+  Link2,
 } from 'lucide-react';
-import { cn, formatDate, getStatusLabel } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import {
   Button,
@@ -18,31 +18,28 @@ import {
   Select,
   Modal,
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   Badge,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
 } from '@/components/ui';
-import type { LibraryItem, Proposal } from '@/types';
+import type { LibraryItem } from '@/types';
 
 const CATEGORY_OPTIONS = [
-  { value: 'template', label: 'Template' },
+  { value: 'external_link', label: 'External Link' },
+  { value: 'document', label: 'Document' },
+  { value: 'resource', label: 'Resource' },
 ];
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
-  template: FileText,
+  external_link: ExternalLink,
+  document: FileText,
+  resource: Link2,
 };
 
 export function Library() {
-  const { libraryItems, addLibraryItem, deleteLibraryItem, proposals, setCurrentProposal, setActiveSection } = useAppStore();
+  const { libraryItems, addLibraryItem, deleteLibraryItem } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [proposalStatusFilter, setProposalStatusFilter] = useState('');
   const [newItem, setNewItem] = useState<{
     name: string;
     description: string;
@@ -55,21 +52,6 @@ export function Library() {
     url: '',
     category: 'external_link',
     tags: '',
-  });
-
-  // Filter proposals
-  const filteredProposals = proposals.filter((p) => {
-    if (p.status === 'deleted') return false;
-    if (proposalStatusFilter && p.status !== proposalStatusFilter) return false;
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        p.content.title?.toLowerCase().includes(query) ||
-        p.content.client?.toLowerCase().includes(query) ||
-        p.code?.toLowerCase().includes(query)
-      );
-    }
-    return true;
   });
 
   // Filter items
@@ -88,15 +70,6 @@ export function Library() {
     }
     return true;
   });
-
-  // Group items by category
-  const groupedItems = filteredItems.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
-    }
-    acc[item.category].push(item);
-    return acc;
-  }, {} as Record<string, LibraryItem[]>);
 
   const handleAddItem = () => {
     if (!newItem.name || !newItem.url) return;
@@ -133,7 +106,7 @@ export function Library() {
           <div>
             <h1 className="text-xl font-semibold text-gray-900">Library</h1>
             <p className="text-sm text-gray-500">
-              Proposals and templates
+              Resources and external links
             </p>
           </div>
           <Button onClick={() => setIsAddModalOpen(true)}>
@@ -166,69 +139,15 @@ export function Library() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-6">
-        <Tabs defaultValue="proposals">
-          <TabsList className="mb-6">
-            <TabsTrigger value="proposals">Proposals</TabsTrigger>
-            <TabsTrigger value="template">Templates</TabsTrigger>
-          </TabsList>
-
-          {/* Proposals Tab */}
-          <TabsContent value="proposals">
-            <div className="mb-4 flex gap-4">
-              <Select
-                options={[
-                  { value: '', label: 'All Statuses' },
-                  { value: 'draft', label: 'Draft' },
-                  { value: 'pending_approval', label: 'Pending Approval' },
-                  { value: 'approved', label: 'Approved' },
-                  { value: 'rejected', label: 'Rejected' },
-                  { value: 'on_hold', label: 'On Hold' },
-                ]}
-                value={proposalStatusFilter}
-                onChange={(e) => setProposalStatusFilter(e.target.value)}
-                className="w-48"
-              />
-            </div>
-            {filteredProposals.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <FolderOpen className="mb-4 h-12 w-12 text-gray-300" />
-                <h3 className="mb-2 text-lg font-medium text-gray-900">No proposals found</h3>
-                <p className="mb-4 text-sm text-gray-500">
-                  Create a new proposal to get started
-                </p>
-                <Button onClick={() => setActiveSection('new-proposal')}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Proposal
-                </Button>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredProposals.map((proposal) => (
-                  <ProposalCard
-                    key={proposal.id}
-                    proposal={proposal}
-                    onView={() => {
-                      setCurrentProposal(proposal);
-                      setActiveSection('view-proposal');
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="template">
-            {!groupedItems['template'] || groupedItems['template'].length === 0 ? (
-              <EmptyState onAdd={() => setIsAddModalOpen(true)} category="template" />
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {groupedItems['template'].map((item) => (
-                  <TemplateCard key={item.id} item={item} onDelete={handleDelete} />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+        {filteredItems.length === 0 ? (
+          <EmptyState onAdd={() => setIsAddModalOpen(true)} />
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredItems.map((item) => (
+              <ResourceCard key={item.id} item={item} onDelete={handleDelete} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Add Modal */}
@@ -308,15 +227,11 @@ export function Library() {
   );
 }
 
-function EmptyState({ onAdd, category }: { onAdd: () => void; category?: string }) {
-  const categoryLabel = category ?
-    CATEGORY_OPTIONS.find((c) => c.value === category)?.label || category :
-    'resources';
-
+function EmptyState({ onAdd }: { onAdd: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <LibraryIcon className="mb-4 h-12 w-12 text-gray-300" />
-      <h3 className="mb-2 text-lg font-medium text-gray-900">No {categoryLabel.toLowerCase()}</h3>
+      <h3 className="mb-2 text-lg font-medium text-gray-900">No resources</h3>
       <p className="mb-4 text-sm text-gray-500">
         Add your first resource to start building your library
       </p>
@@ -328,120 +243,21 @@ function EmptyState({ onAdd, category }: { onAdd: () => void; category?: string 
   );
 }
 
-function ProposalCard({ proposal, onView }: { proposal: Proposal; onView: () => void }) {
+function ResourceCard({ item, onDelete }: { item: LibraryItem; onDelete: (id: string) => void }) {
+  const Icon = CATEGORY_ICONS[item.category] || FileText;
+
   return (
     <Card className="group relative transition-shadow hover:shadow-md">
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]">
-            <FileText className="h-5 w-5" />
+            <Icon className="h-5 w-5" />
           </div>
 
           <div className="flex-1 overflow-hidden">
-            <div className="flex items-center gap-2 mb-1">
-              {proposal.code && (
-                <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">{proposal.code}</span>
-              )}
-              <Badge status={proposal.status as 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'on_hold' | 'deleted'} className="text-xs">
-                {getStatusLabel(proposal.status)}
-              </Badge>
-            </div>
-            <h3 className="font-medium text-gray-900 truncate">
-              {proposal.content.title || 'Untitled Proposal'}
-            </h3>
-            {proposal.content.client && (
-              <p className="mt-1 text-sm text-gray-500">{proposal.content.client}</p>
-            )}
-
-            <div className="mt-3 flex items-center gap-2">
-              <button
-                onClick={onView}
-                className="inline-flex items-center gap-1 text-sm text-[#5B50BD] hover:text-[#4A41A0] dark:text-[#918AD3] dark:hover:text-[#C8C4E9]"
-              >
-                <Eye className="h-3 w-3" />
-                View
-              </button>
-              <span className="text-gray-300">|</span>
-              <span className="text-xs text-gray-400">
-                {formatDate(proposal.updatedAt)}
-              </span>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function TemplateCard({ item, onDelete }: { item: LibraryItem; onDelete: (id: string) => void }) {
-  const { addProposal, setCurrentProposal, setActiveSection, currentUser } = useAppStore();
-
-  const handleUseTemplate = () => {
-    // Template content mapping based on template name
-    const templateContent: Record<string, Partial<Proposal['content']>> = {
-      'Brand Health Tracking Template': {
-        businessObjectives: ['Track brand awareness over time', 'Monitor brand perception changes', 'Measure competitive positioning'],
-        researchObjectives: ['To measure aided and unaided brand awareness', 'To track brand funnel metrics', 'To assess brand image attributes'],
-        burningQuestions: ['How has brand awareness changed since last quarter?', 'What are the key drivers of brand preference?'],
-      },
-      'Customer Satisfaction Survey Template': {
-        businessObjectives: ['Measure overall customer satisfaction', 'Identify improvement areas', 'Track NPS over time'],
-        researchObjectives: ['To measure satisfaction with products/services', 'To identify key drivers of satisfaction', 'To calculate Net Promoter Score'],
-        burningQuestions: ['What is our current NPS score?', 'Which touchpoints need improvement?'],
-      },
-      'Concept Testing Template': {
-        businessObjectives: ['Identify winning concept', 'Understand improvement areas', 'Validate pricing strategy'],
-        researchObjectives: ['To evaluate concept appeal', 'To measure purchase intent', 'To assess price sensitivity'],
-        burningQuestions: ['Which concept has the highest purchase intent?', 'What improvements would increase appeal?'],
-        advancedAnalysis: ['MaxDiff Analysis', 'Conjoint Analysis'],
-      },
-      'U&A Study Template': {
-        businessObjectives: ['Understand category usage patterns', 'Identify growth opportunities', 'Map competitive landscape'],
-        researchObjectives: ['To understand usage frequency and occasions', 'To identify unmet needs', 'To map brand funnel'],
-        burningQuestions: ['What drives category choice?', 'Where are the growth opportunities?'],
-      },
-      'Ad Testing Template': {
-        businessObjectives: ['Evaluate ad effectiveness', 'Optimize creative elements', 'Measure brand lift'],
-        researchObjectives: ['To measure ad recall and recognition', 'To assess message comprehension', 'To evaluate emotional response'],
-        burningQuestions: ['Does the ad communicate the key message?', 'What elements drive engagement?'],
-      },
-      'Price Sensitivity Template': {
-        businessObjectives: ['Determine optimal price point', 'Understand price elasticity', 'Assess competitive pricing'],
-        researchObjectives: ['To identify price thresholds', 'To measure price-value perception', 'To model demand curves'],
-        burningQuestions: ['What is the optimal price for maximizing revenue?', 'How price sensitive are our customers?'],
-        advancedAnalysis: ['Van Westendorp PSM', 'Gabor-Granger Analysis'],
-      },
-    };
-
-    const templateData = templateContent[item.name] || {};
-
-    // Create a new proposal based on the template
-    const newProposal = addProposal({
-      status: 'draft',
-      content: {
-        title: `New ${item.name.replace(' Template', '')}`,
-        client: '',
-        ...templateData,
-      },
-      author: currentUser,
-    });
-
-    setCurrentProposal(newProposal);
-    setActiveSection('view-proposal');
-  };
-
-  return (
-    <Card className="group relative transition-shadow hover:shadow-md">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-600">
-            <FileText className="h-5 w-5" />
-          </div>
-
-          <div className="flex-1 overflow-hidden">
-            <h3 className="font-medium text-gray-900">{item.name}</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white">{item.name}</h3>
             {item.description && (
-              <p className="mt-1 text-sm text-gray-500 line-clamp-2">{item.description}</p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{item.description}</p>
             )}
 
             {item.tags && item.tags.length > 0 && (
@@ -455,13 +271,15 @@ function TemplateCard({ item, onDelete }: { item: LibraryItem; onDelete: (id: st
             )}
 
             <div className="mt-3 flex items-center gap-2">
-              <button
-                onClick={handleUseTemplate}
-                className="inline-flex items-center gap-1 text-sm text-green-600 hover:text-green-700 font-medium"
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm text-[#5B50BD] hover:text-[#4A41A0] dark:text-[#918AD3] dark:hover:text-[#C8C4E9] font-medium"
               >
-                <Plus className="h-3 w-3" />
-                Use Template
-              </button>
+                <ExternalLink className="h-3 w-3" />
+                Open
+              </a>
               <span className="text-gray-300">|</span>
               <span className="text-xs text-gray-400">
                 Added {formatDate(item.createdAt)}
