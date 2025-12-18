@@ -68,12 +68,6 @@ const menuItems = [
     expandable: true,
   },
   {
-    id: 'meta-learnings',
-    label: 'Meta Learnings',
-    icon: Brain,
-    expandable: false,
-  },
-  {
     id: 'calculators',
     label: 'Calculators',
     icon: Calculator,
@@ -380,6 +374,24 @@ export function Sidebar() {
                 <p className="text-xs text-gray-400 capitalize">{currentUser.role}</p>
               </div>
             </div>
+          </div>
+
+          {/* My Analytics / Meta Learnings */}
+          <div>
+            <h3 className="mb-3 text-sm font-medium text-gray-900">My Analytics</h3>
+            <button
+              onClick={() => {
+                setSettingsOpen(false);
+                setActiveSection('meta-learnings');
+              }}
+              className="flex w-full items-center gap-3 rounded-lg border p-3 hover:bg-gray-50 transition-colors"
+            >
+              <Brain className="h-4 w-4 text-[#5B50BD]" />
+              <div className="flex-1 text-left">
+                <span className="text-sm font-medium">Meta Learnings</span>
+                <p className="text-xs text-gray-500">View your proposal analytics and performance</p>
+              </div>
+            </button>
           </div>
 
           {/* Appearance */}
