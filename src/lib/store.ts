@@ -891,7 +891,7 @@ export const useAppStore = create<AppState>()(
       sidebarOpen: true,
       sidebarCollapsed: false,
       rightSidebarCollapsed: false,
-      activeSection: 'new-proposal',
+      activeSection: 'dashboard',
       isLoggedIn: false,
 
       setCurrentUser: (user) => set({ currentUser: user }),

@@ -31,6 +31,7 @@ import {
   MessageSquare,
   UserCheck,
   HelpCircle,
+  LayoutDashboard,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
@@ -46,6 +47,12 @@ const menuItems = [
     id: 'new-proposal',
     label: 'New Proposal',
     icon: Plus,
+    expandable: false,
+  },
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
     expandable: false,
   },
   {

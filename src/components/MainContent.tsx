@@ -9,6 +9,7 @@ import { MetaLearnings } from '@/components/meta-learnings';
 import { Calculators, DemographicDistribution, FeasibilityCheck } from '@/components/tools';
 import { Library } from '@/components/library';
 import { Architecture } from '@/components/architecture';
+import { Dashboard } from '@/components/dashboard';
 import { cn, getStatusColor } from '@/lib/utils';
 import type { Proposal, ProposalContent } from '@/types';
 
@@ -186,20 +187,17 @@ export function MainContent() {
       case 'architecture':
         return <Architecture />;
 
+      case 'dashboard':
+        return <Dashboard />;
+
       default:
         // Handle project views
         if (activeSection.startsWith('project-')) {
           return <ProjectView projectId={activeSection.replace('project-', '')} />;
         }
 
-        return (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <h2 className="mb-2 text-xl font-semibold text-gray-900">Welcome to BoltInsight</h2>
-              <p className="text-gray-500">Select an option from the sidebar to get started</p>
-            </div>
-          </div>
-        );
+        // Default to Dashboard as the landing page
+        return <Dashboard />;
     }
   };
 
