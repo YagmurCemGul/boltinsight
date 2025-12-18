@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, DragEvent } from 'react';
 import {
   Briefcase,
   FileText,
@@ -26,6 +26,7 @@ import {
   ChevronDown,
   ChevronRight,
   Share2,
+  GripVertical,
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import {
@@ -92,13 +93,27 @@ interface ProposalCardProps {
   onDelete: () => void;
   onMove: () => void;
   isOwner: boolean;
+  onDragStart: (e: DragEvent<HTMLDivElement>, proposal: Proposal) => void;
+  onDragEnd: () => void;
+  isDragging?: boolean;
 }
 
-function ProposalCard({ proposal, onClick, onCopy, onDelete, onMove, isOwner }: ProposalCardProps) {
+function ProposalCard({ proposal, onClick, onCopy, onDelete, onMove, isOwner, onDragStart, onDragEnd, isDragging }: ProposalCardProps) {
   return (
-    <Card className="transition-all hover:shadow-md hover:ring-1 hover:ring-[#5B50BD]/20">
+    <Card
+      className={cn(
+        "transition-all hover:shadow-md hover:ring-1 hover:ring-[#5B50BD]/20 cursor-grab active:cursor-grabbing",
+        isDragging && "opacity-50 ring-2 ring-[#5B50BD] shadow-lg"
+      )}
+      draggable
+      onDragStart={(e) => onDragStart(e, proposal)}
+      onDragEnd={onDragEnd}
+    >
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2 flex-shrink-0 text-gray-300 dark:text-gray-600">
+            <GripVertical className="h-4 w-4" />
+          </div>
           <button onClick={onClick} className="flex-1 text-left min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-medium text-[#5B50BD] dark:text-[#918AD3]">
@@ -176,6 +191,7 @@ export function Workspace() {
     setActiveSection,
     addProposal,
     deleteProposal,
+    moveProposalToProject,
   } = useAppStore();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -186,6 +202,8 @@ export function Workspace() {
   const [moveModalOpen, setMoveModalOpen] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
+  const [draggingProposalId, setDraggingProposalId] = useState<string | null>(null);
+  const [dragOverProjectId, setDragOverProjectId] = useState<string | null>(null);
 
   // Filter and sort proposals
   const filteredProposals = useMemo(() => {
@@ -284,6 +302,45 @@ export function Workspace() {
     setExpandedProjects((prev) =>
       prev.includes(projectId) ? prev.filter((id) => id !== projectId) : [...prev, projectId]
     );
+  };
+
+  // Drag & Drop handlers
+  const handleDragStart = (e: DragEvent<HTMLDivElement>, proposal: Proposal) => {
+    setDraggingProposalId(proposal.id);
+    e.dataTransfer.setData('proposalId', proposal.id);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragEnd = () => {
+    setDraggingProposalId(null);
+    setDragOverProjectId(null);
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>, projectId: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverProjectId(projectId);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverProjectId(null);
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>, projectId: string) => {
+    e.preventDefault();
+    const proposalId = e.dataTransfer.getData('proposalId');
+
+    if (proposalId && projectId) {
+      moveProposalToProject(proposalId, projectId);
+      const proposal = proposals.find(p => p.id === proposalId);
+      const project = projects.find(p => p.id === projectId);
+      if (proposal && project) {
+        toast.success(`Moved "${truncateText(proposal.content.title || 'Untitled', 20)}" to "${project.name}"`);
+      }
+    }
+
+    setDraggingProposalId(null);
+    setDragOverProjectId(null);
   };
 
   const getProjectProposals = (projectId: string) => {
@@ -430,6 +487,9 @@ export function Workspace() {
                     onDelete={() => handleDeleteProposal(proposal.id)}
                     onMove={() => handleMoveProposal(proposal)}
                     isOwner={proposal.author.id === currentUser.id}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    isDragging={draggingProposalId === proposal.id}
                   />
                 ))}
               </div>
@@ -468,9 +528,21 @@ export function Workspace() {
                     {projects.map((project) => {
                       const projectProposals = getProjectProposals(project.id);
                       const isExpanded = expandedProjects.includes(project.id);
+                      const isDragOver = dragOverProjectId === project.id;
 
                       return (
-                        <div key={project.id} className="rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div
+                          key={project.id}
+                          className={cn(
+                            "rounded-lg border transition-all",
+                            isDragOver
+                              ? "border-[#5B50BD] bg-[#EDE9F9] dark:bg-[#231E51] ring-2 ring-[#5B50BD]/50"
+                              : "border-gray-200 dark:border-gray-700"
+                          )}
+                          onDragOver={(e) => handleDragOver(e, project.id)}
+                          onDragLeave={handleDragLeave}
+                          onDrop={(e) => handleDrop(e, project.id)}
+                        >
                           <button
                             onClick={() => toggleProjectExpand(project.id)}
                             className="flex w-full items-center justify-between p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors rounded-lg"
@@ -481,11 +553,19 @@ export function Workspace() {
                               ) : (
                                 <ChevronRight className="h-4 w-4 text-gray-400" />
                               )}
-                              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              <span className={cn(
+                                "text-sm font-medium",
+                                isDragOver ? "text-[#5B50BD] dark:text-[#918AD3]" : "text-gray-900 dark:text-white"
+                              )}>
                                 {project.name}
                               </span>
                             </div>
-                            <Badge variant="custom" className="text-xs border border-gray-300 dark:border-gray-600 bg-transparent text-gray-600 dark:text-gray-400">
+                            <Badge variant="custom" className={cn(
+                              "text-xs border bg-transparent",
+                              isDragOver
+                                ? "border-[#5B50BD] text-[#5B50BD] dark:text-[#918AD3]"
+                                : "border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400"
+                            )}>
                               {projectProposals.length}
                             </Badge>
                           </button>
@@ -536,11 +616,11 @@ export function Workspace() {
                 <ul className="space-y-2 text-xs text-gray-500 dark:text-gray-400">
                   <li className="flex items-start gap-2">
                     <span className="text-[#5B50BD]">•</span>
-                    Use filters to find specific proposals quickly
+                    Drag proposals and drop them into projects
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[#5B50BD]">•</span>
-                    Organize proposals by moving them to projects
+                    Use filters to find specific proposals quickly
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[#5B50BD]">•</span>
