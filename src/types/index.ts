@@ -215,3 +215,24 @@ export interface DemographicDistribution {
   region: { name: string; percentage: number }[];
   income?: { range: string; percentage: number }[];
 }
+
+export type NotificationType =
+  | 'approval_request'    // Someone sent you a proposal for approval
+  | 'approval_approved'   // Your proposal was approved
+  | 'approval_rejected'   // Your proposal was rejected
+  | 'approval_on_hold'    // Your proposal was put on hold
+  | 'comment'             // Someone commented on your proposal
+  | 'mention'             // You were mentioned
+  | 'share';              // A proposal was shared with you
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  proposalId?: string;
+  proposalTitle?: string;
+  fromUser?: User;
+  read: boolean;
+  createdAt: string;
+}

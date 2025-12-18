@@ -10,6 +10,7 @@ import type {
   LibraryItem,
   MetaLearningFilter,
   ProposalStatus,
+  Notification,
 } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { generateProposalCode } from './utils';
@@ -804,6 +805,54 @@ const mockLibraryItems: LibraryItem[] = [
   },
 ];
 
+// Mock notifications for approval requests
+const mockNotifications: Notification[] = [
+  {
+    id: 'notif-1',
+    type: 'approval_request',
+    title: 'New Approval Request',
+    message: 'Demo User sent you "Concept Testing - New Product Line" for approval',
+    proposalId: 'proposal-3',
+    proposalTitle: 'Concept Testing - New Product Line',
+    fromUser: currentUser,
+    read: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 min ago
+  },
+  {
+    id: 'notif-2',
+    type: 'approval_request',
+    title: 'New Approval Request',
+    message: 'Demo User sent you "Mobile App UX Research" for approval',
+    proposalId: 'proposal-8',
+    proposalTitle: 'Mobile App UX Research',
+    fromUser: currentUser,
+    read: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+  },
+  {
+    id: 'notif-3',
+    type: 'approval_approved',
+    title: 'Proposal Approved',
+    message: 'Your proposal "Brand Health Tracking Q1 2025" was approved by Team Manager',
+    proposalId: 'proposal-1',
+    proposalTitle: 'Brand Health Tracking Q1 2025',
+    fromUser: { ...currentUser, id: 'manager-1', name: 'Team Manager', role: 'manager' },
+    read: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+  },
+  {
+    id: 'notif-4',
+    type: 'approval_rejected',
+    title: 'Proposal Rejected',
+    message: 'Your proposal "Ad Effectiveness Study" was rejected by Team Manager. Reason: Sample size too small.',
+    proposalId: 'proposal-5',
+    proposalTitle: 'Ad Effectiveness Study',
+    fromUser: { ...currentUser, id: 'manager-1', name: 'Team Manager', role: 'manager' },
+    read: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
+  },
+];
+
 interface AppState {
   // Current user
   currentUser: User;
@@ -822,6 +871,9 @@ interface AppState {
 
   // Library
   libraryItems: LibraryItem[];
+
+  // Notifications
+  notifications: Notification[];
 
   // Filters
   metaLearningFilter: MetaLearningFilter;
@@ -860,6 +912,14 @@ interface AppState {
   addLibraryItem: (item: Omit<LibraryItem, 'id' | 'createdAt'>) => void;
   deleteLibraryItem: (id: string) => void;
 
+  // Notification actions
+  addNotification: (notification: Omit<Notification, 'id' | 'createdAt'>) => void;
+  markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: () => void;
+  deleteNotification: (id: string) => void;
+  getUnreadNotificationCount: () => number;
+  getPendingApprovals: () => Notification[];
+
   // Filter actions
   setMetaLearningFilter: (filter: MetaLearningFilter) => void;
   clearMetaLearningFilter: () => void;
@@ -887,6 +947,7 @@ export const useAppStore = create<AppState>()(
       chatMessages: [],
       isAiTyping: false,
       libraryItems: mockLibraryItems,
+      notifications: mockNotifications,
       metaLearningFilter: {},
       sidebarOpen: true,
       sidebarCollapsed: false,
@@ -938,12 +999,26 @@ export const useAppStore = create<AppState>()(
         if (!proposal) return;
 
         const code = proposal.code || generateProposalCode();
+        const currentUser = get().currentUser;
         const approvalRecord = {
           id: uuidv4(),
           action: 'submitted' as const,
-          by: get().currentUser,
+          by: currentUser,
           to: approver,
           timestamp: new Date().toISOString(),
+        };
+
+        // Create notification for the approver
+        const notification: Notification = {
+          id: uuidv4(),
+          type: 'approval_request',
+          title: 'New Approval Request',
+          message: `${currentUser.name} sent you "${proposal.content.title || 'Untitled Proposal'}" for approval`,
+          proposalId: id,
+          proposalTitle: proposal.content.title || 'Untitled Proposal',
+          fromUser: currentUser,
+          read: false,
+          createdAt: new Date().toISOString(),
         };
 
         set((state) => ({
@@ -958,16 +1033,60 @@ export const useAppStore = create<AppState>()(
                 }
               : p
           ),
+          notifications: [notification, ...state.notifications],
         }));
       },
 
       updateProposalStatus: (id, status, comment) => {
+        const proposal = get().proposals.find((p) => p.id === id);
+        if (!proposal) return;
+
+        const currentUser = get().currentUser;
         const approvalRecord = {
           id: uuidv4(),
           action: status as 'approved' | 'rejected' | 'on_hold',
-          by: get().currentUser,
+          by: currentUser,
           comment,
           timestamp: new Date().toISOString(),
+        };
+
+        // Create notification for the proposal author
+        const notificationTypeMap: Record<string, 'approval_approved' | 'approval_rejected' | 'approval_on_hold'> = {
+          approved: 'approval_approved',
+          rejected: 'approval_rejected',
+          on_hold: 'approval_on_hold',
+        };
+
+        const titleMap: Record<string, string> = {
+          approved: 'Proposal Approved',
+          rejected: 'Proposal Rejected',
+          on_hold: 'Proposal On Hold',
+        };
+
+        const getStatusMessage = () => {
+          const proposalTitle = proposal.content.title || 'Untitled Proposal';
+          switch (status) {
+            case 'approved':
+              return `Your proposal "${proposalTitle}" was approved by ${currentUser.name}`;
+            case 'rejected':
+              return `Your proposal "${proposalTitle}" was rejected by ${currentUser.name}${comment ? `. Reason: ${comment}` : ''}`;
+            case 'on_hold':
+              return `Your proposal "${proposalTitle}" was put on hold by ${currentUser.name}${comment ? `. Reason: ${comment}` : ''}`;
+            default:
+              return `Your proposal "${proposalTitle}" status was updated`;
+          }
+        };
+
+        const notification: Notification = {
+          id: uuidv4(),
+          type: notificationTypeMap[status] || 'approval_approved',
+          title: titleMap[status] || 'Status Updated',
+          message: getStatusMessage(),
+          proposalId: id,
+          proposalTitle: proposal.content.title || 'Untitled Proposal',
+          fromUser: currentUser,
+          read: false,
+          createdAt: new Date().toISOString(),
         };
 
         set((state) => ({
@@ -981,6 +1100,7 @@ export const useAppStore = create<AppState>()(
                 }
               : p
           ),
+          notifications: [notification, ...state.notifications],
         }));
       },
 
@@ -1064,6 +1184,48 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           libraryItems: state.libraryItems.filter((item) => item.id !== id),
         }));
+      },
+
+      // Notification actions
+      addNotification: (notificationData) => {
+        const newNotification: Notification = {
+          ...notificationData,
+          id: uuidv4(),
+          createdAt: new Date().toISOString(),
+        };
+        set((state) => ({
+          notifications: [newNotification, ...state.notifications],
+        }));
+      },
+
+      markNotificationRead: (id) => {
+        set((state) => ({
+          notifications: state.notifications.map((n) =>
+            n.id === id ? { ...n, read: true } : n
+          ),
+        }));
+      },
+
+      markAllNotificationsRead: () => {
+        set((state) => ({
+          notifications: state.notifications.map((n) => ({ ...n, read: true })),
+        }));
+      },
+
+      deleteNotification: (id) => {
+        set((state) => ({
+          notifications: state.notifications.filter((n) => n.id !== id),
+        }));
+      },
+
+      getUnreadNotificationCount: () => {
+        return get().notifications.filter((n) => !n.read).length;
+      },
+
+      getPendingApprovals: () => {
+        return get().notifications.filter(
+          (n) => n.type === 'approval_request' && !n.read
+        );
       },
 
       // Filter actions
