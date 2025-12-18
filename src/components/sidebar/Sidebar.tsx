@@ -67,9 +67,9 @@ const menuItems = [
     expandable: false,
   },
   {
-    id: 'moe-calculator',
-    label: 'Margin of Error',
-    icon: Percent,
+    id: 'calculators',
+    label: 'Calculators',
+    icon: Calculator,
     expandable: false,
   },
   {

@@ -19,10 +19,12 @@ import {
   Link as LinkIcon,
   FileText,
   FileDown,
+  Presentation,
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
+import pptxgen from 'pptxgenjs';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { Button, Input, Textarea, Select, Badge, Modal, toast } from '@/components/ui';
@@ -129,13 +131,193 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
     toast.success('Submitted for approval', 'Your proposal has been sent to the approver.');
   };
 
-  const handleExport = async (format: 'word' | 'pdf') => {
+  const handleExport = async (format: 'word' | 'pdf' | 'ppt') => {
     toast.info(`Exporting as ${format.toUpperCase()}`, 'Your document is being prepared for download...');
 
     const fileName = `${content.title || 'proposal'}_${proposal.code || proposal.id}`;
 
     try {
-      if (format === 'pdf') {
+      if (format === 'ppt') {
+        // Generate PowerPoint using pptxgenjs
+        const pptx = new pptxgen();
+
+        // Set presentation properties
+        pptx.title = content.title || 'Untitled Proposal';
+        pptx.author = proposal.author.name;
+
+        // Title Slide
+        const titleSlide = pptx.addSlide();
+        titleSlide.addText(content.title || 'Untitled Proposal', {
+          x: 0.5,
+          y: 2,
+          w: 9,
+          h: 1.5,
+          fontSize: 36,
+          bold: true,
+          color: '5B50BD',
+          align: 'center',
+        });
+        titleSlide.addText(`Client: ${content.client || 'N/A'}`, {
+          x: 0.5,
+          y: 3.5,
+          w: 9,
+          h: 0.5,
+          fontSize: 18,
+          color: '666666',
+          align: 'center',
+        });
+        titleSlide.addText(`${proposal.code || 'Draft'} | ${new Date().toLocaleDateString()}`, {
+          x: 0.5,
+          y: 4.2,
+          w: 9,
+          h: 0.5,
+          fontSize: 12,
+          color: '999999',
+          align: 'center',
+        });
+
+        // Background Slide
+        if (content.background) {
+          const bgSlide = pptx.addSlide();
+          bgSlide.addText('Background / Context', {
+            x: 0.5,
+            y: 0.5,
+            w: 9,
+            h: 0.6,
+            fontSize: 24,
+            bold: true,
+            color: '5B50BD',
+          });
+          bgSlide.addText(content.background, {
+            x: 0.5,
+            y: 1.3,
+            w: 9,
+            h: 4,
+            fontSize: 14,
+            color: '333333',
+            valign: 'top',
+          });
+        }
+
+        // Business Objectives Slide
+        if (content.businessObjectives && content.businessObjectives.length > 0) {
+          const boSlide = pptx.addSlide();
+          boSlide.addText('Business Objectives', {
+            x: 0.5,
+            y: 0.5,
+            w: 9,
+            h: 0.6,
+            fontSize: 24,
+            bold: true,
+            color: '5B50BD',
+          });
+          content.businessObjectives.forEach((obj, i) => {
+            boSlide.addText(`${i + 1}. ${obj}`, {
+              x: 0.5,
+              y: 1.3 + i * 0.5,
+              w: 9,
+              h: 0.5,
+              fontSize: 14,
+              color: '333333',
+              bullet: true,
+            });
+          });
+        }
+
+        // Research Objectives Slide
+        if (content.researchObjectives && content.researchObjectives.length > 0) {
+          const roSlide = pptx.addSlide();
+          roSlide.addText('Research Objectives', {
+            x: 0.5,
+            y: 0.5,
+            w: 9,
+            h: 0.6,
+            fontSize: 24,
+            bold: true,
+            color: '5B50BD',
+          });
+          content.researchObjectives.forEach((obj, i) => {
+            roSlide.addText(obj, {
+              x: 0.5,
+              y: 1.3 + i * 0.5,
+              w: 9,
+              h: 0.5,
+              fontSize: 14,
+              color: '333333',
+              bullet: true,
+            });
+          });
+        }
+
+        // Target & Sample Slide
+        const targetSlide = pptx.addSlide();
+        targetSlide.addText('Target & Sample', {
+          x: 0.5,
+          y: 0.5,
+          w: 9,
+          h: 0.6,
+          fontSize: 24,
+          bold: true,
+          color: '5B50BD',
+        });
+        targetSlide.addText('Target Definition:', {
+          x: 0.5,
+          y: 1.3,
+          w: 9,
+          h: 0.4,
+          fontSize: 14,
+          bold: true,
+          color: '333333',
+        });
+        targetSlide.addText(content.targetDefinition || 'Not specified', {
+          x: 0.5,
+          y: 1.7,
+          w: 9,
+          h: 1,
+          fontSize: 12,
+          color: '666666',
+        });
+        targetSlide.addText(`Total Sample Size: ${content.sampleSize?.toLocaleString() || 'N/A'}`, {
+          x: 0.5,
+          y: 3,
+          w: 9,
+          h: 0.5,
+          fontSize: 16,
+          bold: true,
+          color: '5B50BD',
+        });
+
+        // Markets Slide
+        if (content.markets && content.markets.length > 0) {
+          const marketsSlide = pptx.addSlide();
+          marketsSlide.addText('Markets', {
+            x: 0.5,
+            y: 0.5,
+            w: 9,
+            h: 0.6,
+            fontSize: 24,
+            bold: true,
+            color: '5B50BD',
+          });
+
+          const tableData = [
+            [{ text: 'Country', options: { bold: true, fill: { color: 'EDE9F9' } } }, { text: 'Language', options: { bold: true, fill: { color: 'EDE9F9' } } }, { text: 'Sample Size', options: { bold: true, fill: { color: 'EDE9F9' } } }],
+            ...content.markets.map(m => [m.country, m.language, m.sampleSize.toString()]),
+          ];
+
+          marketsSlide.addTable(tableData as pptxgen.TableRow[], {
+            x: 0.5,
+            y: 1.3,
+            w: 9,
+            colW: [3, 3, 3],
+            fontSize: 12,
+            border: { pt: 0.5, color: 'CCCCCC' },
+          });
+        }
+
+        // Save the presentation
+        await pptx.writeFile({ fileName: `${fileName}.pptx` });
+      } else if (format === 'pdf') {
         // Generate PDF using jsPDF
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
@@ -863,6 +1045,20 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
               <div>
                 <p className="font-medium">PDF Document</p>
                 <p className="text-sm text-gray-500">Export as .pdf file</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => {
+                handleExport('ppt');
+                setExportModalOpen(false);
+              }}
+              className="flex w-full items-center gap-3 rounded-lg border p-4 text-left hover:bg-gray-50 transition-colors"
+            >
+              <Presentation className="h-8 w-8 text-orange-600" />
+              <div>
+                <p className="font-medium">PowerPoint Presentation</p>
+                <p className="text-sm text-gray-500">Export as .pptx file</p>
               </div>
             </button>
           </div>

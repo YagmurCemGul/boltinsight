@@ -6,7 +6,7 @@ import { Sidebar } from '@/components/sidebar';
 import { ChatInterface } from '@/components/chat';
 import { ProposalEditor, RightSidebar } from '@/components/proposal';
 import { MetaLearnings } from '@/components/meta-learnings';
-import { MarginOfErrorCalculator, DemographicDistribution, FeasibilityCheck } from '@/components/tools';
+import { Calculators, DemographicDistribution, FeasibilityCheck } from '@/components/tools';
 import { Library } from '@/components/library';
 import { Architecture } from '@/components/architecture';
 import { cn, getStatusColor } from '@/lib/utils';
@@ -171,8 +171,8 @@ export function MainContent() {
       case 'meta-learnings':
         return <MetaLearnings />;
 
-      case 'moe-calculator':
-        return <MarginOfErrorCalculator />;
+      case 'calculators':
+        return <Calculators />;
 
       case 'demographics':
         return <DemographicDistribution />;

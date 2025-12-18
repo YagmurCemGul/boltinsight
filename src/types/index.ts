@@ -160,7 +160,8 @@ export interface LibraryItem {
   url: string;
   category: 'external_link' | 'video' | 'template' | 'methodology';
   tags?: string[];
-  createdAt: string;
+  country?: string;
+  createdAt: string | Date;
 }
 
 export interface MetaLearningFilter {
