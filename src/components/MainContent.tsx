@@ -6,9 +6,11 @@ import { Sidebar } from '@/components/sidebar';
 import { ChatInterface } from '@/components/chat';
 import { ProposalEditor, RightSidebar } from '@/components/proposal';
 import { MetaLearnings } from '@/components/meta-learnings';
-import { Calculators, DemographicDistribution, FeasibilityCheck } from '@/components/tools';
+import { Calculators, DemographicDistribution, FeasibilityCheck, SearchView } from '@/components/tools';
 import { Library } from '@/components/library';
 import { Architecture } from '@/components/architecture';
+import { Dashboard } from '@/components/dashboard';
+import { Workspace } from '@/components/workspace';
 import { cn, getStatusColor } from '@/lib/utils';
 import type { Proposal, ProposalContent } from '@/types';
 
@@ -17,6 +19,7 @@ export function MainContent() {
     activeSection,
     sidebarOpen,
     sidebarCollapsed,
+    sidebarWidth,
     rightSidebarCollapsed,
     setRightSidebarCollapsed,
     currentProposal,
@@ -186,20 +189,26 @@ export function MainContent() {
       case 'architecture':
         return <Architecture />;
 
+      case 'dashboard':
+        return <Dashboard />;
+
+      case 'workspace':
+        return <Workspace />;
+
+      case 'search-my':
+        return <SearchView searchAll={false} />;
+
+      case 'search-all':
+        return <SearchView searchAll={true} />;
+
       default:
         // Handle project views
         if (activeSection.startsWith('project-')) {
           return <ProjectView projectId={activeSection.replace('project-', '')} />;
         }
 
-        return (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <h2 className="mb-2 text-xl font-semibold text-gray-900">Welcome to BoltInsight</h2>
-              <p className="text-gray-500">Select an option from the sidebar to get started</p>
-            </div>
-          </div>
-        );
+        // Default to Dashboard as the landing page
+        return <Dashboard />;
     }
   };
 
@@ -209,10 +218,8 @@ export function MainContent() {
 
       {/* Main Content Area */}
       <main
-        className={cn(
-          'flex-1 transition-all duration-200',
-          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-72'
-        )}
+        className="flex-1 transition-all duration-200"
+        style={{ marginLeft: sidebarCollapsed ? 64 : sidebarWidth }}
       >
         <div className="h-full overflow-hidden">{renderContent()}</div>
       </main>

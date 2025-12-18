@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Plus,
   Search,
@@ -31,12 +31,15 @@ import {
   MessageSquare,
   UserCheck,
   HelpCircle,
+  LayoutDashboard,
+  Briefcase,
+  Clock,
+  Share2,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { useThemeStore } from '@/lib/theme';
-import { SearchSection } from './SearchSection';
 import { ProjectsList } from './ProjectsList';
 import { HistoryList } from './HistoryList';
 import { Modal, Button, Input, Select, toast, BoltLogo } from '@/components/ui';
@@ -49,21 +52,27 @@ const menuItems = [
     expandable: false,
   },
   {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    expandable: false,
+  },
+  {
+    id: 'workspace',
+    label: 'Workspace',
+    icon: Briefcase,
+    expandable: false,
+  },
+  {
     id: 'search-my',
     label: 'Search My Proposals',
     icon: User,
-    expandable: true,
+    expandable: false,
   },
   {
     id: 'search-all',
     label: 'Search All Proposals',
     icon: Users,
-    expandable: true,
-  },
-  {
-    id: 'meta-learnings',
-    label: 'Meta Learnings',
-    icon: Brain,
     expandable: false,
   },
   {
@@ -92,32 +101,93 @@ const menuItems = [
   },
 ];
 
-// Mock notifications data
-const mockNotifications = [
-  { id: '1', type: 'approval', message: 'Your proposal "Brand Tracking Q1" was approved', time: new Date(Date.now() - 1000 * 60 * 30), read: false },
-  { id: '2', type: 'comment', message: 'John added a comment on "Market Research"', time: new Date(Date.now() - 1000 * 60 * 60 * 2), read: false },
-  { id: '3', type: 'mention', message: 'You were mentioned in a proposal discussion', time: new Date(Date.now() - 1000 * 60 * 60 * 24), read: true },
-];
-
 export function Sidebar() {
-  const { sidebarOpen, setSidebarOpen, activeSection, setActiveSection, currentUser, sidebarCollapsed, setSidebarCollapsed, setLoggedIn } = useAppStore();
+  const {
+    sidebarOpen,
+    setSidebarOpen,
+    activeSection,
+    setActiveSection,
+    currentUser,
+    sidebarCollapsed,
+    setSidebarCollapsed,
+    sidebarWidth,
+    setSidebarWidth,
+    setLoggedIn,
+    notifications,
+    markNotificationRead,
+    markAllNotificationsRead,
+    proposals,
+    setCurrentProposal,
+  } = useAppStore();
   const { isDarkMode, toggleDarkMode } = useThemeStore();
   const [expandedItems, setExpandedItems] = useState<string[]>(['projects', 'history']);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [notificationsList, setNotificationsList] = useState(mockNotifications);
+  const [isResizing, setIsResizing] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
 
-  const unreadCount = notificationsList.filter(n => !n.read).length;
+  // Handle resize drag
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      const newWidth = e.clientX;
+      setSidebarWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, setSidebarWidth]);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   const markAllRead = () => {
-    setNotificationsList(prev => prev.map(n => ({ ...n, read: true })));
+    markAllNotificationsRead();
+  };
+
+  const handleNotificationClick = (notification: typeof notifications[0]) => {
+    // Mark as read
+    markNotificationRead(notification.id);
+
+    // If it has a proposal, navigate to it
+    if (notification.proposalId) {
+      const proposal = proposals.find(p => p.id === notification.proposalId);
+      if (proposal) {
+        setCurrentProposal(proposal);
+        setActiveSection('view-proposal');
+        setNotificationsOpen(false);
+      }
+    }
   };
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'approval': return <UserCheck className="h-4 w-4 text-green-500" />;
+      case 'approval_request': return <Clock className="h-4 w-4 text-amber-500" />;
+      case 'approval_approved': return <UserCheck className="h-4 w-4 text-green-500" />;
+      case 'approval_rejected': return <X className="h-4 w-4 text-red-500" />;
+      case 'approval_on_hold': return <Clock className="h-4 w-4 text-blue-500" />;
       case 'comment': return <MessageSquare className="h-4 w-4 text-blue-500" />;
+      case 'share': return <Share2 className="h-4 w-4 text-[#5B50BD]" />;
       default: return <FileText className="h-4 w-4 text-gray-500" />;
     }
   };
@@ -147,12 +217,15 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
+        ref={sidebarRef}
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen transform border-r border-gray-200 bg-white transition-all duration-200 ease-in-out',
-          sidebarCollapsed ? 'w-16' : 'w-72',
+          'fixed left-0 top-0 z-40 h-screen transform border-r border-gray-200 bg-white transition-all ease-in-out',
+          sidebarCollapsed ? 'w-16' : '',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
-          'lg:translate-x-0'
+          'lg:translate-x-0',
+          !isResizing && 'duration-200'
         )}
+        style={!sidebarCollapsed ? { width: sidebarWidth } : undefined}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
@@ -229,18 +302,6 @@ export function Sidebar() {
                     )}
                   </button>
 
-                  {/* Search Panels */}
-                  {!sidebarCollapsed && item.id === 'search-my' && expandedItems.includes(item.id) && (
-                    <div className="mt-2 px-2">
-                      <SearchSection searchAll={false} />
-                    </div>
-                  )}
-
-                  {!sidebarCollapsed && item.id === 'search-all' && expandedItems.includes(item.id) && (
-                    <div className="mt-2 px-2">
-                      <SearchSection searchAll={true} />
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -343,6 +404,17 @@ export function Sidebar() {
             </div>
           </div>
         </div>
+
+        {/* Resize Handle */}
+        {!sidebarCollapsed && (
+          <div
+            onMouseDown={handleMouseDown}
+            className={cn(
+              'absolute right-0 top-0 h-full w-1 cursor-col-resize transition-colors hover:bg-[#5B50BD]/50',
+              isResizing && 'bg-[#5B50BD]'
+            )}
+          />
+        )}
       </aside>
 
       {/* Mobile Overlay */}
@@ -373,6 +445,24 @@ export function Sidebar() {
                 <p className="text-xs text-gray-400 capitalize">{currentUser.role}</p>
               </div>
             </div>
+          </div>
+
+          {/* My Analytics / Meta Learnings */}
+          <div>
+            <h3 className="mb-3 text-sm font-medium text-gray-900">My Analytics</h3>
+            <button
+              onClick={() => {
+                setSettingsOpen(false);
+                setActiveSection('meta-learnings');
+              }}
+              className="flex w-full items-center gap-3 rounded-lg border p-3 hover:bg-gray-50 transition-colors"
+            >
+              <Brain className="h-4 w-4 text-[#5B50BD]" />
+              <div className="flex-1 text-left">
+                <span className="text-sm font-medium">Meta Learnings</span>
+                <p className="text-xs text-gray-500">View your proposal analytics and performance</p>
+              </div>
+            </button>
           </div>
 
           {/* Appearance */}
@@ -476,41 +566,50 @@ export function Sidebar() {
             </div>
           )}
 
-          {notificationsList.length === 0 ? (
+          {notifications.length === 0 ? (
             <div className="py-8 text-center">
               <Bell className="mx-auto h-12 w-12 text-gray-300 mb-3" />
               <p className="text-gray-500">No notifications</p>
             </div>
           ) : (
-            <div className="space-y-3 max-h-80 overflow-y-auto">
-              {notificationsList.map((notification) => (
-                <div
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {notifications.map((notification) => (
+                <button
                   key={notification.id}
+                  onClick={() => handleNotificationClick(notification)}
                   className={cn(
-                    'flex items-start gap-3 rounded-lg p-3 transition-colors border',
+                    'flex w-full items-start gap-3 rounded-lg p-3 transition-colors border text-left',
                     notification.read
-                      ? 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700'
-                      : 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700/50'
+                      ? 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                      : 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700/50 hover:bg-purple-100 dark:hover:bg-purple-900/50'
                   )}
                 >
                   <div className="mt-0.5">{getNotificationIcon(notification.type)}</div>
                   <div className="flex-1 min-w-0">
                     <p className={cn(
+                      'text-xs font-semibold mb-0.5',
+                      notification.read
+                        ? 'text-gray-500 dark:text-gray-400'
+                        : 'text-[#5B50BD] dark:text-[#918AD3]'
+                    )}>
+                      {notification.title}
+                    </p>
+                    <p className={cn(
                       'text-sm leading-relaxed',
                       notification.read
                         ? 'text-gray-600 dark:text-gray-300'
-                        : 'text-gray-900 dark:text-gray-100 font-medium'
+                        : 'text-gray-900 dark:text-gray-100'
                     )}>
                       {notification.message}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {formatDate(notification.time)}
+                      {formatDate(notification.createdAt)}
                     </p>
                   </div>
                   {!notification.read && (
                     <span className="h-2 w-2 rounded-full bg-purple-500 dark:bg-purple-400 mt-2 flex-shrink-0" />
                   )}
-                </div>
+                </button>
               ))}
             </div>
           )}

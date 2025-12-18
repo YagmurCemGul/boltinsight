@@ -19,6 +19,7 @@ import {
   ChevronRight,
   PanelRightClose,
   PanelRight,
+  Clock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProposalContent } from '@/types';
@@ -96,15 +97,22 @@ const SECTIONS: Section[] = [
     fields: [{ key: 'sampleSize', label: 'Sample Size', required: true }],
   },
   {
+    id: 'loi',
+    label: '6. LOI (Length of Interview)',
+    icon: Clock,
+    description: 'Survey duration in minutes',
+    fields: [{ key: 'loi', label: 'Length of Interview', required: true }],
+  },
+  {
     id: 'markets',
-    label: '6. Markets',
+    label: '7. Markets',
     icon: Globe,
     description: 'Should include language',
     fields: [{ key: 'markets', label: 'Markets', required: true, isArray: true }],
   },
   {
     id: 'quotas',
-    label: '7. Quota',
+    label: '8. Quota',
     icon: PieChart,
     description: 'System should recommend',
     fields: [{ key: 'quotas', label: 'Quotas', required: false, isArray: true }],
@@ -118,7 +126,7 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'referenceProjects',
-    label: '8. Reference Projects',
+    label: '9. Reference Projects',
     icon: LinkIcon,
     description: 'Reference proposal list',
     fields: [{ key: 'referenceProjects', label: 'Reference Projects', required: false, isArray: true }],
@@ -188,6 +196,9 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
     }
 
     if (typeof value === 'number') {
+      if (field.key === 'loi') {
+        return `${value} min`;
+      }
       return `n=${value.toLocaleString()}`;
     }
 
@@ -337,12 +348,18 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
       {/* Footer - Quick Stats */}
       {!collapsed ? (
         <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800">
-          <div className="grid grid-cols-2 gap-3 text-center">
+          <div className="grid grid-cols-3 gap-2 text-center">
             <div className="rounded-lg bg-white dark:bg-gray-900 p-2 shadow-sm">
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
                 {content.sampleSize?.toLocaleString() || '-'}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Total Sample</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Sample</p>
+            </div>
+            <div className="rounded-lg bg-white dark:bg-gray-900 p-2 shadow-sm">
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                {content.loi ? `${content.loi}m` : '-'}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">LOI</p>
             </div>
             <div className="rounded-lg bg-white dark:bg-gray-900 p-2 shadow-sm">
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -374,6 +391,12 @@ export function RightSidebar({ content, activeSection, onSectionClick, collapsed
               <BarChart3 className="h-4 w-4 text-gray-400 mx-auto" />
               <p className="text-xs font-semibold text-gray-900 dark:text-white">
                 {content.sampleSize ? (content.sampleSize >= 1000 ? `${(content.sampleSize / 1000).toFixed(0)}k` : content.sampleSize) : '-'}
+              </p>
+            </div>
+            <div className="rounded-lg bg-white dark:bg-gray-900 p-1.5 shadow-sm" title="LOI (Length of Interview)">
+              <Clock className="h-4 w-4 text-gray-400 mx-auto" />
+              <p className="text-xs font-semibold text-gray-900 dark:text-white">
+                {content.loi ? `${content.loi}m` : '-'}
               </p>
             </div>
             <div className="rounded-lg bg-white dark:bg-gray-900 p-1.5 shadow-sm" title="Markets">
