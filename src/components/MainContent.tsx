@@ -6,7 +6,7 @@ import { Sidebar } from '@/components/sidebar';
 import { ChatInterface } from '@/components/chat';
 import { ProposalEditor, RightSidebar } from '@/components/proposal';
 import { MetaLearnings } from '@/components/meta-learnings';
-import { Calculators, DemographicDistribution, FeasibilityCheck } from '@/components/tools';
+import { Calculators, DemographicDistribution, FeasibilityCheck, SearchView } from '@/components/tools';
 import { Library } from '@/components/library';
 import { Architecture } from '@/components/architecture';
 import { Dashboard } from '@/components/dashboard';
@@ -193,6 +193,12 @@ export function MainContent() {
 
       case 'workspace':
         return <Workspace />;
+
+      case 'search-my':
+        return <SearchView searchAll={false} />;
+
+      case 'search-all':
+        return <SearchView searchAll={true} />;
 
       default:
         // Handle project views

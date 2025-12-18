@@ -40,7 +40,6 @@ import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { useThemeStore } from '@/lib/theme';
-import { SearchSection } from './SearchSection';
 import { ProjectsList } from './ProjectsList';
 import { HistoryList } from './HistoryList';
 import { Modal, Button, Input, Select, toast, BoltLogo } from '@/components/ui';
@@ -68,13 +67,13 @@ const menuItems = [
     id: 'search-my',
     label: 'Search My Proposals',
     icon: User,
-    expandable: true,
+    expandable: false,
   },
   {
     id: 'search-all',
     label: 'Search All Proposals',
     icon: Users,
-    expandable: true,
+    expandable: false,
   },
   {
     id: 'calculators',
@@ -264,18 +263,6 @@ export function Sidebar() {
                     )}
                   </button>
 
-                  {/* Search Panels */}
-                  {!sidebarCollapsed && item.id === 'search-my' && expandedItems.includes(item.id) && (
-                    <div className="mt-2 px-2">
-                      <SearchSection searchAll={false} />
-                    </div>
-                  )}
-
-                  {!sidebarCollapsed && item.id === 'search-all' && expandedItems.includes(item.id) && (
-                    <div className="mt-2 px-2">
-                      <SearchSection searchAll={true} />
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
