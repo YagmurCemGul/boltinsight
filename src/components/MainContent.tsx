@@ -10,6 +10,7 @@ import { Calculators, DemographicDistribution, FeasibilityCheck } from '@/compon
 import { Library } from '@/components/library';
 import { Architecture } from '@/components/architecture';
 import { Dashboard } from '@/components/dashboard';
+import { Workspace } from '@/components/workspace';
 import { cn, getStatusColor } from '@/lib/utils';
 import type { Proposal, ProposalContent } from '@/types';
 
@@ -189,6 +190,9 @@ export function MainContent() {
 
       case 'dashboard':
         return <Dashboard />;
+
+      case 'workspace':
+        return <Workspace />;
 
       default:
         // Handle project views

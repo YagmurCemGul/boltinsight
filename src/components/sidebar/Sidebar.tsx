@@ -32,6 +32,7 @@ import {
   UserCheck,
   HelpCircle,
   LayoutDashboard,
+  Briefcase,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
@@ -53,6 +54,12 @@ const menuItems = [
     id: 'dashboard',
     label: 'Dashboard',
     icon: LayoutDashboard,
+    expandable: false,
+  },
+  {
+    id: 'workspace',
+    label: 'Workspace',
+    icon: Briefcase,
     expandable: false,
   },
   {
