@@ -35,6 +35,7 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
   const [ownershipFilter, setOwnershipFilter] = useState('');
   const [moveModalOpen, setMoveModalOpen] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const handleMoveProposal = (proposal: Proposal) => {
     setSelectedProposal({ id: proposal.id, title: proposal.content.title || 'Untitled' });
@@ -147,13 +148,24 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
       </div>
 
       {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+      <div className={cn(
+        "relative transition-all duration-300 ease-in-out",
+        isSearchFocused && "scale-[1.02] z-10"
+      )}>
+        <Search className={cn(
+          "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors",
+          isSearchFocused ? "text-[#5B50BD] dark:text-[#918AD3]" : "text-gray-400"
+        )} />
         <Input
           placeholder={searchAll ? 'Search by title, client, code, author...' : 'Search by title, client, code...'}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-9 pr-10"
+          onFocus={() => setIsSearchFocused(true)}
+          onBlur={() => setIsSearchFocused(false)}
+          className={cn(
+            "pl-9 pr-10 transition-all duration-300",
+            isSearchFocused && "ring-2 ring-[#5B50BD] dark:ring-[#918AD3] border-[#5B50BD] dark:border-[#918AD3] shadow-lg"
+          )}
         />
         <button
           onClick={() => setShowFilters(!showFilters)}
