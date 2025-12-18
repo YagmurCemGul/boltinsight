@@ -881,6 +881,7 @@ interface AppState {
   // UI State
   sidebarOpen: boolean;
   sidebarCollapsed: boolean;
+  sidebarWidth: number;
   rightSidebarCollapsed: boolean;
   activeSection: string;
   isLoggedIn: boolean;
@@ -929,6 +930,7 @@ interface AppState {
   // UI actions
   setSidebarOpen: (open: boolean) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
+  setSidebarWidth: (width: number) => void;
   setRightSidebarCollapsed: (collapsed: boolean) => void;
   setActiveSection: (section: string) => void;
   setLoggedIn: (loggedIn: boolean) => void;
@@ -953,6 +955,7 @@ export const useAppStore = create<AppState>()(
       metaLearningFilter: {},
       sidebarOpen: true,
       sidebarCollapsed: false,
+      sidebarWidth: 288,
       rightSidebarCollapsed: false,
       activeSection: 'dashboard',
       isLoggedIn: false,
@@ -1287,6 +1290,7 @@ export const useAppStore = create<AppState>()(
       // UI actions
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+      setSidebarWidth: (width) => set({ sidebarWidth: Math.max(200, Math.min(480, width)) }),
       setRightSidebarCollapsed: (collapsed) => set({ rightSidebarCollapsed: collapsed }),
       setActiveSection: (section) => set({ activeSection: section }),
       setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),

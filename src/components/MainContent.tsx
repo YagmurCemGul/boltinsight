@@ -19,6 +19,7 @@ export function MainContent() {
     activeSection,
     sidebarOpen,
     sidebarCollapsed,
+    sidebarWidth,
     rightSidebarCollapsed,
     setRightSidebarCollapsed,
     currentProposal,
@@ -217,10 +218,8 @@ export function MainContent() {
 
       {/* Main Content Area */}
       <main
-        className={cn(
-          'flex-1 transition-all duration-200',
-          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-72'
-        )}
+        className="flex-1 transition-all duration-200"
+        style={{ marginLeft: sidebarCollapsed ? 64 : sidebarWidth }}
       >
         <div className="h-full overflow-hidden">{renderContent()}</div>
       </main>

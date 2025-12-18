@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Plus,
   Search,
@@ -110,6 +110,8 @@ export function Sidebar() {
     currentUser,
     sidebarCollapsed,
     setSidebarCollapsed,
+    sidebarWidth,
+    setSidebarWidth,
     setLoggedIn,
     notifications,
     markNotificationRead,
@@ -122,6 +124,40 @@ export function Sidebar() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [isResizing, setIsResizing] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  // Handle resize drag
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      const newWidth = e.clientX;
+      setSidebarWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, setSidebarWidth]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -181,12 +217,15 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
+        ref={sidebarRef}
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen transform border-r border-gray-200 bg-white transition-all duration-200 ease-in-out',
-          sidebarCollapsed ? 'w-16' : 'w-72',
+          'fixed left-0 top-0 z-40 h-screen transform border-r border-gray-200 bg-white transition-all ease-in-out',
+          sidebarCollapsed ? 'w-16' : '',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
-          'lg:translate-x-0'
+          'lg:translate-x-0',
+          !isResizing && 'duration-200'
         )}
+        style={!sidebarCollapsed ? { width: sidebarWidth } : undefined}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
@@ -365,6 +404,17 @@ export function Sidebar() {
             </div>
           </div>
         </div>
+
+        {/* Resize Handle */}
+        {!sidebarCollapsed && (
+          <div
+            onMouseDown={handleMouseDown}
+            className={cn(
+              'absolute right-0 top-0 h-full w-1 cursor-col-resize transition-colors hover:bg-[#5B50BD]/50',
+              isResizing && 'bg-[#5B50BD]'
+            )}
+          />
+        )}
       </aside>
 
       {/* Mobile Overlay */}
