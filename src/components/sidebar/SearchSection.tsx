@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, Calendar, Tag, X, User, Users, UserCheck, MoreVertical, Copy, Trash2, Eye, FileText, FolderInput } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Search, Filter, Calendar, Tag, X, User, Users, UserCheck, MoreVertical, Copy, Trash2, FileText, FolderInput, ExternalLink, Plus } from 'lucide-react';
 import { Input, Badge, Select, Dropdown, DropdownItem, DropdownSeparator, toast, MoveToProjectModal } from '@/components/ui';
 import { useAppStore } from '@/lib/store';
 import { cn, formatDate, getStatusLabel, truncateText } from '@/lib/utils';
-import type { ProposalStatus, Proposal } from '@/types';
+import type { Proposal, LibraryItem } from '@/types';
 
 interface SearchSectionProps {
   searchAll: boolean;
@@ -27,12 +27,13 @@ const ownershipOptions = [
 ];
 
 export function SearchSection({ searchAll }: SearchSectionProps) {
-  const { proposals, currentUser, setCurrentProposal, setActiveSection, deleteProposal, addProposal } = useAppStore();
+  const { proposals, libraryItems, currentUser, setCurrentProposal, setActiveSection, deleteProposal, addProposal, deleteLibraryItem } = useAppStore();
   const [query, setQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [ownershipFilter, setOwnershipFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState(''); // 'proposals' | 'templates' | ''
   const [moveModalOpen, setMoveModalOpen] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState<{ id: string; title: string } | null>(null);
 
@@ -65,7 +66,9 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
   };
 
   // Filter proposals based on search criteria
-  const results = useMemo(() => {
+  const proposalResults = useMemo(() => {
+    if (searchAll && typeFilter === 'templates') return [];
+
     let filtered = proposals.filter(p => p.status !== 'deleted');
 
     // For "My Proposals", filter by current user (author)
@@ -106,9 +109,52 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
 
     // Sort by most recent
     return filtered.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-  }, [proposals, currentUser.id, searchAll, query, statusFilter, dateFilter, ownershipFilter]);
+  }, [proposals, currentUser.id, searchAll, query, statusFilter, dateFilter, ownershipFilter, typeFilter]);
 
-  const handleResultClick = (proposal: typeof results[0]) => {
+  // Filter templates (only for searchAll mode)
+  const templateResults = useMemo(() => {
+    if (!searchAll || typeFilter === 'proposals') return [];
+
+    let filtered = libraryItems.filter(item => item.category === 'template');
+
+    // Apply text search
+    if (query) {
+      const lowerQuery = query.toLowerCase();
+      filtered = filtered.filter(item =>
+        item.name.toLowerCase().includes(lowerQuery) ||
+        item.description.toLowerCase().includes(lowerQuery) ||
+        item.tags?.some(tag => tag.toLowerCase().includes(lowerQuery))
+      );
+    }
+
+    // Apply date filter
+    if (dateFilter) {
+      const days = parseInt(dateFilter);
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+      filtered = filtered.filter(item => new Date(item.createdAt) >= cutoffDate);
+    }
+
+    // Sort by most recent
+    return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [libraryItems, searchAll, query, dateFilter, typeFilter]);
+
+  // Handle using a template
+  const handleUseTemplate = (template: LibraryItem) => {
+    const newProposal = addProposal({
+      status: 'draft',
+      content: {
+        title: `New from ${template.name}`,
+        client: '',
+      },
+      author: currentUser,
+    });
+    setCurrentProposal(newProposal);
+    setActiveSection('view-proposal');
+    toast.success('New proposal created from template');
+  };
+
+  const handleResultClick = (proposal: Proposal) => {
     setCurrentProposal(proposal);
     setActiveSection('view-proposal');
   };
@@ -118,11 +164,16 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
     setStatusFilter('');
     setDateFilter('');
     setOwnershipFilter('');
+    setTypeFilter('');
   };
 
   // Calculate counts for the mode indicator
   const myProposalsCount = proposals.filter(p => p.status !== 'deleted' && p.author.id === currentUser.id).length;
   const allProposalsCount = proposals.filter(p => p.status !== 'deleted').length;
+  const templatesCount = libraryItems.filter(item => item.category === 'template').length;
+
+  // Total results count
+  const totalResults = proposalResults.length + templateResults.length;
 
   return (
     <div className="space-y-3">
@@ -136,7 +187,7 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
         {searchAll ? (
           <>
             <Users className="h-4 w-4" />
-            <span>All Proposals ({allProposalsCount})</span>
+            <span>All ({allProposalsCount} proposals, {templatesCount} templates)</span>
           </>
         ) : (
           <>
@@ -171,7 +222,7 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
         <div className="space-y-2 rounded-lg bg-gray-50 dark:bg-gray-800 p-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Filters</span>
-            {(statusFilter || dateFilter || ownershipFilter) && (
+            {(statusFilter || dateFilter || ownershipFilter || typeFilter) && (
               <button
                 onClick={clearFilters}
                 className="flex items-center gap-1 text-xs text-[#5B50BD] dark:text-[#918AD3] hover:text-[#4A41A0] dark:hover:text-[#C8C4E9]"
@@ -183,8 +234,25 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
           </div>
 
           <div className="grid gap-2">
-            {/* Author filter - only show in "All Proposals" mode */}
+            {/* Type filter - only show in "All" mode */}
             {searchAll && (
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-gray-400" />
+                <Select
+                  options={[
+                    { value: '', label: 'All Types' },
+                    { value: 'proposals', label: 'Proposals Only' },
+                    { value: 'templates', label: 'Templates Only' },
+                  ]}
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="flex-1 text-xs"
+                />
+              </div>
+            )}
+
+            {/* Author filter - only show in "All" mode and when not filtering templates only */}
+            {searchAll && typeFilter !== 'templates' && (
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-gray-400" />
                 <Select
@@ -196,15 +264,18 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
               </div>
             )}
 
-            <div className="flex items-center gap-2">
-              <Tag className="h-4 w-4 text-gray-400" />
-              <Select
-                options={statusOptions}
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="flex-1 text-xs"
-              />
-            </div>
+            {/* Status filter - only show when not filtering templates only */}
+            {typeFilter !== 'templates' && (
+              <div className="flex items-center gap-2">
+                <Tag className="h-4 w-4 text-gray-400" />
+                <Select
+                  options={statusOptions}
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="flex-1 text-xs"
+                />
+              </div>
+            )}
 
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-gray-400" />
@@ -227,12 +298,20 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
       {/* Results */}
       <div className="space-y-2">
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          {results.length} {results.length === 1 ? 'proposal' : 'proposals'} {query || statusFilter || dateFilter || ownershipFilter ? 'found' : ''}
+          {searchAll ? (
+            <>
+              {totalResults} {totalResults === 1 ? 'result' : 'results'} {query || statusFilter || dateFilter || ownershipFilter || typeFilter ? 'found' : ''}
+              {typeFilter === '' && ` (${proposalResults.length} proposals, ${templateResults.length} templates)`}
+            </>
+          ) : (
+            <>{proposalResults.length} {proposalResults.length === 1 ? 'proposal' : 'proposals'} {query || statusFilter || dateFilter ? 'found' : ''}</>
+          )}
         </p>
 
-        {results.length > 0 ? (
+        {totalResults > 0 || (!searchAll && proposalResults.length > 0) ? (
           <div className="max-h-60 space-y-1 overflow-y-auto">
-            {results.map((proposal) => (
+            {/* Proposals */}
+            {proposalResults.map((proposal) => (
               <div
                 key={proposal.id}
                 className={cn(
@@ -289,10 +368,69 @@ export function SearchSection({ searchAll }: SearchSectionProps) {
                 </Dropdown>
               </div>
             ))}
+
+            {/* Templates - only in searchAll mode */}
+            {searchAll && templateResults.map((template) => (
+              <div
+                key={template.id}
+                className={cn(
+                  'group flex items-start gap-2 rounded-lg p-2 transition-colors',
+                  'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
+                )}
+              >
+                <a
+                  href={template.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-1 items-start gap-2 text-left min-w-0"
+                >
+                  <ExternalLink className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                        Template
+                      </span>
+                    </div>
+                    <p className="truncate text-sm text-gray-700 dark:text-gray-300 mt-0.5">
+                      {truncateText(template.name, 25)}
+                    </p>
+                    <p className="text-[10px] text-gray-400 truncate">
+                      {template.description || 'No description'} - {formatDate(template.createdAt)}
+                    </p>
+                  </div>
+                </a>
+                <Dropdown
+                  trigger={
+                    <button className="flex-shrink-0 rounded p-1 text-gray-400 opacity-0 transition-opacity hover:bg-gray-200 dark:hover:bg-gray-600 group-hover:opacity-100">
+                      <MoreVertical className="h-4 w-4" />
+                    </button>
+                  }
+                  align="right"
+                >
+                  <DropdownItem onClick={() => handleUseTemplate(template)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Use Template
+                  </DropdownItem>
+                  <DropdownSeparator />
+                  <DropdownItem
+                    variant="destructive"
+                    onClick={() => {
+                      deleteLibraryItem(template.id);
+                      toast.success('Template deleted');
+                    }}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </DropdownItem>
+                </Dropdown>
+              </div>
+            ))}
           </div>
         ) : (
           <p className="text-center text-xs text-gray-400 dark:text-gray-500 py-4">
-            {searchAll ? 'No proposals found in the system' : 'You have no proposals yet'}
+            {searchAll
+              ? (typeFilter === 'templates' ? 'No templates found' : typeFilter === 'proposals' ? 'No proposals found' : 'No results found')
+              : 'You have no proposals yet'}
           </p>
         )}
       </div>
