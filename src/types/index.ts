@@ -57,6 +57,7 @@ export interface ProposalContent {
   burningQuestions?: string[];
   targetDefinition?: string;
   sampleSize?: number;
+  loi?: number; // Length of Interview in minutes
   markets?: Market[];
   quotas?: Quota[];
   advancedAnalysis?: string[];

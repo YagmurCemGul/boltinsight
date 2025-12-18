@@ -45,6 +45,7 @@ const SECTION_CONFIG = [
   { id: 'burningQuestions', label: 'Burning Questions', icon: FileQuestion, required: false },
   { id: 'targetDefinition', label: 'Target Definition', icon: Target, required: true },
   { id: 'sampleSize', label: 'Sample Size', icon: BarChart3, required: true },
+  { id: 'loi', label: 'LOI (Length of Interview)', icon: BarChart3, required: true },
   { id: 'markets', label: 'Markets', icon: Globe, required: true },
   { id: 'quotas', label: 'Quota Recommendations', icon: BarChart3, required: false },
   { id: 'advancedAnalysis', label: 'Advanced Analysis', icon: BarChart3, required: false },
@@ -83,6 +84,7 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
         'burningQuestions': 'burningQuestions',
         'targetDefinition': 'targetDefinition',
         'sampleSize': 'sampleSize',
+        'loi': 'loi',
         'markets': 'markets',
         'quotas': 'quotas',
         'advancedAnalysis': 'advancedAnalysis',
@@ -532,6 +534,7 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
       content.client &&
       content.targetDefinition &&
       content.sampleSize &&
+      content.loi &&
       content.markets &&
       content.markets.length > 0
     );
@@ -730,6 +733,39 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
                   onChange={(e) => updateContent('sampleSize', parseInt(e.target.value) || undefined)}
                   placeholder="e.g., 1000"
                 />
+              </SectionEditor>
+            )}
+
+            {/* LOI (Length of Interview) */}
+            {activeSection === 'loi' && (
+              <SectionEditor
+                title="LOI (Length of Interview)"
+                description="Survey duration in minutes - affects pricing and respondent experience"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="number"
+                      value={content.loi || ''}
+                      onChange={(e) => updateContent('loi', parseInt(e.target.value) || undefined)}
+                      placeholder="e.g., 15"
+                      className="w-32"
+                    />
+                    <span className="text-sm text-gray-500">minutes</span>
+                  </div>
+                  <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-4">
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      <strong>Pricing Impact:</strong> Survey duration directly affects respondent costs.
+                      A 5-minute survey costs significantly less than a 20-minute survey.
+                    </p>
+                    <ul className="mt-2 text-xs text-blue-600 dark:text-blue-400 space-y-1">
+                      <li>• 5-10 min: Lower cost, higher response rates</li>
+                      <li>• 10-15 min: Standard duration</li>
+                      <li>• 15-20 min: Premium pricing</li>
+                      <li>• 20+ min: May require incentive adjustments</li>
+                    </ul>
+                  </div>
+                </div>
               </SectionEditor>
             )}
 
