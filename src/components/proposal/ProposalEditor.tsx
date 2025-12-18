@@ -24,7 +24,6 @@ import {
 import { jsPDF } from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
-import pptxgen from 'pptxgenjs';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { Button, Input, Textarea, Select, Badge, Modal, toast } from '@/components/ui';
@@ -138,7 +137,9 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
 
     try {
       if (format === 'ppt') {
-        // Generate PowerPoint using pptxgenjs
+        // Generate PowerPoint using pptxgenjs (dynamic import for SSR compatibility)
+        const pptxgenModule = await import('pptxgenjs');
+        const pptxgen = pptxgenModule.default;
         const pptx = new pptxgen();
 
         // Set presentation properties
@@ -305,7 +306,7 @@ export function ProposalEditor({ proposal, onSave, externalActiveSection, onSect
             ...content.markets.map(m => [m.country, m.language, m.sampleSize.toString()]),
           ];
 
-          marketsSlide.addTable(tableData as pptxgen.TableRow[], {
+          marketsSlide.addTable(tableData as any[], {
             x: 0.5,
             y: 1.3,
             w: 9,
