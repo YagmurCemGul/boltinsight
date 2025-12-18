@@ -895,6 +895,8 @@ interface AppState {
   setCurrentProposal: (proposal: Proposal | null) => void;
   submitForApproval: (id: string, approver: User) => void;
   updateProposalStatus: (id: string, status: ProposalStatus, comment?: string) => void;
+  addCollaborator: (proposalId: string, collaborator: User) => void;
+  removeCollaborator: (proposalId: string, collaboratorId: string) => void;
 
   // Project actions
   addProject: (project: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => Project;
@@ -1101,6 +1103,56 @@ export const useAppStore = create<AppState>()(
               : p
           ),
           notifications: [notification, ...state.notifications],
+        }));
+      },
+
+      addCollaborator: (proposalId, collaborator) => {
+        const proposal = get().proposals.find((p) => p.id === proposalId);
+        if (!proposal) return;
+
+        // Check if already a collaborator
+        if (proposal.collaborators?.some((c) => c.id === collaborator.id)) return;
+
+        const currentUser = get().currentUser;
+
+        // Create share notification for the new collaborator
+        const notification: Notification = {
+          id: uuidv4(),
+          type: 'share',
+          title: 'Proposal Shared with You',
+          message: `${currentUser.name} shared "${proposal.content.title || 'Untitled Proposal'}" with you`,
+          proposalId,
+          proposalTitle: proposal.content.title || 'Untitled Proposal',
+          fromUser: currentUser,
+          read: false,
+          createdAt: new Date().toISOString(),
+        };
+
+        set((state) => ({
+          proposals: state.proposals.map((p) =>
+            p.id === proposalId
+              ? {
+                  ...p,
+                  collaborators: [...(p.collaborators || []), collaborator],
+                  updatedAt: new Date().toISOString(),
+                }
+              : p
+          ),
+          notifications: [notification, ...state.notifications],
+        }));
+      },
+
+      removeCollaborator: (proposalId, collaboratorId) => {
+        set((state) => ({
+          proposals: state.proposals.map((p) =>
+            p.id === proposalId
+              ? {
+                  ...p,
+                  collaborators: (p.collaborators || []).filter((c) => c.id !== collaboratorId),
+                  updatedAt: new Date().toISOString(),
+                }
+              : p
+          ),
         }));
       },
 

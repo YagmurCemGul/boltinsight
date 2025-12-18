@@ -34,6 +34,7 @@ import {
   LayoutDashboard,
   Briefcase,
   Clock,
+  Share2,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
@@ -151,6 +152,7 @@ export function Sidebar() {
       case 'approval_rejected': return <X className="h-4 w-4 text-red-500" />;
       case 'approval_on_hold': return <Clock className="h-4 w-4 text-blue-500" />;
       case 'comment': return <MessageSquare className="h-4 w-4 text-blue-500" />;
+      case 'share': return <Share2 className="h-4 w-4 text-[#5B50BD]" />;
       default: return <FileText className="h-4 w-4 text-gray-500" />;
     }
   };

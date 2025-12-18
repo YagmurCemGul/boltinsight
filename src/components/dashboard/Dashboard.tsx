@@ -16,6 +16,7 @@ import {
   FolderOpen,
   Bell,
   Eye,
+  Share2,
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { Button, Card, CardContent, Badge } from '@/components/ui';
@@ -231,6 +232,18 @@ export function Dashboard() {
     return proposals.filter((p) => p.status !== 'deleted' && p.author.id === currentUser.id).length;
   }, [proposals, currentUser.id]);
 
+  // Get proposals shared with me (where I'm a collaborator but not the author)
+  const sharedWithMe = useMemo(() => {
+    return proposals
+      .filter(
+        (p) =>
+          p.status !== 'deleted' &&
+          p.author.id !== currentUser.id &&
+          p.collaborators?.some((c) => c.id === currentUser.id)
+      )
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  }, [proposals, currentUser.id]);
+
   const handleProposalClick = (proposal: Proposal) => {
     setCurrentProposal(proposal);
     setActiveSection('view-proposal');
@@ -319,7 +332,7 @@ export function Dashboard() {
         {/* Main Content Grid */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Recent Proposals */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardContent className="p-0">
                 <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4 py-3">
@@ -353,6 +366,38 @@ export function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Shared with Me */}
+            {sharedWithMe.length > 0 && (
+              <Card>
+                <CardContent className="p-0">
+                  <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Share2 className="h-4 w-4 text-[#5B50BD] dark:text-[#918AD3]" />
+                      <h2 className="font-semibold text-gray-900 dark:text-white">Shared with Me</h2>
+                      <Badge variant="default" className="bg-[#EDE9F9] text-[#5B50BD] dark:bg-[#231E51] dark:text-[#918AD3]">
+                        {sharedWithMe.length}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                    {sharedWithMe.slice(0, 5).map((proposal) => (
+                      <div key={proposal.id} className="relative">
+                        <ProposalRow
+                          proposal={proposal}
+                          onClick={() => handleProposalClick(proposal)}
+                        />
+                        <div className="absolute right-12 top-1/2 -translate-y-1/2">
+                          <span className="text-xs text-gray-400">
+                            by {proposal.author.name}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Right Column */}
@@ -368,6 +413,10 @@ export function Dashboard() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500 dark:text-gray-400">My Proposals</span>
                     <span className="font-medium text-gray-900 dark:text-white">{myProposalsCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Shared with Me</span>
+                    <span className="font-medium text-[#5B50BD] dark:text-[#918AD3]">{sharedWithMe.length}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500 dark:text-gray-400">Active Projects</span>

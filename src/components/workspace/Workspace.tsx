@@ -256,9 +256,13 @@ export function Workspace() {
   const stats = useMemo(() => {
     const active = proposals.filter((p) => p.status !== 'deleted');
     const mine = active.filter((p) => p.author.id === currentUser.id);
+    const shared = active.filter(
+      (p) => p.author.id !== currentUser.id && p.collaborators?.some((c) => c.id === currentUser.id)
+    );
     return {
       total: active.length,
       mine: mine.length,
+      shared: shared.length,
       approved: mine.filter((p) => p.status === 'approved').length,
       pending: mine.filter((p) => p.status === 'pending_approval').length,
       drafts: mine.filter((p) => p.status === 'draft').length,
@@ -375,7 +379,7 @@ export function Workspace() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-6">
         {/* Quick Stats */}
-        <div className="mb-6 grid gap-3 grid-cols-2 sm:grid-cols-5">
+        <div className="mb-6 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           <div className="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
             <p className="text-xs text-gray-500 dark:text-gray-400">Total Proposals</p>
             <p className="text-xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
@@ -384,6 +388,13 @@ export function Workspace() {
             <p className="text-xs text-gray-500 dark:text-gray-400">My Proposals</p>
             <p className="text-xl font-bold text-[#5B50BD] dark:text-[#918AD3]">{stats.mine}</p>
           </div>
+          <button
+            onClick={() => setOwnershipFilter('shared')}
+            className="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 text-left hover:border-[#5B50BD] hover:ring-1 hover:ring-[#5B50BD]/20 transition-all"
+          >
+            <p className="text-xs text-gray-500 dark:text-gray-400">Shared with Me</p>
+            <p className="text-xl font-bold text-[#5B50BD] dark:text-[#918AD3]">{stats.shared}</p>
+          </button>
           <div className="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
             <p className="text-xs text-gray-500 dark:text-gray-400">Approved</p>
             <p className="text-xl font-bold text-green-600">{stats.approved}</p>
