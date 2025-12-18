@@ -829,6 +829,7 @@ interface AppState {
   // UI State
   sidebarOpen: boolean;
   sidebarCollapsed: boolean;
+  sidebarWidth: number;
   rightSidebarCollapsed: boolean;
   activeSection: string;
   isLoggedIn: boolean;
@@ -867,6 +868,7 @@ interface AppState {
   // UI actions
   setSidebarOpen: (open: boolean) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
+  setSidebarWidth: (width: number) => void;
   setRightSidebarCollapsed: (collapsed: boolean) => void;
   setActiveSection: (section: string) => void;
   setLoggedIn: (loggedIn: boolean) => void;
@@ -890,6 +892,7 @@ export const useAppStore = create<AppState>()(
       metaLearningFilter: {},
       sidebarOpen: true,
       sidebarCollapsed: false,
+      sidebarWidth: 288,
       rightSidebarCollapsed: false,
       activeSection: 'new-proposal',
       isLoggedIn: false,
@@ -1073,6 +1076,7 @@ export const useAppStore = create<AppState>()(
       // UI actions
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+      setSidebarWidth: (width) => set({ sidebarWidth: width }),
       setRightSidebarCollapsed: (collapsed) => set({ rightSidebarCollapsed: collapsed }),
       setActiveSection: (section) => set({ activeSection: section }),
       setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),
@@ -1143,12 +1147,14 @@ export const useAppStore = create<AppState>()(
         return {
           isLoggedIn: false,
           sidebarCollapsed: false,
+          sidebarWidth: 288,
           rightSidebarCollapsed: false,
         };
       },
       partialize: (state) => ({
         isLoggedIn: state.isLoggedIn,
         sidebarCollapsed: state.sidebarCollapsed,
+        sidebarWidth: state.sidebarWidth,
         rightSidebarCollapsed: state.rightSidebarCollapsed,
       }),
     }

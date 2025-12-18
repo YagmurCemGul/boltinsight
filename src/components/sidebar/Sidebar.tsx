@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Plus,
   Search,
@@ -31,6 +31,7 @@ import {
   MessageSquare,
   UserCheck,
   HelpCircle,
+  GripVertical,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
@@ -40,6 +41,10 @@ import { SearchSection } from './SearchSection';
 import { ProjectsList } from './ProjectsList';
 import { HistoryList } from './HistoryList';
 import { Modal, Button, Input, Select, toast, BoltLogo } from '@/components/ui';
+
+const MIN_SIDEBAR_WIDTH = 200;
+const MAX_SIDEBAR_WIDTH = 480;
+const COLLAPSED_WIDTH = 64;
 
 const menuItems = [
   {
@@ -100,13 +105,28 @@ const mockNotifications = [
 ];
 
 export function Sidebar() {
-  const { sidebarOpen, setSidebarOpen, activeSection, setActiveSection, currentUser, sidebarCollapsed, setSidebarCollapsed, setLoggedIn } = useAppStore();
+  const {
+    sidebarOpen,
+    setSidebarOpen,
+    activeSection,
+    setActiveSection,
+    currentUser,
+    sidebarCollapsed,
+    setSidebarCollapsed,
+    sidebarWidth,
+    setSidebarWidth,
+    setLoggedIn
+  } = useAppStore();
   const { isDarkMode, toggleDarkMode } = useThemeStore();
   const [expandedItems, setExpandedItems] = useState<string[]>(['projects', 'history']);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [notificationsList, setNotificationsList] = useState(mockNotifications);
+
+  // Resize state
+  const [isResizing, setIsResizing] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
 
   const unreadCount = notificationsList.filter(n => !n.read).length;
 
@@ -135,6 +155,43 @@ export function Sidebar() {
     setActiveSection(id);
   };
 
+  // Resize handlers
+  const startResizing = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  const stopResizing = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  const resize = useCallback((e: MouseEvent) => {
+    if (isResizing && !sidebarCollapsed) {
+      const newWidth = e.clientX;
+      if (newWidth >= MIN_SIDEBAR_WIDTH && newWidth <= MAX_SIDEBAR_WIDTH) {
+        setSidebarWidth(newWidth);
+      }
+    }
+  }, [isResizing, sidebarCollapsed, setSidebarWidth]);
+
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener('mousemove', resize);
+      window.addEventListener('mouseup', stopResizing);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', resize);
+      window.removeEventListener('mouseup', stopResizing);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, resize, stopResizing]);
+
+  const currentWidth = sidebarCollapsed ? COLLAPSED_WIDTH : sidebarWidth;
+
   return (
     <>
       {/* Mobile Toggle */}
@@ -147,12 +204,14 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
+        ref={sidebarRef}
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen transform border-r border-gray-200 bg-white transition-all duration-200 ease-in-out',
-          sidebarCollapsed ? 'w-16' : 'w-72',
+          'fixed left-0 top-0 z-40 h-screen transform border-r border-gray-200 bg-white transition-all ease-in-out',
+          !isResizing && 'duration-200',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
           'lg:translate-x-0'
         )}
+        style={{ width: currentWidth }}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
@@ -343,6 +402,28 @@ export function Sidebar() {
             </div>
           </div>
         </div>
+
+        {/* Resize Handle */}
+        {!sidebarCollapsed && (
+          <div
+            className={cn(
+              'absolute top-0 right-0 w-1 h-full cursor-col-resize group hidden lg:block',
+              'hover:bg-[#5B50BD]/30 active:bg-[#5B50BD]/50 transition-colors',
+              isResizing && 'bg-[#5B50BD]/50'
+            )}
+            onMouseDown={startResizing}
+          >
+            <div className={cn(
+              'absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2',
+              'w-4 h-8 flex items-center justify-center rounded bg-gray-200 dark:bg-gray-700',
+              'opacity-0 group-hover:opacity-100 transition-opacity',
+              'shadow-sm border border-gray-300 dark:border-gray-600',
+              isResizing && 'opacity-100'
+            )}>
+              <GripVertical className="h-3 w-3 text-gray-500" />
+            </div>
+          </div>
+        )}
       </aside>
 
       {/* Mobile Overlay */}
